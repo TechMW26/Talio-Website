@@ -169,7 +169,7 @@ export function AdminDashboard() {
     <div className="min-h-screen bg-gray-950 text-white">
       {/* Top bar */}
       <div className="border-b border-gray-800/60 bg-gray-900/40 backdrop-blur-sm sticky top-0 z-30">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+        <div className="w-full px-8 py-4 flex items-center justify-between">
           <h1 className="text-xl font-bold">Admin Dashboard</h1>
           <div className="flex items-center gap-3">
             <button
@@ -191,7 +191,7 @@ export function AdminDashboard() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 py-8">
+      <div className="w-full px-8 py-8">
         {/* Tab Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-5 mb-8">
           {([

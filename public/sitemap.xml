@@ -1,117 +1,117 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://talio.ai/</loc>
+    <loc>https://talio.in/</loc>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://talio.ai/features</loc>
+    <loc>https://talio.in/features</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://talio.ai/features/attendance</loc>
+    <loc>https://talio.in/features/attendance</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://talio.ai/features/payroll</loc>
+    <loc>https://talio.in/features/payroll</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://talio.ai/features/leaves</loc>
+    <loc>https://talio.in/features/leaves</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://talio.ai/features/projects</loc>
+    <loc>https://talio.in/features/projects</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://talio.ai/features/goals</loc>
+    <loc>https://talio.in/features/goals</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://talio.ai/features/workflows</loc>
+    <loc>https://talio.in/features/workflows</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://talio.ai/features/mira-ai</loc>
+    <loc>https://talio.in/features/mira-ai</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://talio.ai/features/team-chat</loc>
+    <loc>https://talio.in/features/team-chat</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://talio.ai/features/notifications</loc>
+    <loc>https://talio.in/features/notifications</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://talio.ai/pricing</loc>
+    <loc>https://talio.in/pricing</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://talio.ai/about</loc>
+    <loc>https://talio.in/about</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://talio.ai/contact</loc>
+    <loc>https://talio.in/contact</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://talio.ai/downloads</loc>
+    <loc>https://talio.in/downloads</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://talio.ai/documents</loc>
+    <loc>https://talio.in/documents</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://talio.ai/mira-ai</loc>
+    <loc>https://talio.in/mira-ai</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://talio.ai/get-started</loc>
+    <loc>https://talio.in/get-started</loc>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://talio.ai/help</loc>
+    <loc>https://talio.in/help</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://talio.ai/partners</loc>
+    <loc>https://talio.in/partners</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://talio.ai/solutions</loc>
+    <loc>https://talio.in/solutions</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://talio.ai/privacy</loc>
+    <loc>https://talio.in/privacy</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
-    <loc>https://talio.ai/terms</loc>
+    <loc>https://talio.in/terms</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>

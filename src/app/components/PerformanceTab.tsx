@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { motion } from 'motion/react';
 import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
@@ -8,6 +8,9 @@ import {
   Globe, Monitor, Smartphone, Tablet, Filter, TrendingUp, Users,
   Eye, Timer, ArrowDownRight, Percent, ChevronDown,
 } from 'lucide-react';
+import { MapContainer, TileLayer, CircleMarker, Popup, useMap } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 import { getPageVisits, getVisitors, getLeads, getContacts, getSignups, type PageVisit, type VisitorProfile, type LeadEntry } from '@/lib/firebase';
 
 // ── Helpers ──
@@ -40,7 +43,6 @@ function avgDuration(visits: PageVisit[]): number {
 }
 
 function bounceRate(visits: PageVisit[]): number {
-  // A "bounce" = session with only 1 page view
   const sessPages: Record<string, Set<string>> = {};
   visits.forEach(v => {
     if (!sessPages[v.sessionId]) sessPages[v.sessionId] = new Set();
@@ -61,73 +63,63 @@ const CHART_COLORS = ['#3b82f6', '#8b5cf6', '#10b981', '#f59e0b', '#ef4444', '#0
 
 const ALL_PAGES = 'All Pages';
 
-// ── World SVG Map ──
+// Fix default Leaflet marker icon path issues in bundled builds
+delete (L.Icon.Default.prototype as unknown as Record<string, unknown>)._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+  iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+});
+
+// ── Leaflet World Heatmap ──
+
+interface HeatPoint {
+  lat: number;
+  lon: number;
+  count: number;
+  city: string;
+  country: string;
+  visitors: VisitorProfile[];
+}
+
+function MapAutoFit({ points }: { points: HeatPoint[] }) {
+  const map = useMap();
+  useEffect(() => {
+    if (points.length === 0) return;
+    const bounds = L.latLngBounds(points.map(p => [p.lat, p.lon] as [number, number]));
+    map.fitBounds(bounds, { padding: [40, 40], maxZoom: 6 });
+  }, [points, map]);
+  return null;
+}
 
 function WorldHeatMap({ visitors }: { visitors: VisitorProfile[] }) {
-  const svgRef = useRef<SVGSVGElement>(null);
-  const [viewBox, setViewBox] = useState({ x: 0, y: 0, w: 800, h: 450 });
-  const [isDragging, setIsDragging] = useState(false);
-  const dragStart = useRef({ x: 0, y: 0, vx: 0, vy: 0 });
-
-  // Group visitors by approximate lat/lon grid
-  const heatPoints = useMemo(() => {
-    const grid: Record<string, { lat: number; lon: number; count: number; visitors: VisitorProfile[] }> = {};
+  const heatPoints = useMemo<HeatPoint[]>(() => {
+    const grid: Record<string, HeatPoint> = {};
     visitors.forEach(v => {
       if (!v.lat && !v.lon) return;
-      // Grid resolution depends on zoom level
-      const res = Math.max(2, viewBox.w / 80);
-      const gx = Math.round(v.lon / res) * res;
-      const gy = Math.round(v.lat / res) * res;
+      const gx = Math.round(v.lon * 10) / 10;
+      const gy = Math.round(v.lat * 10) / 10;
       const key = `${gx},${gy}`;
-      if (!grid[key]) grid[key] = { lat: gy, lon: gx, count: 0, visitors: [] };
+      if (!grid[key]) grid[key] = { lat: gy, lon: gx, count: 0, city: v.city || 'Unknown', country: v.country || '', visitors: [] };
       grid[key].count++;
       grid[key].visitors.push(v);
     });
     return Object.values(grid);
-  }, [visitors, viewBox.w]);
-
-  // Convert lat/lon to SVG coordinates (Mercator-like projection)
-  const project = (lat: number, lon: number) => ({
-    x: ((lon + 180) / 360) * 800,
-    y: ((90 - lat) / 180) * 450,
-  });
-
-  const handleWheel = (e: React.WheelEvent) => {
-    e.preventDefault();
-    const factor = e.deltaY > 0 ? 1.15 : 0.87;
-    const svg = svgRef.current!;
-    const rect = svg.getBoundingClientRect();
-    const mx = ((e.clientX - rect.left) / rect.width) * viewBox.w + viewBox.x;
-    const my = ((e.clientY - rect.top) / rect.height) * viewBox.h + viewBox.y;
-
-    const nw = Math.min(800, Math.max(50, viewBox.w * factor));
-    const nh = Math.min(450, Math.max(28, viewBox.h * factor));
-    const nx = mx - (mx - viewBox.x) * (nw / viewBox.w);
-    const ny = my - (my - viewBox.y) * (nh / viewBox.h);
-
-    setViewBox({ x: nx, y: ny, w: nw, h: nh });
-  };
-
-  const handleMouseDown = (e: React.MouseEvent) => {
-    setIsDragging(true);
-    dragStart.current = { x: e.clientX, y: e.clientY, vx: viewBox.x, vy: viewBox.y };
-  };
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!isDragging) return;
-    const svg = svgRef.current!;
-    const rect = svg.getBoundingClientRect();
-    const dx = (e.clientX - dragStart.current.x) / rect.width * viewBox.w;
-    const dy = (e.clientY - dragStart.current.y) / rect.height * viewBox.h;
-    setViewBox(prev => ({ ...prev, x: dragStart.current.vx - dx, y: dragStart.current.vy - dy }));
-  };
-
-  const handleMouseUp = () => setIsDragging(false);
+  }, [visitors]);
 
   const maxCount = Math.max(1, ...heatPoints.map(p => p.count));
 
+  const countryBreakdown = useMemo(() => {
+    const map: Record<string, number> = {};
+    visitors.forEach(v => {
+      if (!v.country) return;
+      map[v.country] = (map[v.country] || 0) + 1;
+    });
+    return Object.entries(map).sort((a, b) => b[1] - a[1]).slice(0, 8);
+  }, [visitors]);
+
   return (
-    <div className="bg-gray-900/60 border border-gray-800/60 rounded-2xl p-6">
+    <div className="w-full bg-gray-900/60 border border-gray-800/60 rounded-2xl p-6">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <Globe className="w-5 h-5 text-blue-400" />
@@ -136,67 +128,61 @@ function WorldHeatMap({ visitors }: { visitors: VisitorProfile[] }) {
         <span className="text-xs text-gray-500">Scroll to zoom · Drag to pan</span>
       </div>
 
-      <svg
-        ref={svgRef}
-        viewBox={`${viewBox.x} ${viewBox.y} ${viewBox.w} ${viewBox.h}`}
-        className="w-full rounded-xl bg-gray-950 border border-gray-800/40"
-        style={{ height: 400, cursor: isDragging ? 'grabbing' : 'grab' }}
-        onWheel={handleWheel}
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseUp}
-      >
-        {/* Grid lines */}
-        {Array.from({ length: 19 }).map((_, i) => {
-          const lon = -180 + i * 20;
-          const { x } = project(0, lon);
-          return <line key={`vl${i}`} x1={x} y1={0} x2={x} y2={450} stroke="#1f2937" strokeWidth={0.5} />;
-        })}
-        {Array.from({ length: 9 }).map((_, i) => {
-          const lat = -80 + i * 20;
-          const { y } = project(lat, 0);
-          return <line key={`hl${i}`} x1={0} y1={y} x2={800} y2={y} stroke="#1f2937" strokeWidth={0.5} />;
-        })}
+      <div className="w-full rounded-xl overflow-hidden border border-gray-800/40" style={{ height: 450 }}>
+        <MapContainer
+          center={[20, 0]}
+          zoom={2}
+          minZoom={2}
+          maxZoom={14}
+          scrollWheelZoom={true}
+          style={{ height: '100%', width: '100%', background: '#0a0f1a' }}
+        >
+          <TileLayer
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>'
+            url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+          />
+          {heatPoints.length > 0 && <MapAutoFit points={heatPoints} />}
+          {heatPoints.map((p, i) => {
+            const intensity = p.count / maxCount;
+            const radius = Math.max(6, Math.min(35, intensity * 30 + 6));
+            return (
+              <CircleMarker
+                key={i}
+                center={[p.lat, p.lon]}
+                radius={radius}
+                pathOptions={{
+                  color: 'rgba(239, 68, 68, 0.8)',
+                  fillColor: `rgba(239, 68, 68, ${0.3 + intensity * 0.5})`,
+                  fillOpacity: 0.3 + intensity * 0.5,
+                  weight: 2,
+                }}
+              >
+                <Popup>
+                  <div style={{ color: '#111', fontSize: 13, lineHeight: 1.5 }}>
+                    <strong>{p.city}, {p.country}</strong><br />
+                    {p.count} visitor{p.count > 1 ? 's' : ''}
+                    {p.visitors.slice(0, 3).map((v, j) => (
+                      <div key={j} style={{ fontSize: 11, color: '#555', marginTop: 2 }}>
+                        {v.ip} · {v.browser} · {v.device}
+                      </div>
+                    ))}
+                    {p.visitors.length > 3 && <div style={{ fontSize: 11, color: '#888' }}>+{p.visitors.length - 3} more</div>}
+                  </div>
+                </Popup>
+              </CircleMarker>
+            );
+          })}
+        </MapContainer>
+      </div>
 
-        {/* Continent outlines (simplified) */}
-        <ellipse cx={400} cy={225} rx={380} ry={205} fill="none" stroke="#374151" strokeWidth={0.5} />
-
-        {/* Heat points */}
-        {heatPoints.map((p, i) => {
-          const { x, y } = project(p.lat, p.lon);
-          const intensity = p.count / maxCount;
-          const r = Math.max(4, Math.min(30, intensity * 25 + 4));
-          return (
-            <g key={i}>
-              <circle cx={x} cy={y} r={r * 2} fill={`rgba(239, 68, 68, ${intensity * 0.15})`} />
-              <circle cx={x} cy={y} r={r} fill={`rgba(239, 68, 68, ${0.3 + intensity * 0.5})`} />
-              <circle cx={x} cy={y} r={r * 0.4} fill={`rgba(255, 100, 100, ${0.8 + intensity * 0.2})`} />
-              <title>{`${p.visitors[0]?.city || 'Unknown'}, ${p.visitors[0]?.country || ''} — ${p.count} visitor${p.count > 1 ? 's' : ''}`}</title>
-            </g>
-          );
-        })}
-      </svg>
-
-      {/* Country breakdown below map */}
-      {heatPoints.length > 0 && (
-        <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-2">
-          {(() => {
-            const countryMap: Record<string, number> = {};
-            visitors.forEach(v => {
-              if (!v.country) return;
-              countryMap[v.country] = (countryMap[v.country] || 0) + 1;
-            });
-            return Object.entries(countryMap)
-              .sort((a, b) => b[1] - a[1])
-              .slice(0, 8)
-              .map(([country, count]) => (
-                <div key={country} className="bg-gray-800/50 rounded-lg px-3 py-2 text-sm">
-                  <span className="text-white font-medium">{country}</span>
-                  <span className="text-gray-500 ml-2">{count}</span>
-                </div>
-              ));
-          })()}
+      {countryBreakdown.length > 0 && (
+        <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2 w-full">
+          {countryBreakdown.map(([country, count]) => (
+            <div key={country} className="bg-gray-800/50 rounded-lg px-3 py-2 text-sm">
+              <span className="text-white font-medium">{country}</span>
+              <span className="text-gray-500 ml-2">{count}</span>
+            </div>
+          ))}
         </div>
       )}
     </div>
@@ -231,16 +217,15 @@ function Demographics({ visitors }: { visitors: VisitorProfile[] }) {
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-      {/* Browser */}
-      <div className="bg-gray-900/60 border border-gray-800/60 rounded-2xl p-6">
+    <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-5">
+      <div className="w-full bg-gray-900/60 border border-gray-800/60 rounded-2xl p-6">
         <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">Browser</h3>
         {browserData.length === 0 ? (
           <p className="text-gray-500 text-sm">No data</p>
         ) : (
-          <ResponsiveContainer width="100%" height={180}>
+          <ResponsiveContainer width="100%" height={200}>
             <PieChart>
-              <Pie data={browserData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={70} label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}>
+              <Pie data={browserData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={75} label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}>
                 {browserData.map((_, i) => <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />)}
               </Pie>
               <Tooltip contentStyle={{ background: '#1f2937', border: '1px solid #374151', borderRadius: 8, color: '#fff', fontSize: 12 }} />
@@ -249,15 +234,14 @@ function Demographics({ visitors }: { visitors: VisitorProfile[] }) {
         )}
       </div>
 
-      {/* OS */}
-      <div className="bg-gray-900/60 border border-gray-800/60 rounded-2xl p-6">
+      <div className="w-full bg-gray-900/60 border border-gray-800/60 rounded-2xl p-6">
         <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">Operating System</h3>
         {osData.length === 0 ? (
           <p className="text-gray-500 text-sm">No data</p>
         ) : (
-          <ResponsiveContainer width="100%" height={180}>
+          <ResponsiveContainer width="100%" height={200}>
             <PieChart>
-              <Pie data={osData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={70} label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}>
+              <Pie data={osData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={75} label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}>
                 {osData.map((_, i) => <Cell key={i} fill={CHART_COLORS[(i + 2) % CHART_COLORS.length]} />)}
               </Pie>
               <Tooltip contentStyle={{ background: '#1f2937', border: '1px solid #374151', borderRadius: 8, color: '#fff', fontSize: 12 }} />
@@ -266,8 +250,7 @@ function Demographics({ visitors }: { visitors: VisitorProfile[] }) {
         )}
       </div>
 
-      {/* Device */}
-      <div className="bg-gray-900/60 border border-gray-800/60 rounded-2xl p-6">
+      <div className="w-full bg-gray-900/60 border border-gray-800/60 rounded-2xl p-6">
         <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">Device Type</h3>
         <div className="space-y-4 mt-2">
           {deviceData.length === 0 ? (
@@ -278,10 +261,10 @@ function Demographics({ visitors }: { visitors: VisitorProfile[] }) {
               const pct = visitors.length ? Math.round((d.value / visitors.length) * 100) : 0;
               return (
                 <div key={d.name} className="flex items-center gap-3">
-                  <div className={`w-9 h-9 rounded-lg flex items-center justify-center`} style={{ background: `${CHART_COLORS[i]}20` }}>
+                  <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ background: `${CHART_COLORS[i]}20` }}>
                     <Icon className="w-4 h-4" style={{ color: CHART_COLORS[i] }} />
                   </div>
-                  <div className="flex-1">
+                  <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between mb-1">
                       <span className="text-sm text-white">{d.name}</span>
                       <span className="text-xs text-gray-400">{d.value} ({pct}%)</span>
@@ -306,14 +289,14 @@ function VisitorDetailsTable({ visitors }: { visitors: VisitorProfile[] }) {
   const [expanded, setExpanded] = useState<string | null>(null);
 
   return (
-    <div className="bg-gray-900/60 border border-gray-800/60 rounded-2xl overflow-hidden">
+    <div className="w-full bg-gray-900/60 border border-gray-800/60 rounded-2xl overflow-hidden">
       <div className="px-6 py-4 border-b border-gray-800/60">
         <h3 className="text-lg font-semibold text-white flex items-center gap-2">
           <Users className="w-5 h-5 text-purple-400" />
           Visitor Details
         </h3>
       </div>
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto w-full">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-gray-800/60">
@@ -376,7 +359,6 @@ export function PerformanceTab() {
   const [visits, setVisits] = useState<PageVisit[]>([]);
   const [visitors, setVisitors] = useState<VisitorProfile[]>([]);
   const [leads, setLeads] = useState<LeadEntry[]>([]);
-  const [allLeads, setAllLeads] = useState<LeadEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [pageFilter, setPageFilter] = useState(ALL_PAGES);
   const [showFilter, setShowFilter] = useState(false);
@@ -385,13 +367,12 @@ export function PerformanceTab() {
     (async () => {
       setLoading(true);
       try {
-        const [v, vis, l, c, s] = await Promise.all([
-          getPageVisits(), getVisitors(), getLeads(), getContacts(), getSignups(),
+        const [v, vis, l] = await Promise.all([
+          getPageVisits(), getVisitors(), getLeads(),
         ]);
         setVisits(v);
         setVisitors(vis);
         setLeads(l);
-        setAllLeads([...l, ...c, ...s]);
       } catch (err) {
         console.error('Failed to load analytics:', err);
       }
@@ -418,14 +399,14 @@ export function PerformanceTab() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-32">
+      <div className="flex items-center justify-center py-32 w-full">
         <div className="animate-spin w-8 h-8 border-2 border-blue-400 border-t-transparent rounded-full" />
       </div>
     );
   }
 
   return (
-    <div className="space-y-8">
+    <div className="w-full space-y-8">
       {/* Page Filter */}
       <div className="relative inline-block">
         <button
@@ -454,7 +435,7 @@ export function PerformanceTab() {
       </div>
 
       {/* Stat cards */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+      <div className="w-full grid grid-cols-2 md:grid-cols-5 gap-4">
         {[
           { label: 'Total Visits', value: filteredVisits.length, icon: Eye, color: 'blue' },
           { label: 'Unique Sessions', value: uniqueSessions, icon: Users, color: 'purple' },
@@ -467,7 +448,7 @@ export function PerformanceTab() {
             <motion.div
               key={s.label}
               whileHover={{ y: -2 }}
-              className="bg-gray-900/60 border border-gray-800/60 rounded-2xl p-5"
+              className="w-full bg-gray-900/60 border border-gray-800/60 rounded-2xl p-5"
             >
               <div className={`w-9 h-9 rounded-xl bg-${s.color}-500/10 flex items-center justify-center mb-3`}>
                 <Icon className={`w-4 h-4 text-${s.color}-400`} />
@@ -480,7 +461,7 @@ export function PerformanceTab() {
       </div>
 
       {/* Traffic chart */}
-      <div className="bg-gray-900/60 border border-gray-800/60 rounded-2xl p-6">
+      <div className="w-full bg-gray-900/60 border border-gray-800/60 rounded-2xl p-6">
         <div className="flex items-center gap-2 mb-4">
           <TrendingUp className="w-5 h-5 text-blue-400" />
           <h3 className="text-lg font-semibold text-white">Traffic Over Time</h3>
@@ -507,7 +488,7 @@ export function PerformanceTab() {
       </div>
 
       {/* Page visits bar chart */}
-      <div className="bg-gray-900/60 border border-gray-800/60 rounded-2xl p-6">
+      <div className="w-full bg-gray-900/60 border border-gray-800/60 rounded-2xl p-6">
         <div className="flex items-center gap-2 mb-4">
           <Eye className="w-5 h-5 text-purple-400" />
           <h3 className="text-lg font-semibold text-white">Top Pages</h3>
@@ -527,11 +508,11 @@ export function PerformanceTab() {
         )}
       </div>
 
-      {/* World Heatmap */}
+      {/* World Heatmap - OpenStreetMap via Leaflet */}
       <WorldHeatMap visitors={visitors} />
 
       {/* Demographics */}
-      <div>
+      <div className="w-full">
         <h3 className="text-lg font-semibold text-white mb-4">Demographics</h3>
         <Demographics visitors={visitors} />
       </div>

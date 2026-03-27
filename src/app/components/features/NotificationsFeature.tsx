@@ -10,6 +10,7 @@ export function NotificationsFeature() {
       subtitle="AI-prioritized alerts delivered across multiple channels with fully customizable preferences."
       accentColor="text-orange-400"
       gradientFrom="to-orange-950/30"
+      heroImage="https://images.unsplash.com/photo-1510906594845-bc082582c8cc?auto=format&fit=crop&w=1920&q=80"
       stats={[
         { value: 'AI', label: 'Smart Priority' },
         { value: 'Multi', label: 'Channel Delivery' },

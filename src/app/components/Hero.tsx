@@ -1,9 +1,7 @@
 import { motion, useScroll, useTransform } from 'motion/react';
-import { ArrowRight } from 'lucide-react';
-import { Button } from '@/app/components/ui/button';
 import React, { useState, useEffect, useRef } from 'react';
-import { HoverRevealText } from '@/app/components/HoverRevealText';
-import { SubtitleWithCursor } from '@/app/components/SubtitleWithCursor';
+import { AnimatedButton } from '@/app/components/AnimatedButton';
+import { Link } from 'react-router';
 
 export function Hero() {
   const [mounted, setMounted] = useState(false);
@@ -35,27 +33,7 @@ export function Hero() {
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
-  // Split text animation for each word
-  const words = ["Manage Your Team", "Smarter with AI"];
-  
-  // State for looping disappear animation - seamless across all words
-  const [disappearingIndex, setDisappearingIndex] = useState(-1);
-  
-  useEffect(() => {
-    const totalChars = words.join('').length; // Total characters across all words
-    let currentIndex = 0;
-    
-    const interval = setInterval(() => {
-      setDisappearingIndex(currentIndex);
-      currentIndex = (currentIndex + 1) % (totalChars + 8); // +8 for pause between loops
-      
-      if (currentIndex >= totalChars) {
-        setDisappearingIndex(-1); // Reset to show all chars during pause
-      }
-    }, 120); // Slightly faster for smoother effect
-    
-    return () => clearInterval(interval);
-  }, []);
+
 
   return (
     <section ref={ref} className="relative min-h-[100vh] flex flex-col items-center justify-center overflow-hidden bg-black" style={{ position: 'relative' }}>
@@ -116,29 +94,18 @@ export function Hero() {
             </motion.div>
           </motion.div>
 
-          {/* Main Headline - Massive & Split */}
-          <div className="mb-10 flex flex-col items-center justify-center gap-2 md:gap-3 lg:gap-4">
-            {words.map((word, wordIndex) => (
-              <div key={wordIndex} className="w-full flex justify-center relative">
-                <motion.h1
-                  initial={{ y: 100, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{
-                    duration: 1.2,
-                    delay: 0.3 + wordIndex * 0.15,
-                    ease: [0.16, 1, 0.3, 1]
-                  }}
-                  className={`
-                    text-[clamp(2.5rem,5.5vw,6rem)] font-bold tracking-tighter leading-[1.1] text-center
-                    ${wordIndex === 0 ? 'text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-200 to-white z-10' : ''}
-                    ${wordIndex === 1 ? 'text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-blue-600 to-purple-600 z-0' : ''}
-                  `}
-                >
-                  {word}
-                </motion.h1>
-              </div>
-            ))}
-          </div>
+          {/* Main Headline */}
+          <motion.h1
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+            style={{ marginBottom: 0 }}
+            className="text-[clamp(2.5rem,5.5vw,6rem)] font-bold tracking-tighter leading-[1.1] text-center mb-10"
+          >
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-200 to-white">Manage Your Team</span>
+            <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-blue-600 to-purple-600">Smarter with AI</span>
+          </motion.h1>
 
           {/* Subheadline */}
           <motion.div
@@ -172,68 +139,16 @@ export function Hero() {
             transition={{ duration: 0.8, delay: 1.2, ease: [0.16, 1, 0.3, 1] }}
             className="flex flex-col sm:flex-row items-center justify-center gap-4 md:gap-6"
           >
-          <MagneticButton>
-            <Button className="bg-white text-black hover:bg-gray-200 px-8 md:px-12 py-6 md:py-8 text-base md:text-lg rounded-full group shadow-2xl shadow-white/20 hover:shadow-white/30 transition-all duration-500 relative overflow-hidden w-full sm:w-auto">
-              <span className="relative z-10 flex items-center gap-2">
-                Start Today
-                <ArrowRight className="w-4 md:w-5 h-4 md:h-5 group-hover:translate-x-1 transition-transform" />
-              </span>
-              <motion.div
-                className="absolute inset-0 bg-gradient-to-r from-purple-600 to-blue-600"
-                initial={{ x: '-100%' }}
-                whileHover={{ x: 0 }}
-                transition={{ duration: 0.5 }}
-              />
-            </Button>
-          </MagneticButton>
+          <Link to="/get-started">
+            <AnimatedButton label="Start Today" size="lg" />
+          </Link>
           
-          <MagneticButton>
-            <Button 
-              variant="outline" 
-              className="px-8 md:px-12 py-6 md:py-8 text-base md:text-lg rounded-full border-2 border-gray-700 hover:border-white hover:bg-white transition-all duration-500 w-full sm:w-auto !text-black bg-white"
-            >
-              See Features
-            </Button>
-          </MagneticButton>
+          <Link to="/features">
+            <AnimatedButton label="See Features" variant="secondary" size="lg" />
+          </Link>
           </motion.div>
         </div>
       </motion.div>
     </section>
-  );
-}
-
-// Magnetic Button Component
-function MagneticButton({ children }: { children: React.ReactNode }) {
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-  const ref = useRef<HTMLDivElement>(null);
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!ref.current) return;
-    
-    const rect = ref.current.getBoundingClientRect();
-    const x = e.clientX - rect.left - rect.width / 2;
-    const y = e.clientY - rect.top - rect.height / 2;
-    
-    setPosition({ x: x * 0.3, y: y * 0.3 });
-  };
-
-  const handleMouseLeave = () => {
-    setPosition({ x: 0, y: 0 });
-  };
-
-  return (
-    <div
-      ref={ref}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-      className="relative"
-    >
-      <motion.div
-        animate={{ x: position.x, y: position.y }}
-        transition={{ type: "spring", stiffness: 150, damping: 15, mass: 0.1 }}
-      >
-        {children}
-      </motion.div>
-    </div>
   );
 }

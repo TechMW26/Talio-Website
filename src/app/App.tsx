@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
+import Lenis from 'lenis';
 import { Navbar } from '@/app/components/Navbar';
 import { Footer } from '@/app/components/Footer';
 import { CustomCursor } from '@/app/components/CustomCursor';
@@ -33,7 +34,8 @@ import { AnalyticsTracker } from '@/app/components/AnalyticsTracker';
 function ScrollToTop() {
   const { pathname } = useLocation();
   useEffect(() => {
-    window.scrollTo(0, 0);
+    // Instant scroll to top — bypass Lenis smooth scroll for page navigation
+    window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
   }, [pathname]);
   return null;
 }
@@ -41,6 +43,30 @@ function ScrollToTop() {
 function AppLayout() {
   const { pathname } = useLocation();
   const isAdmin = pathname === '/admin';
+  const lenisRef = useRef<Lenis | null>(null);
+
+  // Initialize Lenis smooth scroll
+  useEffect(() => {
+    const lenis = new Lenis({
+      lerp: 0.08,          // Lower = smoother/slower interpolation (default 0.1)
+      duration: 1.4,        // Scroll duration
+      smoothWheel: true,
+      wheelMultiplier: 0.8, // Slightly slower wheel scroll
+      touchMultiplier: 1.5, // Good for mobile
+    });
+    lenisRef.current = lenis;
+
+    function raf(time: number) {
+      lenis.raf(time);
+      requestAnimationFrame(raf);
+    }
+    requestAnimationFrame(raf);
+
+    return () => {
+      lenis.destroy();
+      lenisRef.current = null;
+    };
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-950 transition-colors duration-300 cursor-none relative" style={{ position: 'relative' }}>

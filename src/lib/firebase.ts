@@ -89,6 +89,12 @@ async function fbGet<T = unknown>(path: string): Promise<Record<string, T> | nul
   return res.json();
 }
 
+async function fbDelete(path: string) {
+  const res = await fetch(`${DB_URL}/${path}.json`, { method: 'DELETE' });
+  if (!res.ok) throw new Error(`Firebase DELETE failed: ${res.statusText}`);
+  return res.json();
+}
+
 // ── Dedup helpers ──
 
 async function findExistingEntry(path: string, email?: string, phone?: string): Promise<[string, LeadEntry] | null> {
@@ -145,6 +151,10 @@ export async function getSignups(): Promise<LeadEntry[]> {
   const data = await fbGet<LeadEntry>('signups');
   if (!data) return [];
   return Object.entries(data).map(([key, val]) => ({ ...val, id: key }));
+}
+
+export async function deleteEntry(collection: 'leads' | 'contacts' | 'signups', id: string) {
+  return fbDelete(`${collection}/${id}`);
 }
 
 // ── Analytics ──

@@ -10,6 +10,7 @@ export function MiraAIFeature() {
       subtitle="Your natural language HR companion — ask anything, get instant answers, and automate tasks."
       accentColor="text-purple-400"
       gradientFrom="to-purple-950/30"
+      heroImage="https://images.unsplash.com/photo-1700427296131-0cc4c4610fc6?auto=format&fit=crop&w=1920&q=80"
       stats={[
         { value: '10x', label: 'Faster Answers' },
         { value: '95%', label: 'Query Accuracy' },

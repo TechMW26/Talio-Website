@@ -10,6 +10,7 @@ export function GoalsFeature() {
       subtitle="Set company objectives, track key results, and align your entire team for maximum impact."
       accentColor="text-rose-400"
       gradientFrom="to-rose-950/30"
+      heroImage="https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=1920&q=80"
       stats={[
         { value: '3x', label: 'Goal Achievement' },
         { value: '100%', label: 'Team Alignment' },

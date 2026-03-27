@@ -459,7 +459,18 @@ export function Pricing() {
           >
             <button className="group relative px-12 py-7 text-base font-semibold rounded-full border-2 border-gray-900 dark:border-gray-100 bg-white dark:bg-black text-black dark:text-white overflow-hidden shadow-lg transition-all duration-500 hover:shadow-2xl">
               <span className="relative z-10 flex items-center gap-3">
-                Contact Sales
+                <span className="flex overflow-hidden">
+                  {"Contact Sales".split('').map((char, i) => (
+                    <span key={i} className="relative inline-flex flex-col h-[1.5em] overflow-hidden">
+                      <span className="group-hover:-translate-y-full transition-transform duration-500 ease-[0.22,1,0.36,1]" style={{ transitionDelay: `${i * 0.025}s` }}>
+                        {char === ' ' ? '\u00A0' : char}
+                      </span>
+                      <span className="absolute top-0 left-0 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-[0.22,1,0.36,1]" style={{ transitionDelay: `${i * 0.025}s` }}>
+                        {char === ' ' ? '\u00A0' : char}
+                      </span>
+                    </span>
+                  ))}
+                </span>
                 <motion.svg
                   width="20"
                   height="20"

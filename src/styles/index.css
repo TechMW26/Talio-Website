@@ -1,16 +1,30 @@
 @import './fonts.css';
 @import './tailwind.css';
 @import './theme.css';
+@import './global.css';
 
-/* Smooth scrolling */
-html {
-  scroll-behavior: smooth;
-  position: relative;
+/* Lenis smooth scroll */
+html.lenis, html.lenis body {
+  height: auto;
 }
 
-/* Hide default cursor */
-* {
-  cursor: none !important;
+.lenis.lenis-smooth {
+  scroll-behavior: auto;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+/* Hide default cursor — desktop only */
+@media (pointer: fine) {
+  * {
+    cursor: none !important;
+  }
 }
 
 /* Hide all scrollbars while keeping scrollable */

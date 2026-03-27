@@ -1,232 +1,108 @@
-import { useEffect, useState, useRef } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { useEffect, useRef, useCallback } from 'react';
 
 export function CustomCursor() {
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [isHovering, setIsHovering] = useState(false);
-  const [isClicking, setIsClicking] = useState(false);
-  const [cursorText, setCursorText] = useState('');
-  const [isVisible, setIsVisible] = useState(false);
-  const [isDarkBackground, setIsDarkBackground] = useState(false);
-  const [mouseSpeed, setMouseSpeed] = useState(0);
-  const [cursorScale, setCursorScale] = useState(1);
-  const lastPositionRef = useRef({ x: 0, y: 0 });
-  const lastTimeRef = useRef(Date.now());
+  const dotRef = useRef<HTMLDivElement>(null);
+  const ringRef = useRef<HTMLDivElement>(null);
+  const pos = useRef({ x: -100, y: -100 });
+  const targetPos = useRef({ x: -100, y: -100 });
+  const hovering = useRef(false);
+  const clicking = useRef(false);
+  const visible = useRef(false);
+  const rafId = useRef(0);
+  const mounted = useRef(true);
+
+  // Detect touch/mobile devices
+  const isTouch = typeof window !== 'undefined' && !window.matchMedia('(pointer: fine)').matches;
+
+  // Smooth interpolation loop — ring lags behind dot
+  const loop = useCallback(() => {
+    const dot = dotRef.current;
+    const ring = ringRef.current;
+    if (!dot || !ring || !mounted.current) return;
+
+    // Lerp ring position toward target
+    pos.current.x += (targetPos.current.x - pos.current.x) * 0.15;
+    pos.current.y += (targetPos.current.y - pos.current.y) * 0.15;
+
+    const isHov = hovering.current;
+    const isClick = clicking.current;
+    const vis = visible.current ? 1 : 0;
+
+    // Dot — snaps immediately to mouse position
+    dot.style.transform = `translate3d(${targetPos.current.x - 3}px, ${targetPos.current.y - 3}px, 0) scale(${isClick ? 0.6 : 1})`;
+    dot.style.opacity = String(vis);
+
+    // Ring — smooth follow with lerp
+    const ringSize = isHov ? 48 : 20;
+    const ringOffset = ringSize / 2;
+    ring.style.transform = `translate3d(${pos.current.x - ringOffset}px, ${pos.current.y - ringOffset}px, 0)`;
+    ring.style.width = `${ringSize}px`;
+    ring.style.height = `${ringSize}px`;
+    ring.style.opacity = String(vis);
+    ring.style.borderColor = isHov ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.5)';
+
+    rafId.current = requestAnimationFrame(loop);
+  }, []);
 
   useEffect(() => {
-    const checkBackgroundColor = (element: HTMLElement | null) => {
-      if (!element) return false;
-      
-      let currentEl: HTMLElement | null = element;
-      while (currentEl) {
-        const style = window.getComputedStyle(currentEl);
-        const bgColor = style.backgroundColor;
-        
-        // Parse RGB/RGBA
-        const match = bgColor.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
-        if (match) {
-          const [_, r, g, b] = match.map(Number);
-          const alpha = parseFloat(style.backgroundColor.split(',')[3]) || 1;
-          
-          // If purely transparent, keep going up
-          if (alpha === 0 || bgColor === 'rgba(0, 0, 0, 0)' || bgColor === 'transparent') {
-            currentEl = currentEl.parentElement;
-            continue;
-          }
+    // Skip on touch-only devices
+    if (isTouch) return;
 
-          // Calculate brightness (YIQ formula)
-          const brightness = (r * 299 + g * 587 + b * 114) / 1000;
-          return brightness < 128;
-        }
-        
-        // If we hit document/body and no color found, assume light unless dark mode class
-        if (currentEl === document.body || currentEl === document.documentElement) {
-            return document.documentElement.classList.contains('dark');
-        }
-        
-        currentEl = currentEl.parentElement;
-      }
-      return false;
+    mounted.current = true;
+    rafId.current = requestAnimationFrame(loop);
+
+    const onMove = (e: MouseEvent) => {
+      targetPos.current = { x: e.clientX, y: e.clientY };
+      if (!visible.current) visible.current = true;
     };
 
-    const handleMouseMove = (e: MouseEvent) => {
-      const currentTime = Date.now();
-      const timeDelta = currentTime - lastTimeRef.current;
-      
-      if (timeDelta > 0) {
-        // Calculate distance moved
-        const dx = e.clientX - lastPositionRef.current.x;
-        const dy = e.clientY - lastPositionRef.current.y;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-        
-        // Calculate speed (pixels per millisecond)
-        const speed = distance / timeDelta;
-        
-        // Update speed state
-        setMouseSpeed(speed);
-        
-        // Calculate cursor scale based on speed (macOS effect)
-        // Speed threshold: 0.5 px/ms = slow, 2+ px/ms = fast
-        const speedScale = Math.min(1 + (speed * 1.2), 4); // Max 4x scale, highly sensitive
-        setCursorScale(speedScale);
-      }
-      
-      setMousePosition({ x: e.clientX, y: e.clientY });
-      lastPositionRef.current = { x: e.clientX, y: e.clientY };
-      lastTimeRef.current = currentTime;
-      
-      if (!isVisible) setIsVisible(true);
-      
-      const target = e.target as HTMLElement;
-      setIsDarkBackground(checkBackgroundColor(target));
+    const onOver = (e: MouseEvent) => {
+      const t = e.target as HTMLElement;
+      const isInteractive = t.tagName === 'BUTTON' || t.tagName === 'A' ||
+        !!t.closest('button') || !!t.closest('a') ||
+        t.classList.contains('cursor-pointer');
+      const isInput = t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || !!t.closest('input');
+      hovering.current = isInteractive && !isInput;
     };
 
-    const handleMouseOver = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      
-      const isButton = target.tagName === 'BUTTON' || target.closest('button');
-      const isLink = target.tagName === 'A' || target.closest('a');
-      const isInput = target.tagName === 'INPUT' || target.closest('input') || target.tagName === 'TEXTAREA';
-      const isClickable = target.classList.contains('cursor-pointer') || window.getComputedStyle(target).cursor === 'pointer';
-      
-      if (isButton || isLink || isClickable) {
-        setIsHovering(true);
-        if (target.classList.contains('cursor-grab') || target.closest('.cursor-grab')) {
-          setCursorText('DRAG');
-        } else if (target.getAttribute('data-cursor')) {
-          setCursorText(target.getAttribute('data-cursor') || '');
-        } else {
-          setCursorText('');
-        }
-      } else {
-        setIsHovering(false);
-        setCursorText('');
-      }
+    const onDown = () => { clicking.current = true; };
+    const onUp = () => { clicking.current = false; };
+    const onLeave = () => { visible.current = false; };
+    const onEnter = () => { visible.current = true; };
 
-      if (isInput) {
-         setIsHovering(false);
-      }
-    };
-
-    const handleMouseDown = () => setIsClicking(true);
-    const handleMouseUp = () => setIsClicking(false);
-    const handleMouseLeave = () => setIsVisible(false);
-    const handleMouseEnter = () => setIsVisible(true);
-
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('mouseover', handleMouseOver);
-    window.addEventListener('mousedown', handleMouseDown);
-    window.addEventListener('mouseup', handleMouseUp);
-    document.addEventListener('mouseleave', handleMouseLeave);
-    document.addEventListener('mouseenter', handleMouseEnter);
-
-    document.body.style.cursor = 'none';
-
-    // Reset scale gradually when mouse stops moving
-    const scaleResetInterval = setInterval(() => {
-      setCursorScale((prev) => {
-        if (prev > 1) {
-          return Math.max(1, prev - 0.05); // Gradually return to normal
-        }
-        return 1;
-      });
-    }, 16); // ~60fps
+    window.addEventListener('mousemove', onMove, { passive: true });
+    window.addEventListener('mouseover', onOver, { passive: true });
+    window.addEventListener('mousedown', onDown);
+    window.addEventListener('mouseup', onUp);
+    document.addEventListener('mouseleave', onLeave);
+    document.addEventListener('mouseenter', onEnter);
 
     return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseover', handleMouseOver);
-      window.removeEventListener('mousedown', handleMouseDown);
-      window.removeEventListener('mouseup', handleMouseUp);
-      document.removeEventListener('mouseleave', handleMouseLeave);
-      document.removeEventListener('mouseenter', handleMouseEnter);
-      document.body.style.cursor = 'auto';
-      clearInterval(scaleResetInterval);
+      mounted.current = false;
+      cancelAnimationFrame(rafId.current);
+      window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('mouseover', onOver);
+      window.removeEventListener('mousedown', onDown);
+      window.removeEventListener('mouseup', onUp);
+      document.removeEventListener('mouseleave', onLeave);
+      document.removeEventListener('mouseenter', onEnter);
     };
-  }, [isVisible]);
+  }, [loop, isTouch]);
 
-  if (!isVisible) return null;
-
-  // Adaptive bright colors based on background
-  const cursorDotColor = isDarkBackground 
-    ? 'bg-white' 
-    : 'bg-white';
-  
-  const cursorRingColor = isDarkBackground
-    ? 'border-white/60 bg-white/10'
-    : 'border-white/60 bg-white/10';
-  
-  const cursorRingHoverColor = isDarkBackground
-    ? 'border-white/70 bg-white/15'
-    : 'border-white/70 bg-white/15';
+  if (isTouch) return null;
 
   return (
     <>
-      {/* Main Cursor Dot with Speed Scale */}
-      <motion.div
-        className="fixed top-0 left-0 pointer-events-none z-[99999]"
-        animate={{
-          x: mousePosition.x - 3,
-          y: mousePosition.y - 3,
-          scale: (isClicking ? 0.8 : 1) * cursorScale, // Apply speed scale
-        }}
-        transition={{ 
-          type: "spring", 
-          stiffness: 1000, 
-          damping: 50, 
-          mass: 0.1,
-          scale: { type: "spring", stiffness: 400, damping: 30 } // Smooth scale transition
-        }}
-      >
-        <div className={`
-          w-1.5 h-1.5 rounded-full 
-          ${cursorDotColor}
-          shadow-[0_0_15px_rgba(255,255,255,0.5)]
-          transition-all duration-150
-        `} />
-      </motion.div>
-
-      {/* Interactive Ring with Speed Scale */}
-      <motion.div
-        className="fixed top-0 left-0 pointer-events-none z-[99998]"
-        animate={{
-          x: mousePosition.x - (isHovering ? 24 : 10),
-          y: mousePosition.y - (isHovering ? 24 : 10),
-          width: isHovering ? 48 : 20,
-          height: isHovering ? 48 : 20,
-          opacity: 1,
-          scale: cursorScale, // Apply speed scale to ring
-        }}
-        transition={{ 
-          type: "spring", 
-          stiffness: 300, 
-          damping: 25, 
-          mass: 0.4,
-          scale: { type: "spring", stiffness: 400, damping: 30 } // Smooth scale transition
-        }}
-      >
-        <div className={`
-          w-full h-full rounded-full 
-          border-[1.5px]
-          flex items-center justify-center
-          transition-all duration-200
-          ${isHovering ? cursorRingHoverColor : cursorRingColor}
-          backdrop-blur-[2px]
-          shadow-[0_0_20px_rgba(255,255,255,0.3)]
-        `}>
-          <AnimatePresence>
-            {isHovering && cursorText && (
-              <motion.span
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.8 }}
-                className="text-[8px] font-bold tracking-widest uppercase text-white"
-              >
-                {cursorText}
-              </motion.span>
-            )}
-          </AnimatePresence>
-        </div>
-      </motion.div>
+      <div
+        ref={dotRef}
+        className="fixed top-0 left-0 pointer-events-none z-[99999] w-1.5 h-1.5 rounded-full bg-white will-change-transform"
+        style={{ opacity: 0, transition: 'opacity 0.15s, transform 0.06s linear' }}
+      />
+      <div
+        ref={ringRef}
+        className="fixed top-0 left-0 pointer-events-none z-[99998] rounded-full border-[1.5px] will-change-transform"
+        style={{ opacity: 0, width: 20, height: 20, borderColor: 'rgba(255,255,255,0.5)', transition: 'width 0.2s, height 0.2s, border-color 0.2s, opacity 0.15s' }}
+      />
     </>
   );
 }

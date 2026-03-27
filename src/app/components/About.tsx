@@ -1,7 +1,7 @@
 import { motion, useInView, useScroll, useTransform } from 'motion/react';
 import { useRef, useState } from 'react';
-import { ArrowRight, Lightbulb, Users, Shield, TrendingUp, ChevronLeft, ChevronRight } from 'lucide-react';
-import { Button } from '@/app/components/ui/button';
+import { Lightbulb, Users, Shield, TrendingUp, ChevronLeft, ChevronRight } from 'lucide-react';
+import { AnimatedButton } from '@/app/components/AnimatedButton';
 import { ZoomStorySection } from '@/app/components/ZoomStorySection';
 import { usePageMeta } from '@/app/hooks/usePageMeta';
 
@@ -79,7 +79,16 @@ export function About() {
   return (
     <div className="bg-gray-950 relative transition-colors duration-300" style={{ position: 'relative' }}>
       {/* Hero Section */}
-      <section ref={heroRef} className="relative min-h-[80vh] flex items-center justify-center py-20 md:py-32 overflow-hidden bg-gradient-to-br from-gray-900 via-gray-950 to-blue-950/30" style={{ position: 'relative' }}>
+      <section ref={heroRef} className="relative min-h-[80vh] flex items-center justify-center py-20 md:py-32 overflow-hidden" style={{ position: 'relative' }}>
+        {/* Background Image */}
+        <div className="absolute inset-0">
+          <img
+            src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1920&q=80"
+            alt=""
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-gray-950 via-gray-950/80 to-gray-950" />
+        </div>
         {/* Background Elements */}
         <div className="absolute inset-0">
           <motion.div
@@ -367,10 +376,11 @@ export function About() {
                 <motion.div
                   key={item.title}
                   initial={{ opacity: 0, y: 60 }}
-                  animate={ventureInView ? { opacity: 1, y: 0 } : {}}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-50px" }}
                   transition={{ 
                     duration: 1, 
-                    delay: 1.3 + index * 0.15,
+                    delay: index * 0.15,
                     ease: [0.16, 1, 0.3, 1]
                   }}
                   whileHover={{ 
@@ -445,8 +455,9 @@ export function About() {
           {/* Bottom Stats Section */}
           <motion.div
             initial={{ opacity: 0, y: 40 }}
-            animate={ventureInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 1, delay: 2 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 1 }}
             className="mt-32 pt-16 border-t border-gray-800"
           >
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
@@ -459,8 +470,9 @@ export function About() {
                 <motion.div
                   key={stat.label}
                   initial={{ opacity: 0, y: 20 }}
-                  animate={ventureInView ? { opacity: 1, y: 0 } : {}}
-                  transition={{ duration: 0.8, delay: 2.2 + index * 0.1 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.8, delay: index * 0.1 }}
                   className="text-center lg:text-left"
                 >
                   <motion.div
@@ -665,12 +677,7 @@ export function About() {
               </div>
 
               {/* Submit Button */}
-              <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-10 py-6 text-base md:text-lg rounded-2xl font-semibold shadow-2xl hover:shadow-blue-600/30 transition-all duration-300 group border-2 border-white/20">
-                <span className="flex items-center justify-center gap-2">
-                  Get Started Free
-                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                </span>
-              </Button>
+              <AnimatedButton label="Get Started Free" size="lg" fullWidth />
 
               {/* Trust Badge */}
               <p className="text-white/70 text-sm mt-4">
@@ -685,12 +692,7 @@ export function About() {
             transition={{ duration: 0.6, delay: 0.6 }}
             className="flex flex-col sm:flex-row items-center justify-center gap-4"
           >
-            <Button 
-              variant="outline"
-              className="bg-white/10 backdrop-blur-sm border-2 border-white/30 text-white hover:bg-white hover:text-blue-600 px-10 py-6 text-base md:text-lg rounded-full font-semibold transition-all duration-300"
-            >
-              Contact Sales Team
-            </Button>
+            <AnimatedButton label="Contact Sales Team" variant="secondary" size="lg" />
           </motion.div>
         </div>
       </section>

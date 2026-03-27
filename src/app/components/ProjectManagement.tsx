@@ -292,8 +292,15 @@ function ProjectManagementContent() {
   const [animatingCardId, setAnimatingCardId] = useState<string | null>(null);
   const hasAnimated = useRef(false);
 
+  // Track when board is fully expanded to trigger tagline animation
+  const [boardFullscreen, setBoardFullscreen] = useState(false);
+
   // Single scroll-triggered animation: pick a random card, move it to the next column
   useMotionValueEvent(scrollYProgress, "change", (latest) => {
+    // Track fullscreen state for tagline animation
+    if (latest >= 0.32 && !boardFullscreen) setBoardFullscreen(true);
+    if (latest < 0.25 && boardFullscreen) setBoardFullscreen(false);
+
     // Trigger once when the board is fully expanded (~40% scroll)
     if (latest > 0.4 && !hasAnimated.current) {
       hasAnimated.current = true;
@@ -454,11 +461,11 @@ function ProjectManagementContent() {
               </motion.div>
 
               {/* Board Content Grid */}
-              <div className="p-8 flex-1 overflow-y-auto">
+              <div className="p-8 flex-1 overflow-y-auto flex flex-col">
                 {/* Subtle Dot Grid Background */}
                 <div className="absolute inset-0 top-[80px] opacity-[0.4] bg-[radial-gradient(#3f3f46_1px,transparent_1px)] [background-size:24px_24px] pointer-events-none" />
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 relative z-0 pb-20">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 relative z-0">
                   {kanbanData.map((column, colIndex) => {
                     const colColors = COLUMN_COLORS[colIndex] || COLUMN_COLORS[0];
                     return (
@@ -472,6 +479,57 @@ function ProjectManagementContent() {
                       />
                     );
                   })}
+                </div>
+
+                {/* Handwriting tagline — only animates when board is fullscreen */}
+                <div className="relative flex flex-1 items-center justify-center min-h-[120px] md:min-h-[160px] lg:min-h-[200px]">
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={boardFullscreen ? { opacity: 1 } : { opacity: 0 }}
+                    transition={{ duration: 0.6, ease: 'easeOut' }}
+                    className="relative select-none"
+                  >
+                    {/* Glow backdrop */}
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={boardFullscreen ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 }}
+                      transition={{ duration: 1.5, delay: 0.3, ease: 'easeOut' }}
+                      className="absolute inset-0 -inset-x-12 -inset-y-8 bg-gradient-to-r from-blue-500/10 via-purple-500/15 to-pink-500/10 rounded-full blur-3xl pointer-events-none"
+                    />
+                    <motion.p
+                      className="relative text-4xl md:text-6xl lg:text-7xl xl:text-8xl text-center text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 pb-4"
+                      style={{
+                        fontFamily: "'Cedarville Cursive', cursive",
+                        lineHeight: 1.4,
+                        filter: 'drop-shadow(0 0 30px rgba(168, 85, 247, 0.5)) drop-shadow(0 0 60px rgba(96, 165, 250, 0.25))',
+                      }}
+                    >
+                      {"Drag. Drop. Done.".split('').map((char, i) => (
+                        <motion.span
+                          key={i}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={boardFullscreen ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+                          transition={{
+                            duration: 0.4,
+                            delay: boardFullscreen ? 0.3 + i * 0.06 : 0,
+                            ease: [0.16, 1, 0.3, 1],
+                          }}
+                          className="inline-block"
+                        >
+                          {char === ' ' ? '\u00A0' : char}
+                        </motion.span>
+                      ))}
+                    </motion.p>
+                    {/* Subheading */}
+                    <motion.p
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={boardFullscreen ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
+                      transition={{ duration: 0.8, delay: boardFullscreen ? 1.6 : 0, ease: [0.16, 1, 0.3, 1] }}
+                      className="text-sm md:text-base lg:text-lg text-white font-light text-center mt-2 tracking-wide"
+                    >
+                      Project management made smarter
+                    </motion.p>
+                  </motion.div>
                 </div>
               </div>
               

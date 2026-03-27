@@ -49,12 +49,12 @@ export function Navbar() {
   };
 
   const navItems = [
+    { name: 'MIRA AI', href: '/mira-ai', isRoute: true, gradient: true },
     { name: 'Features', href: '/features', isRoute: true },
     { name: 'Pricing', href: '/pricing', isRoute: true },
     { name: 'Downloads', href: '/downloads', isRoute: true },
     { name: 'About', href: '/about', isRoute: true },
-    { name: 'Contact', href: '/contact', isRoute: true },
-    { name: 'MIRA AI', href: '/mira-ai', isRoute: true, gradient: true }
+    { name: 'Contact', href: '/contact', isRoute: true }
   ];
 
   return (

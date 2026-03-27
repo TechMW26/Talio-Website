@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { LogOut, Users, Mail, UserPlus, RefreshCw, Search, ChevronDown, Calendar, Download, BarChart3 } from 'lucide-react';
-import { getLeads, getContacts, getSignups, type LeadEntry } from '@/lib/firebase';
+import { LogOut, Users, Mail, UserPlus, RefreshCw, Search, Download, BarChart3, X, Trash2, Phone, Building2, Briefcase, Factory, MessageSquare } from 'lucide-react';
+import { getLeads, getContacts, getSignups, deleteEntry, type LeadEntry } from '@/lib/firebase';
 import { usePageMeta } from '@/app/hooks/usePageMeta';
 import { PerformanceTab } from '@/app/components/PerformanceTab';
 
@@ -32,6 +32,8 @@ export function AdminDashboard() {
   const [signups, setSignups] = useState<LeadEntry[]>([]);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState('');
+  const [selectedItem, setSelectedItem] = useState<LeadEntry | null>(null);
+  const [deleting, setDeleting] = useState<string | null>(null);
 
   useEffect(() => {
     if (sessionStorage.getItem('talio_admin') === 'true') setAuthed(true);
@@ -112,6 +114,29 @@ export function AdminDashboard() {
     a.download = `talio-${tab}-${new Date().toISOString().slice(0, 10)}.csv`;
     a.click();
     URL.revokeObjectURL(url);
+  };
+
+  const handleDelete = async (item: LeadEntry) => {
+    if (!item.id) return;
+    const collection = tab as 'leads' | 'contacts' | 'signups';
+    setDeleting(item.id);
+    try {
+      await deleteEntry(collection, item.id);
+      if (collection === 'leads') setLeads(prev => prev.filter(l => l.id !== item.id));
+      if (collection === 'contacts') setContacts(prev => prev.filter(c => c.id !== item.id));
+      if (collection === 'signups') setSignups(prev => prev.filter(s => s.id !== item.id));
+      if (selectedItem?.id === item.id) setSelectedItem(null);
+    } catch (err) {
+      console.error('Delete failed:', err);
+    }
+    setDeleting(null);
+  };
+
+  const formatDate = (dateStr?: string) => {
+    if (!dateStr) return '—';
+    return new Date(dateStr).toLocaleDateString('en-IN', {
+      day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit',
+    });
   };
 
   // ── Login Screen ──
@@ -264,14 +289,16 @@ export function AdminDashboard() {
                   <tr className="border-b border-gray-800/60">
                     <th className="text-left px-5 py-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Name</th>
                     <th className="text-left px-5 py-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Email</th>
-                    {tab !== 'contacts' && (
-                      <th className="text-left px-5 py-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Company</th>
-                    )}
-                    {tab === 'contacts' && (
-                      <th className="text-left px-5 py-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Subject</th>
+                    <th className="text-left px-5 py-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Phone</th>
+                    <th className="text-left px-5 py-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                      {tab === 'contacts' ? 'Subject' : 'Company'}
+                    </th>
+                    {tab === 'leads' && (
+                      <th className="text-left px-5 py-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Job Title</th>
                     )}
                     <th className="text-left px-5 py-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Source</th>
                     <th className="text-left px-5 py-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Date</th>
+                    <th className="text-right px-5 py-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -282,31 +309,39 @@ export function AdminDashboard() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="border-b border-gray-800/40 hover:bg-gray-800/30 transition-colors"
+                        onClick={() => setSelectedItem(item)}
+                        className="border-b border-gray-800/40 hover:bg-gray-800/30 transition-colors cursor-pointer"
                       >
-                        <td className="px-5 py-4 font-medium text-white">
+                        <td className="px-5 py-4 font-medium text-white whitespace-nowrap">
                           {item.firstName} {item.lastName}
                         </td>
                         <td className="px-5 py-4 text-gray-300">{item.email}</td>
-                        {tab !== 'contacts' && (
-                          <td className="px-5 py-4 text-gray-400">{item.companyName || item.company || '—'}</td>
-                        )}
-                        {tab === 'contacts' && (
-                          <td className="px-5 py-4 text-gray-400">{item.subject || '—'}</td>
+                        <td className="px-5 py-4 text-gray-400">{item.phone || '—'}</td>
+                        <td className="px-5 py-4 text-gray-400">
+                          {tab === 'contacts' ? (item.subject || '—') : (item.companyName || item.company || '—')}
+                        </td>
+                        {tab === 'leads' && (
+                          <td className="px-5 py-4 text-gray-400">{item.jobTitle || '—'}</td>
                         )}
                         <td className="px-5 py-4">
                           <span className="px-2.5 py-1 text-xs rounded-full bg-gray-800 text-gray-300 border border-gray-700">
                             {item.source}
                           </span>
                         </td>
-                        <td className="px-5 py-4 text-gray-500">
-                          {item.submittedAt ? new Date(item.submittedAt).toLocaleDateString('en-IN', {
-                            day: 'numeric',
-                            month: 'short',
-                            year: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit',
-                          }) : '—'}
+                        <td className="px-5 py-4 text-gray-500 whitespace-nowrap">{formatDate(item.submittedAt)}</td>
+                        <td className="px-5 py-4 text-right">
+                          <button
+                            onClick={(e) => { e.stopPropagation(); handleDelete(item); }}
+                            disabled={deleting === item.id}
+                            className="p-1.5 rounded-lg text-gray-500 hover:text-red-400 hover:bg-red-900/20 transition-colors disabled:opacity-40"
+                            title="Delete"
+                          >
+                            {deleting === item.id ? (
+                              <RefreshCw className="w-4 h-4 animate-spin" />
+                            ) : (
+                              <Trash2 className="w-4 h-4" />
+                            )}
+                          </button>
                         </td>
                       </motion.tr>
                     ))}
@@ -317,26 +352,113 @@ export function AdminDashboard() {
           )}
         </div>
 
-        {/* Row detail: for contacts show message on click, for signups show extra fields */}
-        {tab === 'contacts' && filtered.length > 0 && (
-          <div className="mt-6 space-y-3">
-            <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider">Messages</h3>
-            {filtered.slice(0, 10).map((item, i) => (
-              <div key={item.id || i} className="bg-gray-900/60 border border-gray-800/40 rounded-xl p-5">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="font-medium text-white">{item.firstName} {item.lastName}</span>
-                  <span className="text-xs text-gray-500">
-                    {item.submittedAt ? new Date(item.submittedAt).toLocaleDateString() : ''}
-                  </span>
+        {/* Detail Popup Modal */}
+        <AnimatePresence>
+          {selectedItem && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setSelectedItem(null)}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            >
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                transition={{ duration: 0.2 }}
+                onClick={(e) => e.stopPropagation()}
+                className="bg-gray-900 border border-gray-800 rounded-2xl w-full max-w-lg max-h-[85vh] overflow-y-auto shadow-2xl"
+              >
+                {/* Modal Header */}
+                <div className="sticky top-0 bg-gray-900 border-b border-gray-800/60 px-6 py-4 flex items-center justify-between z-10">
+                  <div>
+                    <h3 className="text-lg font-bold text-white">{selectedItem.firstName} {selectedItem.lastName}</h3>
+                    <p className="text-xs text-gray-500 mt-0.5">{formatDate(selectedItem.submittedAt)}</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => { handleDelete(selectedItem); }}
+                      disabled={deleting === selectedItem.id}
+                      className="p-2 rounded-lg text-gray-400 hover:text-red-400 hover:bg-red-900/20 transition-colors"
+                      title="Delete"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => setSelectedItem(null)}
+                      className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 transition-colors"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
-                {item.subject && <p className="text-sm text-gray-400 mb-1">Re: {item.subject}</p>}
-                <p className="text-sm text-gray-300 leading-relaxed">{item.message || 'No message'}</p>
-              </div>
-            ))}
-          </div>
-        )}
+
+                {/* Modal Body */}
+                <div className="px-6 py-5 space-y-4">
+                  {/* Contact Info */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <DetailField icon={Mail} label="Email" value={selectedItem.email} />
+                    <DetailField icon={Phone} label="Phone" value={selectedItem.phone} />
+                  </div>
+
+                  {/* Company Info */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <DetailField icon={Building2} label="Company" value={selectedItem.companyName || selectedItem.company} />
+                    <DetailField icon={Users} label="Company Size" value={selectedItem.companySize} />
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <DetailField icon={Briefcase} label="Job Title" value={selectedItem.jobTitle} />
+                    <DetailField icon={Factory} label="Industry" value={selectedItem.industry} />
+                  </div>
+
+                  {/* Source */}
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-gray-500 uppercase tracking-wider">Source</span>
+                    <span className="px-2.5 py-1 text-xs rounded-full bg-gray-800 text-gray-300 border border-gray-700">
+                      {selectedItem.source}
+                    </span>
+                  </div>
+
+                  {/* Subject + Message (contacts) */}
+                  {selectedItem.subject && (
+                    <div className="pt-2 border-t border-gray-800/60">
+                      <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Subject</p>
+                      <p className="text-sm text-white font-medium">{selectedItem.subject}</p>
+                    </div>
+                  )}
+                  {selectedItem.message && (
+                    <div className="pt-2 border-t border-gray-800/60">
+                      <div className="flex items-center gap-1.5 mb-2">
+                        <MessageSquare className="w-3.5 h-3.5 text-gray-500" />
+                        <p className="text-xs text-gray-500 uppercase tracking-wider">Message</p>
+                      </div>
+                      <p className="text-sm text-gray-300 leading-relaxed bg-gray-800/40 rounded-xl p-4 border border-gray-800/40">
+                        {selectedItem.message}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         </>
         )}
+      </div>
+    </div>
+  );
+}
+
+function DetailField({ icon: Icon, label, value }: { icon: typeof Mail; label: string; value?: string }) {
+  return (
+    <div className="flex items-start gap-3 p-3 rounded-xl bg-gray-800/30 border border-gray-800/40">
+      <Icon className="w-4 h-4 text-gray-500 mt-0.5 flex-shrink-0" />
+      <div className="min-w-0">
+        <p className="text-[10px] text-gray-500 uppercase tracking-wider">{label}</p>
+        <p className="text-sm text-white truncate">{value || '—'}</p>
       </div>
     </div>
   );

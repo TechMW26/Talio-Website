@@ -1,6 +1,7 @@
 import { motion } from 'motion/react';
 import { Github, Twitter, Linkedin, Instagram, ArrowUp, Mail, MapPin, Phone } from 'lucide-react';
 import { Link } from 'react-router';
+import { AnimatedButton } from '@/app/components/AnimatedButton';
 import logoImage from '@/assets/2090cd551224404a5a02329a4590597a32d19a1f.png';
 import foxMascot from '@/assets/6966dd6bb9e98b4e32d6852e29b51847da2ba9cd.png';
 
@@ -78,43 +79,39 @@ export function Footer() {
 
       <div className="relative max-w-7xl mx-auto px-6 md:px-8 lg:px-12">
 
-        {/* CTA Section */}
+        {/* CTA Section — Hobbes-inspired split layout */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-          className="py-32 md:py-44 lg:py-52 flex flex-col items-center text-center border-b border-white/5"
+          className="py-20 md:py-28 flex flex-col md:flex-row items-start md:items-center justify-between gap-12 border-b border-white/5"
         >
-          <h2 className="text-5xl md:text-6xl lg:text-[5.5rem] font-bold tracking-tighter mb-8 leading-[1.05] text-center">
-            Ready to transform
-            <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-blue-400 to-purple-400">
-              your workforce?
+          {/* Left side */}
+          <div className="flex-1">
+            <span className="inline-flex items-center gap-2 text-xs font-semibold text-gray-500 uppercase tracking-widest mb-6 border border-white/10 rounded-full px-4 py-1.5">
+              ✦ Experience Talio
             </span>
-          </h2>
-          <p className="text-lg md:text-xl text-gray-400 font-light leading-relaxed max-w-2xl text-center mb-14">
-            Join thousands of teams already using Talio to streamline operations and boost productivity.
-          </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-5">
-            <Link to="/get-started">
-              <motion.div
-                whileHover={{ scale: 1.03, y: -2 }}
-                whileTap={{ scale: 0.98 }}
-                className="px-10 py-5 bg-white text-black font-semibold rounded-full text-lg hover:shadow-lg hover:shadow-white/10 transition-shadow duration-300"
-              >
-                Start Free Trial
-              </motion.div>
-            </Link>
-            <Link to="/contact">
-              <motion.div
-                whileHover={{ scale: 1.03, y: -2 }}
-                whileTap={{ scale: 0.98 }}
-                className="px-10 py-5 border border-white/15 text-white font-medium rounded-full text-lg hover:bg-white/5 hover:border-white/25 transition-all duration-300"
-              >
-                Talk to Sales
-              </motion.div>
-            </Link>
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tighter leading-[1.1] text-white">
+              Ready to see Talio
+              <br />
+              in Action?
+            </h2>
+          </div>
+
+          {/* Right side */}
+          <div className="flex-1 md:max-w-md">
+            <p className="text-base text-gray-400 font-light leading-relaxed mb-8">
+              Designed for teams that need control, consistency, and measurable impact across every workforce touchpoint.
+            </p>
+            <div className="flex flex-wrap gap-4">
+              <Link to="/get-started">
+                <AnimatedButton label="Start Free Trial" size="sm" />
+              </Link>
+              <Link to="/contact">
+                <AnimatedButton label="Talk to Sales" variant="secondary" size="sm" />
+              </Link>
+            </div>
           </div>
         </motion.div>
 

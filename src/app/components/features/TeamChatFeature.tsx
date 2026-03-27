@@ -10,6 +10,7 @@ export function TeamChatFeature() {
       subtitle="Real-time messaging with channels, direct messages, file sharing, and deep Talio integration."
       accentColor="text-sky-400"
       gradientFrom="to-sky-950/30"
+      heroImage="https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=1920&q=80"
       stats={[
         { value: '100%', label: 'Real-time Sync' },
         { value: '50GB', label: 'File Storage' },

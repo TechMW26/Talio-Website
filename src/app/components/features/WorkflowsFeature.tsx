@@ -10,6 +10,7 @@ export function WorkflowsFeature() {
       subtitle="Automate repetitive tasks with intelligent automation — no code required."
       accentColor="text-violet-400"
       gradientFrom="to-violet-950/30"
+      heroImage="https://images.unsplash.com/photo-1523961131990-5ea7c61b2107?auto=format&fit=crop&w=1920&q=80"
       stats={[
         { value: '70%', label: 'Less Manual Work' },
         { value: '24/7', label: 'Automation' },

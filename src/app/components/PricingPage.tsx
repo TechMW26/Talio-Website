@@ -9,8 +9,8 @@ const plans = [
     icon: Sparkles,
     name: "Starter",
     price: { monthly: 0, annual: 0 },
-    priceLabel: "$0",
-    period: "/month",
+    priceLabel: "Free",
+    period: "",
     subtitle: "For small teams getting started",
     featured: false,
     gradient: "from-blue-500 to-cyan-500",
@@ -123,14 +123,14 @@ export function PricingPage() {
         <motion.div
           style={{
             y: useTransform(scrollYProgress, [0, 1], [100, -100]),
-            opacity: useTransform(scrollYProgress, [0, 0.5, 1], [0.3, 0.5, 0.3]),
+            opacity: useTransform(scrollYProgress, [0, 0.5, 1], [0.15, 0.25, 0.15]),
           }}
           className="absolute top-1/4 -left-1/4 w-[600px] h-[600px] bg-gradient-to-br from-purple-500/20 via-blue-500/10 to-transparent rounded-full blur-3xl"
         />
         <motion.div
           style={{
             y: useTransform(scrollYProgress, [0, 1], [-100, 100]),
-            opacity: useTransform(scrollYProgress, [0, 0.5, 1], [0.3, 0.5, 0.3]),
+            opacity: useTransform(scrollYProgress, [0, 0.5, 1], [0.15, 0.25, 0.15]),
           }}
           className="absolute bottom-1/4 -right-1/4 w-[500px] h-[500px] bg-gradient-to-br from-pink-500/20 via-purple-500/10 to-transparent rounded-full blur-3xl"
         />
@@ -142,24 +142,26 @@ export function PricingPage() {
         initial={{ opacity: 0, y: 30 }}
         animate={heroInView ? { opacity: 1, y: 0 } : {}}
         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-        className="relative pt-40 pb-16 text-center px-6"
+        className="relative pt-40 pb-10 flex flex-col items-center text-center px-6"
       >
-        <span className="inline-flex items-center gap-2 text-xs md:text-sm font-semibold text-gray-500 uppercase tracking-widest mb-10">
+        <span className="inline-flex items-center gap-2 text-xs md:text-sm font-semibold text-gray-500 uppercase tracking-widest mb-8">
           ✦ PRICING
         </span>
-        <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-10 leading-[1.05] tracking-tighter text-center">
+        <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-[1.05] tracking-tighter text-center">
+          Simple, Transparent
+          <br />
           <span className="bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent">
-            Simple, Transparent Pricing
+            Pricing
           </span>
         </h1>
-        <p className="text-lg md:text-xl text-gray-400 font-light leading-relaxed max-w-2xl mx-auto text-center">
+        <p className="text-lg md:text-xl text-gray-400 font-light leading-relaxed max-w-xl text-center">
           Choose the plan that works for your team. Start free, scale as you grow.
         </p>
       </motion.section>
 
       {/* Billing Toggle */}
-      <div className="flex items-center justify-center gap-4 mb-20">
-        <span className={`text-sm font-medium ${billing === "monthly" ? "text-white" : "text-gray-400"}`}>
+      <div className="flex items-center justify-center gap-4 mb-16 mt-6">
+        <span className={`text-sm font-medium transition-colors ${billing === "monthly" ? "text-white" : "text-gray-500"}`}>
           Monthly
         </span>
         <button
@@ -167,12 +169,12 @@ export function PricingPage() {
           className="relative w-14 h-7 rounded-full bg-gray-800 border border-gray-700 transition-colors"
         >
           <motion.div
-            className="absolute top-0.5 left-0.5 w-6 h-6 rounded-full bg-purple-500"
+            className="absolute top-0.5 left-0.5 w-6 h-6 rounded-full bg-gradient-to-r from-purple-500 to-pink-500"
             animate={{ x: billing === "annual" ? 28 : 0 }}
             transition={{ type: "spring", stiffness: 500, damping: 30 }}
           />
         </button>
-        <span className={`text-sm font-medium ${billing === "annual" ? "text-white" : "text-gray-400"}`}>
+        <span className={`text-sm font-medium transition-colors ${billing === "annual" ? "text-white" : "text-gray-500"}`}>
           Annual
         </span>
         <span className="ml-1 px-2.5 py-0.5 rounded-full bg-green-500/10 border border-green-500/20 text-green-400 text-xs font-medium">
@@ -186,9 +188,9 @@ export function PricingPage() {
         initial={{ opacity: 0, y: 30 }}
         animate={plansInView ? { opacity: 1, y: 0 } : {}}
         transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-        className="relative max-w-[1400px] mx-auto px-6 md:px-8 lg:px-12 pb-28"
+        className="relative max-w-[1200px] mx-auto px-6 md:px-8 lg:px-12 pb-28"
       >
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid md:grid-cols-3 gap-6 items-start">
           {plans.map((plan, index) => {
             const Icon = plan.icon;
             const isHovered = hoveredIndex === index;
@@ -208,7 +210,7 @@ export function PricingPage() {
                 }}
                 onMouseEnter={() => setHoveredIndex(index)}
                 onMouseLeave={() => setHoveredIndex(null)}
-                className="relative group pt-6"
+                className={`relative group ${plan.featured ? 'md:-mt-4 md:mb-4' : 'pt-6'}`}
               >
                 {/* Popular Badge */}
                 {plan.badge && (
@@ -227,7 +229,7 @@ export function PricingPage() {
                         ],
                       }}
                       transition={{ duration: 2, repeat: Infinity, repeatType: "reverse" }}
-                      className={`px-6 py-2.5 bg-gradient-to-r ${plan.gradient} text-white text-xs font-bold uppercase tracking-widest rounded-full`}
+                      className={`px-6 py-2 bg-gradient-to-r ${plan.gradient} text-white text-xs font-bold uppercase tracking-widest rounded-full`}
                     >
                       {plan.badge}
                     </motion.div>
@@ -241,80 +243,73 @@ export function PricingPage() {
 
                 {/* Main Card */}
                 <motion.div
-                  whileHover={{ y: -12 }}
+                  whileHover={{ y: -8 }}
                   transition={{ duration: 0.3, type: "spring", stiffness: 300 }}
                   className={`
-                    relative h-full p-10 rounded-[2.5rem] overflow-hidden
+                    relative h-full rounded-[2.5rem] overflow-hidden
                     ${plan.featured
-                      ? "bg-white text-black"
-                      : "bg-gray-900 border-2 border-gray-800"
+                      ? "bg-gray-900/60 border-2 border-purple-500/30 backdrop-blur-sm p-10"
+                      : "bg-gray-900/60 border border-gray-800/60 backdrop-blur-sm p-10"
                     }
-                    shadow-xl hover:shadow-2xl transition-shadow duration-500
+                    transition-shadow duration-500
                   `}
                 >
                   {/* Glassmorphic Accent */}
                   <motion.div
-                    className={`absolute top-0 right-0 w-64 h-64 bg-gradient-to-br ${plan.gradient} rounded-full blur-3xl`}
-                    animate={isHovered ? { scale: [1, 1.2, 1], opacity: [0.1, 0.2, 0.1] } : { opacity: 0.1 }}
+                    className={`absolute top-0 right-0 w-48 h-48 bg-gradient-to-br ${plan.gradient} rounded-full blur-3xl`}
+                    animate={isHovered ? { scale: [1, 1.2, 1], opacity: [0.08, 0.15, 0.08] } : { opacity: 0.06 }}
                     transition={{ duration: 3, repeat: Infinity, repeatType: "reverse" }}
                   />
 
-                  {/* Floating Icon */}
-                  <div className="relative mb-8">
+                  {/* Centered Icon */}
+                  <div className="flex justify-center mb-7 relative">
                     <motion.div
-                      animate={isHovered ? { y: [0, -10, 0], rotate: [0, 5, -5, 0] } : {}}
+                      animate={isHovered ? { y: [0, -8, 0] } : {}}
                       transition={{ duration: 2, repeat: Infinity, repeatType: "reverse" }}
                       className="relative z-10"
                     >
-                      <div className={`w-20 h-20 rounded-2xl flex items-center justify-center relative shadow-2xl ${
+                      <div className={`w-16 h-16 rounded-2xl flex items-center justify-center relative shadow-xl ${
                         plan.featured
-                          ? "bg-black/10 backdrop-blur-xl border-2 border-black/10"
+                          ? `bg-gradient-to-br ${plan.gradient}`
                           : `bg-gradient-to-br ${plan.gradient}`
                       }`}>
-                        <motion.div
-                          animate={{ rotate: 360 }}
-                          transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-                          className="absolute inset-0 rounded-2xl"
-                        >
-                          <div className={`absolute top-0 left-1/2 w-2 h-2 bg-gradient-to-r ${plan.gradient} rounded-full -translate-x-1/2`} />
-                        </motion.div>
-                        <Icon className={`w-10 h-10 relative z-10 ${plan.featured ? "text-black" : "text-white"}`} />
+                        <Icon className="w-8 h-8 relative z-10 text-white" />
                       </div>
                     </motion.div>
                   </div>
 
-                  {/* Plan Name */}
-                  <h3 className={`text-3xl font-bold mb-3 tracking-tight relative z-10 ${plan.featured ? "text-black" : "text-white"}`}>
+                  {/* Plan Name — centered */}
+                  <h3 className="text-2xl font-bold mb-2 tracking-tight relative z-10 text-white text-center">
                     {plan.name}
                   </h3>
 
-                  {/* Description */}
-                  <p className={`text-base mb-10 font-light relative z-10 ${plan.featured ? "text-gray-600" : "text-gray-400"}`}>
+                  {/* Description — centered */}
+                  <p className="text-sm mb-8 font-light relative z-10 text-gray-400 text-center">
                     {plan.subtitle}
                   </p>
 
-                  {/* Price */}
-                  <div className="mb-10 relative z-10">
-                    <div className="flex items-baseline gap-2">
-                      <span className={`text-7xl font-bold tracking-tighter ${plan.featured ? "text-black" : "text-white"}`}>
-                        {priceDisplay}
+                  {/* Price — centered */}
+                  <div className="mb-8 relative z-10 text-center">
+                    <span className="text-5xl md:text-6xl font-bold tracking-tighter text-white">
+                      {priceDisplay}
+                    </span>
+                    {plan.period && (
+                      <span className="text-base text-gray-500 ml-1">
+                        {plan.period}
                       </span>
-                      {plan.period && (
-                        <span className={`text-xl ${plan.featured ? "text-gray-500" : "text-gray-400"}`}>
-                          {plan.period}
-                        </span>
-                      )}
-                    </div>
+                    )}
                   </div>
 
-                  {/* CTA Button */}
-                  <Link to={plan.ctaLink}>
+                  {/* CTA Button — centered */}
+                  <Link to={plan.ctaLink} className="block mb-10 relative z-10">
                     <motion.div
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
-                      className={`relative w-full py-5 text-base font-semibold rounded-full mb-12 overflow-hidden text-center shadow-lg group/btn z-10 ${
-                        plan.featured ? "bg-black text-white" : "bg-white text-black"
-                      }`}
+                      className={`relative w-full py-4 text-sm font-semibold rounded-full overflow-hidden text-center shadow-lg group ${
+                        plan.featured
+                          ? "bg-white text-black"
+                          : "bg-white/10 text-white border border-white/10 hover:bg-white/15"
+                      } transition-colors`}
                     >
                       <motion.div
                         className={`absolute inset-0 bg-gradient-to-r ${plan.gradient}`}
@@ -323,47 +318,47 @@ export function PricingPage() {
                         transition={{ duration: 0.3 }}
                       />
                       <span className="relative z-10 flex items-center justify-center gap-2">
-                        {plan.cta}
-                        <motion.div
-                          animate={isHovered ? { x: [0, 5, 0] } : {}}
-                          transition={{ duration: 1, repeat: Infinity }}
-                        >
-                          <ArrowRight className="w-5 h-5" />
-                        </motion.div>
+                        <span className="flex overflow-hidden">
+                          {plan.cta.split('').map((char: string, i: number) => (
+                            <span key={i} className="relative inline-flex flex-col h-[1.5em] overflow-hidden">
+                              <span className="group-hover:-translate-y-full transition-transform duration-500 ease-[0.22,1,0.36,1]" style={{ transitionDelay: `${i * 0.025}s` }}>
+                                {char === ' ' ? '\u00A0' : char}
+                              </span>
+                              <span className="absolute top-0 left-0 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-[0.22,1,0.36,1]" style={{ transitionDelay: `${i * 0.025}s` }}>
+                                {char === ' ' ? '\u00A0' : char}
+                              </span>
+                            </span>
+                          ))}
+                        </span>
+                        <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                       </span>
                     </motion.div>
                   </Link>
 
+                  {/* Divider */}
+                  <div className="w-full h-px bg-gray-800/60 mb-8" />
+
                   {/* Features */}
-                  <div className="space-y-5 relative z-10">
+                  <div className="space-y-4 relative z-10">
                     {plan.features.map((feature, featureIndex) => (
                       <motion.div
                         key={feature.name}
                         initial={{ opacity: 0, x: -20 }}
                         animate={plansInView ? { opacity: 1, x: 0 } : {}}
                         transition={{ duration: 0.5, delay: 0.4 + index * 0.1 + featureIndex * 0.05 }}
-                        whileHover={{ x: 5 }}
-                        className="flex items-start gap-4 group/feature"
+                        className="flex items-center gap-3"
                       >
                         {feature.included ? (
-                          <motion.div
-                            whileHover={{ scale: 1.3, rotate: 360 }}
-                            transition={{ duration: 0.5, type: "spring" }}
-                            className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center ${
-                              plan.featured ? "bg-green-500/20" : `bg-gradient-to-br ${plan.gradient}`
-                            }`}
-                          >
-                            <Check className={`w-4 h-4 ${plan.featured ? "text-green-600" : "text-white"}`} strokeWidth={3} />
-                          </motion.div>
+                          <div className={`flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center bg-gradient-to-br ${plan.gradient}`}>
+                            <Check className="w-3 h-3 text-white" strokeWidth={3} />
+                          </div>
                         ) : (
-                          <div className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center bg-gray-800">
-                            <X className="w-4 h-4 text-gray-600" strokeWidth={3} />
+                          <div className="flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center bg-gray-800/80">
+                            <X className="w-3 h-3 text-gray-600" strokeWidth={3} />
                           </div>
                         )}
-                        <span className={`text-base font-light ${
-                          feature.included
-                            ? plan.featured ? "text-gray-700" : "text-gray-300"
-                            : "text-gray-600 line-through"
+                        <span className={`text-sm ${
+                          feature.included ? "text-gray-300" : "text-gray-600 line-through"
                         }`}>
                           {feature.name}
                         </span>
@@ -376,8 +371,8 @@ export function PricingPage() {
                     className="absolute inset-0 pointer-events-none"
                     animate={isHovered ? {
                       background: [
-                        "linear-gradient(90deg, transparent 0%, transparent 40%, rgba(255,255,255,0.08) 50%, transparent 60%, transparent 100%)",
-                        "linear-gradient(90deg, transparent 0%, transparent 40%, rgba(255,255,255,0.08) 50%, transparent 60%, transparent 100%)",
+                        "linear-gradient(90deg, transparent 0%, transparent 40%, rgba(255,255,255,0.05) 50%, transparent 60%, transparent 100%)",
+                        "linear-gradient(90deg, transparent 0%, transparent 40%, rgba(255,255,255,0.05) 50%, transparent 60%, transparent 100%)",
                       ],
                       backgroundPosition: ["-200% 0", "200% 0"],
                     } : {}}
@@ -399,25 +394,35 @@ export function PricingPage() {
         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
         className="relative max-w-3xl mx-auto px-6 md:px-8 lg:px-12 pb-28"
       >
-        <h2 className="text-4xl md:text-6xl lg:text-7xl font-bold text-center text-white mb-16 tracking-tighter leading-[1.05]">
-          Frequently Asked Questions
-        </h2>
-        <div className="space-y-4">
+        <div className="flex flex-col items-center text-center">
+          <span className="text-xs md:text-sm font-semibold text-gray-500 uppercase tracking-widest mb-6">
+            ✦ FAQ
+          </span>
+          <h2 className="text-3xl md:text-5xl lg:text-6xl font-bold text-white tracking-tighter leading-[1.05] mb-4">
+            Frequently Asked
+            <br />
+            <span className="text-gray-500">Questions</span>
+          </h2>
+          <p className="text-gray-400 font-light mb-14 max-w-lg">
+            Everything you need to know about Talio pricing and plans.
+          </p>
+        </div>
+        <div className="space-y-3">
           {faqs.map((faq, i) => (
             <div
               key={i}
-              className="rounded-3xl bg-gray-900 border border-gray-800 overflow-hidden"
+              className="rounded-2xl bg-gray-900/60 border border-gray-800/60 overflow-hidden"
             >
               <button
                 onClick={() => setOpenFaq(openFaq === i ? null : i)}
                 className="w-full flex items-center justify-between px-6 py-5 text-left"
               >
-                <span className="text-white font-medium">{faq.question}</span>
+                <span className="text-white font-medium text-sm">{faq.question}</span>
                 <motion.span
                   animate={{ rotate: openFaq === i ? 180 : 0 }}
                   transition={{ duration: 0.3 }}
                 >
-                  <ChevronDown className="w-5 h-5 text-gray-400" />
+                  <ChevronDown className="w-5 h-5 text-gray-500" />
                 </motion.span>
               </button>
               <motion.div
@@ -429,7 +434,7 @@ export function PricingPage() {
                 transition={{ duration: 0.3 }}
                 className="overflow-hidden"
               >
-                <p className="px-6 pb-5 text-gray-400 leading-relaxed">
+                <p className="px-6 pb-5 text-gray-400 text-sm leading-relaxed">
                   {faq.answer}
                 </p>
               </motion.div>
@@ -444,20 +449,23 @@ export function PricingPage() {
         initial={{ opacity: 0, y: 30 }}
         animate={ctaInView ? { opacity: 1, y: 0 } : {}}
         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-        className="relative text-center px-6 pb-32"
+        className="relative flex flex-col items-center text-center px-6 pb-32"
       >
-        <p className="text-xl text-gray-400 mb-8 font-light">
-          Need a custom plan for your organization?
+        <h3 className="text-2xl md:text-3xl font-bold text-white mb-3 tracking-tight text-center">
+          Need a custom plan?
+        </h3>
+        <p className="text-base text-gray-400 mb-8 font-light max-w-md text-center">
+          Let's build a solution tailored to your organization's needs.
         </p>
         <Link to="/contact">
           <motion.div
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="inline-block px-12 py-5 text-base font-semibold rounded-full border border-white/15 text-white hover:bg-white/5 hover:border-white/25 transition-all duration-300"
+            className="inline-block px-10 py-4 text-sm font-semibold rounded-full bg-white text-black hover:bg-gray-100 transition-colors"
           >
-            <span className="flex items-center gap-3">
+            <span className="flex items-center gap-2">
               Contact Sales
-              <ArrowRight className="w-5 h-5" />
+              <ArrowRight className="w-4 h-4" />
             </span>
           </motion.div>
         </Link>

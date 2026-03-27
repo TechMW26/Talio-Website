@@ -10,6 +10,7 @@ export function PayrollFeature() {
       subtitle="Automated salary calculations, tax deductions, and payslip generation — error-free and on time."
       accentColor="text-emerald-400"
       gradientFrom="to-emerald-950/30"
+      heroImage="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1920&q=80"
       stats={[
         { value: '99.9%', label: 'Accuracy' },
         { value: '80%', label: 'Time Saved' },

@@ -38,6 +38,7 @@ interface FeatureDetailPageProps {
   };
   gradientFrom?: string;
   accentColor?: string;
+  heroImage?: string;
 }
 
 export function FeatureDetailPage({
@@ -50,7 +51,8 @@ export function FeatureDetailPage({
   steps,
   testimonial,
   gradientFrom = 'to-blue-950/30',
-  accentColor = 'text-blue-400'
+  accentColor = 'text-blue-400',
+  heroImage
 }: FeatureDetailPageProps) {
   usePageMeta(`${badge} — Features`, `${subtitle} Discover how Talio's ${badge.toLowerCase()} features help streamline your workforce management.`);
 
@@ -71,7 +73,17 @@ export function FeatureDetailPage({
   return (
     <div className="bg-gray-950 relative transition-colors duration-300">
       {/* Hero */}
-      <section ref={heroRef} className={`relative min-h-[60vh] flex items-center justify-center py-20 md:py-32 overflow-hidden bg-gradient-to-br from-gray-900 via-gray-950 ${gradientFrom}`}>
+      <section ref={heroRef} className={`relative min-h-[60vh] flex items-center justify-center py-20 md:py-32 overflow-hidden ${!heroImage ? `bg-gradient-to-br from-gray-900 via-gray-950 ${gradientFrom}` : ''}`}>
+        {heroImage && (
+          <div className="absolute inset-0">
+            <img
+              src={heroImage}
+              alt=""
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-b from-gray-950 via-gray-950/80 to-gray-950" />
+          </div>
+        )}
         <div className="absolute inset-0">
           <motion.div
             animate={{ scale: [1, 1.2, 1], opacity: [0.2, 0.4, 0.2] }}
@@ -376,7 +388,7 @@ function LeadForm({ source, accentColor, titleGradient }: { source: string; acce
         disabled={formState === 'submitting'}
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
-        className="w-full px-8 py-4 bg-white text-black font-semibold rounded-full text-base hover:shadow-lg hover:shadow-white/10 transition-shadow duration-300 flex items-center justify-center gap-2 disabled:opacity-70"
+        className="group w-full px-8 py-4 bg-white text-black font-semibold rounded-full text-base hover:shadow-lg hover:shadow-white/10 transition-shadow duration-300 flex items-center justify-center gap-2 disabled:opacity-70 overflow-hidden relative"
       >
         {formState === 'submitting' ? (
           <>
@@ -384,9 +396,21 @@ function LeadForm({ source, accentColor, titleGradient }: { source: string; acce
             Processing...
           </>
         ) : (
-          <>
-            Get Started Free <ArrowRight className="w-5 h-5" />
-          </>
+          <span className="relative z-10 flex items-center gap-2">
+            <span className="flex overflow-hidden">
+              {"Get Started Free".split('').map((char, i) => (
+                <span key={i} className="relative inline-flex flex-col h-[1.5em] overflow-hidden">
+                  <span className="group-hover:-translate-y-full transition-transform duration-500 ease-[0.22,1,0.36,1]" style={{ transitionDelay: `${i * 0.025}s` }}>
+                    {char === ' ' ? '\u00A0' : char}
+                  </span>
+                  <span className="absolute top-0 left-0 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-[0.22,1,0.36,1]" style={{ transitionDelay: `${i * 0.025}s` }}>
+                    {char === ' ' ? '\u00A0' : char}
+                  </span>
+                </span>
+              ))}
+            </span>
+            <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
+          </span>
         )}
       </motion.button>
     </form>

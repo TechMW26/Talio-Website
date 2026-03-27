@@ -6,6 +6,7 @@ import {
   Bot, MessageSquare, Bell, ArrowRight
 } from 'lucide-react';
 import { usePageMeta } from '@/app/hooks/usePageMeta';
+import { AnimatedButton } from '@/app/components/AnimatedButton';
 
 const coreFeatures = [
   {
@@ -92,7 +93,16 @@ export function FeaturesOverview() {
   return (
     <div className="bg-gray-950 relative transition-colors duration-300">
       {/* Hero */}
-      <section ref={heroRef} className="relative min-h-[70vh] flex items-center justify-center py-20 md:py-32 overflow-hidden bg-gradient-to-br from-gray-900 via-gray-950 to-indigo-950/30">
+      <section ref={heroRef} className="relative min-h-[70vh] flex items-center justify-center py-20 md:py-32 overflow-hidden">
+        {/* Background Image */}
+        <div className="absolute inset-0">
+          <img
+            src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1920&q=80"
+            alt=""
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-gray-950 via-gray-950/80 to-gray-950" />
+        </div>
         <div className="absolute inset-0">
           <motion.div
             animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
@@ -101,49 +111,40 @@ export function FeaturesOverview() {
           />
         </div>
 
-        <div className="relative max-w-5xl mx-auto px-6 md:px-8 lg:px-12 text-center z-10">
-          <motion.span
-            initial={{ opacity: 0, y: 20 }}
-            animate={heroInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="inline-flex items-center gap-2 text-xs md:text-sm font-semibold text-indigo-400 uppercase tracking-widest mb-10"
-          >
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={heroInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          className="relative flex flex-col items-center text-center z-10 px-6"
+        >
+          <span className="inline-flex items-center gap-2 text-xs md:text-sm font-semibold text-gray-500 uppercase tracking-widest mb-8">
             ✦ FEATURES
-          </motion.span>
-          <motion.h1
-            initial={{ opacity: 0, y: 30 }}
-            animate={heroInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 1, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
-            className="text-4xl md:text-6xl lg:text-7xl font-bold mb-10 leading-[1.05] tracking-tighter text-center"
-          >
+          </span>
+          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold leading-[1.05] tracking-tighter text-center" style={{ marginBottom: '1.5rem' }}>
             <span className="text-white">Everything You Need to </span>
+            <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">Manage Your Team</span>
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={heroInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.8, delay: 0.5 }}
-            className="text-lg md:text-xl text-gray-400 leading-relaxed font-light max-w-2xl mx-auto text-center"
-          >
+          </h1>
+          <p className="text-lg md:text-xl text-gray-400 font-light leading-relaxed max-w-xl text-center">
             From attendance to AI — a complete suite of tools to streamline your workforce operations.
-          </motion.p>
-        </div>
+          </p>
+        </motion.div>
       </section>
 
       {/* Core Features */}
       <section ref={coreRef} className="py-20 md:py-32">
         <div className="max-w-7xl mx-auto px-6 md:px-8 lg:px-12">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 30 }}
             animate={coreInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.8 }}
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
             className="flex flex-col items-center text-center mb-20 md:mb-28"
           >
-            <span className="text-xs md:text-sm font-semibold text-indigo-400 uppercase tracking-widest mb-10">CORE PLATFORM</span>
-            <h2 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white leading-[1.05] tracking-tighter mb-10 text-center">
+            <span className="inline-flex items-center gap-2 text-xs md:text-sm font-semibold text-gray-500 uppercase tracking-widest mb-6">CORE PLATFORM</span>
+            <h2 className="text-3xl md:text-5xl lg:text-6xl font-bold text-white tracking-tighter leading-[1.05] text-center" style={{ marginBottom: '1rem' }}>
               Six Powerful Modules
             </h2>
-            <p className="text-lg md:text-xl text-gray-400 font-light leading-relaxed max-w-2xl text-center">
+            <p className="text-gray-400 font-light max-w-lg">
               Each module works seamlessly together to give you full control over your workforce.
             </p>
           </motion.div>
@@ -178,16 +179,16 @@ export function FeaturesOverview() {
       <section ref={commRef} className="py-20 md:py-32 bg-gradient-to-b from-gray-950 to-gray-900">
         <div className="max-w-7xl mx-auto px-6 md:px-8 lg:px-12">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 30 }}
             animate={commInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.8 }}
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
             className="flex flex-col items-center text-center mb-20 md:mb-28"
           >
-            <span className="text-xs md:text-sm font-semibold text-purple-400 uppercase tracking-widest mb-10">COMMUNICATION & AI</span>
-            <h2 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white leading-[1.05] tracking-tighter mb-10 text-center">
+            <span className="inline-flex items-center gap-2 text-xs md:text-sm font-semibold text-gray-500 uppercase tracking-widest mb-6">COMMUNICATION & AI</span>
+            <h2 className="text-3xl md:text-5xl lg:text-6xl font-bold text-white tracking-tighter leading-[1.05] text-center" style={{ marginBottom: '1rem' }}>
               Stay Connected, Work Smarter
             </h2>
-            <p className="text-lg md:text-xl text-gray-400 font-light leading-relaxed max-w-2xl text-center">
+            <p className="text-gray-400 font-light max-w-lg">
               AI-powered communication tools that keep your team aligned and productive.
             </p>
           </motion.div>
@@ -220,36 +221,25 @@ export function FeaturesOverview() {
 
       {/* CTA */}
       <section ref={ctaRef} className="py-20 md:py-32">
-        <div className="max-w-4xl mx-auto px-6 md:px-8 lg:px-12 text-center">
+        <div className="max-w-4xl mx-auto px-6 md:px-8 lg:px-12">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={ctaInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            className="flex flex-col items-center text-center"
           >
-            <h2 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-10 tracking-tighter leading-[1.05] text-center">
+            <h2 className="text-3xl md:text-5xl lg:text-6xl font-bold text-white tracking-tighter leading-[1.05] text-center" style={{ marginBottom: '1rem' }}>
               Ready to Get Started?
             </h2>
-            <p className="text-lg md:text-xl text-gray-400 font-light leading-relaxed max-w-2xl mx-auto text-center mb-12">
+            <p className="text-gray-400 font-light max-w-lg mb-12">
               See how Talio can transform your workforce management. Start with a 14-day free trial.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link to="/get-started">
-                <motion.div
-                  whileHover={{ scale: 1.03, y: -2 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="px-8 py-4 bg-white text-black font-semibold rounded-full text-base hover:shadow-lg hover:shadow-white/10 transition-shadow duration-300"
-                >
-                  Start Free Trial
-                </motion.div>
+                <AnimatedButton label="Start Free Trial" />
               </Link>
               <Link to="/pricing">
-                <motion.div
-                  whileHover={{ scale: 1.03, y: -2 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="px-8 py-4 border border-white/15 text-white font-medium rounded-full text-base hover:bg-white/5 hover:border-white/25 transition-all duration-300"
-                >
-                  View Pricing
-                </motion.div>
+                <AnimatedButton label="View Pricing" variant="secondary" />
               </Link>
             </div>
           </motion.div>

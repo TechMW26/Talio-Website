@@ -1,58 +1,165 @@
-import { motion, useScroll, useTransform } from 'motion/react';
-import { useRef } from 'react';
-import { ArrowRight, Sparkles, TrendingUp, Users } from 'lucide-react';
-import { Button } from '@/app/components/ui/button';
+import { motion, useScroll, useTransform, useMotionValueEvent } from 'motion/react';
+import { useRef, useState, useEffect, useCallback } from 'react';
+import { Sparkles, TrendingUp, Users } from 'lucide-react';
+import { AnimatedButton } from '@/app/components/AnimatedButton';
+
+// Animated grid with gradient lines that warp near the mouse
+function WarpGrid({ className }: { className?: string }) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const mouse = useRef({ x: -1000, y: -1000 });
+  const rafId = useRef(0);
+  const mounted = useRef(true);
+
+  const draw = useCallback(() => {
+    const canvas = canvasRef.current;
+    if (!canvas || !mounted.current) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const w = rect.width;
+    const h = rect.height;
+
+    if (canvas.width !== w * dpr || canvas.height !== h * dpr) {
+      canvas.width = w * dpr;
+      canvas.height = h * dpr;
+      ctx.scale(dpr, dpr);
+    }
+
+    ctx.clearRect(0, 0, w, h);
+
+    const spacing = 60;
+    const mx = mouse.current.x - rect.left;
+    const my = mouse.current.y - rect.top;
+    const warpRadius = 120;
+    const warpStrength = 18;
+
+    // Draw vertical lines
+    for (let x = 0; x <= w; x += spacing) {
+      ctx.beginPath();
+      for (let y = 0; y <= h; y += 4) {
+        const dx = x - mx;
+        const dy = y - my;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        let px = x;
+        if (dist < warpRadius) {
+          const factor = (1 - dist / warpRadius) * warpStrength;
+          px += (dx / (dist || 1)) * factor;
+        }
+        if (y === 0) ctx.moveTo(px, y);
+        else ctx.lineTo(px, y);
+      }
+      // Gradient stroke — blue to purple
+      const gradient = ctx.createLinearGradient(x, 0, x, h);
+      gradient.addColorStop(0, 'rgba(96, 165, 250, 0.25)');
+      gradient.addColorStop(0.5, 'rgba(168, 85, 247, 0.25)');
+      gradient.addColorStop(1, 'rgba(96, 165, 250, 0.25)');
+      ctx.strokeStyle = gradient;
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    }
+
+    // Draw horizontal lines
+    for (let y = 0; y <= h; y += spacing) {
+      ctx.beginPath();
+      for (let x = 0; x <= w; x += 4) {
+        const dx = x - mx;
+        const dy = y - my;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        let py = y;
+        if (dist < warpRadius) {
+          const factor = (1 - dist / warpRadius) * warpStrength;
+          py += (dy / (dist || 1)) * factor;
+        }
+        if (x === 0) ctx.moveTo(x, py);
+        else ctx.lineTo(x, py);
+      }
+      const gradient = ctx.createLinearGradient(0, y, w, y);
+      gradient.addColorStop(0, 'rgba(168, 85, 247, 0.25)');
+      gradient.addColorStop(0.5, 'rgba(96, 165, 250, 0.25)');
+      gradient.addColorStop(1, 'rgba(168, 85, 247, 0.25)');
+      ctx.strokeStyle = gradient;
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    }
+
+    // Draw brighter intersection dots
+    for (let x = 0; x <= w; x += spacing) {
+      for (let y = 0; y <= h; y += spacing) {
+        const dx = x - mx;
+        const dy = y - my;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        let px = x, py = y;
+        if (dist < warpRadius) {
+          const factor = (1 - dist / warpRadius) * warpStrength;
+          px += (dx / (dist || 1)) * factor;
+          py += (dy / (dist || 1)) * factor;
+        }
+        const brightness = dist < warpRadius ? 0.5 + (1 - dist / warpRadius) * 0.5 : 0.3;
+        ctx.beginPath();
+        ctx.arc(px, py, dist < warpRadius ? 2 : 1.2, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(168, 130, 255, ${brightness})`;
+        ctx.fill();
+      }
+    }
+
+    rafId.current = requestAnimationFrame(draw);
+  }, []);
+
+  useEffect(() => {
+    mounted.current = true;
+    rafId.current = requestAnimationFrame(draw);
+
+    const onMove = (e: MouseEvent) => {
+      mouse.current = { x: e.clientX, y: e.clientY };
+    };
+    window.addEventListener('mousemove', onMove, { passive: true });
+
+    return () => {
+      mounted.current = false;
+      cancelAnimationFrame(rafId.current);
+      window.removeEventListener('mousemove', onMove);
+    };
+  }, [draw]);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      className={className}
+      style={{ width: '100%', height: '100%' }}
+    />
+  );
+}
 
 export function ZoomStorySection() {
   const containerRef = useRef(null);
+  const [contentReady, setContentReady] = useState(false);
   
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start start", "end end"]
   });
 
-  // Phase 1: Zoom animation (0 to 0.3 of scroll) - now fills entire viewport
-  const zoomProgress = useTransform(scrollYProgress, [0, 0.3], [0, 1]);
+  // Phase 1: Zoom animation (0 to 0.4 of scroll) - fills entire viewport
+  const zoomProgress = useTransform(scrollYProgress, [0, 0.4], [0, 1]);
   const scale = useTransform(zoomProgress, [0, 1], [0.2, 1]);
   const borderRadius = useTransform(zoomProgress, [0, 1], [24, 0]);
-  
-  // Phase 2: Content reveal (0.3 to 1 of scroll)
-  const contentProgress = useTransform(scrollYProgress, [0.3, 0.4, 0.6, 0.8], [0, 1, 1, 1]);
-  const labelOpacity = useTransform(scrollYProgress, [0.3, 0.45], [0, 1]);
-  const labelY = useTransform(scrollYProgress, [0.3, 0.45], [30, 0]);
-  
-  const headingOpacity = useTransform(scrollYProgress, [0.35, 0.5], [0, 1]);
-  const headingY = useTransform(scrollYProgress, [0.35, 0.5], [40, 0]);
-  
-  const paragraph1Opacity = useTransform(scrollYProgress, [0.4, 0.55], [0, 1]);
-  const paragraph1Y = useTransform(scrollYProgress, [0.4, 0.55], [30, 0]);
-  
-  const paragraph2Opacity = useTransform(scrollYProgress, [0.45, 0.6], [0, 1]);
-  const paragraph2Y = useTransform(scrollYProgress, [0.45, 0.6], [30, 0]);
-  
-  const paragraph3Opacity = useTransform(scrollYProgress, [0.5, 0.65], [0, 1]);
-  const paragraph3Y = useTransform(scrollYProgress, [0.5, 0.65], [30, 0]);
-  
-  const buttonOpacity = useTransform(scrollYProgress, [0.55, 0.7], [0, 1]);
-  const buttonY = useTransform(scrollYProgress, [0.55, 0.7], [30, 0]);
-  
-  const stat1Opacity = useTransform(scrollYProgress, [0.45, 0.6], [0, 1]);
-  const stat1X = useTransform(scrollYProgress, [0.45, 0.6], [50, 0]);
-  
-  const stat2Opacity = useTransform(scrollYProgress, [0.5, 0.65], [0, 1]);
-  const stat2X = useTransform(scrollYProgress, [0.5, 0.65], [50, 0]);
-  
-  const stat3Opacity = useTransform(scrollYProgress, [0.55, 0.7], [0, 1]);
-  const stat3X = useTransform(scrollYProgress, [0.55, 0.7], [50, 0]);
+
+  // Bidirectional content trigger — animate in AND out on scroll
+  useMotionValueEvent(scrollYProgress, 'change', (v) => {
+    if (v >= 0.35 && !contentReady) setContentReady(true);
+    if (v < 0.28 && contentReady) setContentReady(false);
+  });
 
   const stats = [
-    { value: '500+', label: 'Enterprise Signups', icon: TrendingUp, opacity: stat1Opacity, x: stat1X },
-    { value: '50K+', label: 'Active Users', icon: Users, opacity: stat2Opacity, x: stat2X },
-    { value: '15+', label: 'Years of Legacy', icon: Sparkles, opacity: stat3Opacity, x: stat3X }
+    { value: '500+', label: 'Enterprise Signups', icon: TrendingUp },
+    { value: '50K+', label: 'Active Users', icon: Users },
+    { value: '15+', label: 'Years of Legacy', icon: Sparkles }
   ];
 
   return (
-    <div ref={containerRef} className="relative bg-gradient-to-br from-gray-900 via-gray-950 to-blue-950/30 -mt-1" style={{ height: '400vh', position: 'relative' }}>
+    <div ref={containerRef} className="relative bg-gradient-to-br from-gray-900 via-gray-950 to-blue-950/30 -mt-1" style={{ height: '200vh', position: 'relative' }}>
       {/* Sticky Container */}
       <div className="sticky top-0 h-screen flex items-center justify-center overflow-hidden">
         {/* Animated Background Gradients */}
@@ -77,14 +184,14 @@ export function ZoomStorySection() {
           className="absolute inset-0"
         >
           {/* Main Content Box */}
-          <div className="relative w-full h-full overflow-hidden bg-gradient-to-br from-gray-900/95 to-gray-950/95 backdrop-blur-xl border border-white/10 shadow-2xl">
-            {/* Checkered Grid Background - More Prominent */}
-            <div className="absolute inset-0 opacity-[0.15]">
-              <div className="absolute inset-0" style={{
-                backgroundImage: `linear-gradient(to right, #fff 2px, transparent 2px), linear-gradient(to bottom, #fff 2px, transparent 2px)`,
-                backgroundSize: '60px 60px'
-              }} />
-            </div>
+          <div className="relative w-full h-full overflow-hidden bg-transparent border border-white/10 shadow-2xl">
+            {/* Animated Warp Grid Background — blurs during zoom, sharpens when fully expanded */}
+            <motion.div
+              className="absolute inset-0 opacity-80"
+              style={{ filter: useTransform(zoomProgress, [0, 0.85, 1], ['blur(6px)', 'blur(2px)', 'blur(0px)']) }}
+            >
+              <WarpGrid className="absolute inset-0" />
+            </motion.div>
 
             {/* Content Container */}
             <div className="relative h-full flex items-center justify-center px-8 md:px-16 lg:px-24 py-12 md:py-16">
@@ -94,7 +201,9 @@ export function ZoomStorySection() {
                 <div className="space-y-6 md:space-y-8">
                   {/* Label */}
                   <motion.div
-                    style={{ opacity: labelOpacity, y: labelY }}
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={contentReady ? { opacity: 1, y: 0 } : {}}
+                    transition={{ duration: 0.8, delay: 0, ease: [0.16, 1, 0.3, 1] }}
                     className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-600/10 border border-blue-500/20"
                   >
                     <Sparkles className="w-4 h-4 text-blue-400" />
@@ -105,7 +214,9 @@ export function ZoomStorySection() {
 
                   {/* Heading */}
                   <motion.h3
-                    style={{ opacity: headingOpacity, y: headingY }}
+                    initial={{ opacity: 0, y: 40 }}
+                    animate={contentReady ? { opacity: 1, y: 0 } : {}}
+                    transition={{ duration: 0.9, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
                     className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-white leading-tight tracking-tight"
                   >
                     Transforming Work{' '}
@@ -116,34 +227,39 @@ export function ZoomStorySection() {
 
                   {/* Paragraphs */}
                   <motion.p
-                    style={{ opacity: paragraph1Opacity, y: paragraph1Y }}
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={contentReady ? { opacity: 1, y: 0 } : {}}
+                    transition={{ duration: 0.8, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
                     className="text-base md:text-lg lg:text-xl text-gray-300 leading-relaxed font-light"
                   >
                     We believe that workforce management should empower teams, not burden them. That's why we built Talio - to make managing your team effortless.
                   </motion.p>
 
                   <motion.p
-                    style={{ opacity: paragraph2Opacity, y: paragraph2Y }}
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={contentReady ? { opacity: 1, y: 0 } : {}}
+                    transition={{ duration: 0.8, delay: 0.45, ease: [0.16, 1, 0.3, 1] }}
                     className="text-sm md:text-base lg:text-lg text-gray-400 leading-relaxed font-light"
                   >
                     From intelligent scheduling to real-time analytics, every feature is designed to help you focus on what matters most - your people and your mission.
                   </motion.p>
 
                   <motion.p
-                    style={{ opacity: paragraph3Opacity, y: paragraph3Y }}
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={contentReady ? { opacity: 1, y: 0 } : {}}
+                    transition={{ duration: 0.8, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
                     className="text-sm md:text-base lg:text-lg text-gray-400 leading-relaxed font-light"
                   >
                     Join thousands of organizations who trust Talio to streamline their operations and unlock their team's full potential.
                   </motion.p>
 
                   {/* CTA Button */}
-                  <motion.div style={{ opacity: buttonOpacity, y: buttonY }}>
-                    <Button className="bg-white text-black hover:bg-gray-200 px-6 md:px-8 py-5 md:py-6 text-base md:text-lg rounded-full group shadow-xl transition-all duration-300">
-                      <span className="flex items-center gap-2">
-                        Learn Our Story
-                        <ArrowRight className="w-4 h-4 md:w-5 md:h-5 group-hover:translate-x-1 transition-transform" />
-                      </span>
-                    </Button>
+                  <motion.div
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={contentReady ? { opacity: 1, y: 0 } : {}}
+                    transition={{ duration: 0.8, delay: 0.75, ease: [0.16, 1, 0.3, 1] }}
+                  >
+                    <AnimatedButton label="Learn Our Story" size="md" />
                   </motion.div>
                 </div>
 
@@ -154,10 +270,12 @@ export function ZoomStorySection() {
                     return (
                       <motion.div
                         key={stat.label}
-                        style={{ opacity: stat.opacity, x: stat.x }}
+                        initial={{ opacity: 0, x: 50 }}
+                        animate={contentReady ? { opacity: 1, x: 0 } : {}}
+                        transition={{ duration: 0.8, delay: 0.4 + index * 0.15, ease: [0.16, 1, 0.3, 1] }}
                         className="relative group"
                       >
-                        <div className="relative p-5 md:p-6 lg:p-8 rounded-2xl bg-gradient-to-br from-white/5 to-white/[0.02] backdrop-blur-sm border border-white/10 hover:border-white/20 transition-all duration-500 hover:scale-[1.02]">
+                        <div className="relative p-5 md:p-6 lg:p-8 rounded-2xl bg-gradient-to-br from-white/5 to-white/[0.02] border border-white/10 hover:border-white/20 transition-all duration-500 hover:scale-[1.02]">
                           {/* Icon */}
                           <div className="absolute top-5 md:top-6 right-5 md:right-6">
                             <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-br from-blue-600/20 to-purple-600/20 flex items-center justify-center">

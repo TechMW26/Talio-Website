@@ -10,6 +10,7 @@ export function LeavesFeature() {
       subtitle="Smart leave tracking with approval workflows, balance monitoring, and complete policy compliance."
       accentColor="text-amber-400"
       gradientFrom="to-amber-950/30"
+      heroImage="https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=1920&q=80"
       stats={[
         { value: '90%', label: 'Faster Approvals' },
         { value: '100%', label: 'Policy Compliance' },

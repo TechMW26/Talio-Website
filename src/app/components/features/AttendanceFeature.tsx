@@ -10,6 +10,7 @@ export function AttendanceFeature() {
       subtitle="GPS check-ins with geofencing, facial recognition, and real-time tracking for accurate attendance management."
       accentColor="text-cyan-400"
       gradientFrom="to-cyan-950/30"
+      heroImage="https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=1920&q=80"
       stats={[
         { value: '98%', label: 'Accuracy' },
         { value: '5min', label: 'Setup Time' },

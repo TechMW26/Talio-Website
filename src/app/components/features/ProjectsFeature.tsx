@@ -10,6 +10,7 @@ export function ProjectsFeature() {
       subtitle="Kanban boards, task tracking, deadlines, and team collaboration all in one place."
       accentColor="text-pink-400"
       gradientFrom="to-pink-950/30"
+      heroImage="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1920&q=80"
       stats={[
         { value: '40%', label: 'Faster Delivery' },
         { value: '100%', label: 'Task Visibility' },

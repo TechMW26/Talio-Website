@@ -1,5 +1,5 @@
 import { motion, useScroll, useTransform, useMotionValueEvent, AnimatePresence } from 'motion/react';
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, forwardRef } from 'react';
 import { DndProvider, useDrag, useDrop } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { Sparkles, Plus, MoreHorizontal, Layout, Settings, Share2, ZoomIn, ZoomOut } from 'lucide-react';
@@ -28,21 +28,21 @@ const COLUMN_COLORS = [
 ];
 
 // Minimalist Card Component with column-based color coding
-function DraggableCard({ 
-  card, 
-  columnIndex, 
-  cardIndex, 
-  column,
-  moveCard,
-  isAnimating,
-}: { 
+const DraggableCard = forwardRef<HTMLDivElement, {
   card: Card;
   columnIndex: number;
   cardIndex: number;
   column: Column;
   moveCard: (draggedCard: Card, fromColumn: number, fromIndex: number, toColumn: number, toIndex: number) => void;
   isAnimating: boolean;
-}) {
+}>(function DraggableCard({ 
+  card, 
+  columnIndex, 
+  cardIndex, 
+  column,
+  moveCard,
+  isAnimating,
+}, _ref) {
   const cardRef = useRef<HTMLDivElement>(null);
   const colors = COLUMN_COLORS[columnIndex] || COLUMN_COLORS[0];
   
@@ -138,7 +138,7 @@ function DraggableCard({
       </div>
     </motion.div>
   );
-}
+});
 
 // Droppable column zone — accepts drops on the entire column area including empty space
 function DroppableColumn({ 

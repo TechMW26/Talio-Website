@@ -1,6 +1,6 @@
 import { motion, useInView, useScroll, useTransform } from 'motion/react';
 import { useRef, useState } from 'react';
-import { Lightbulb, Users, Shield, TrendingUp, ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
+import { Lightbulb, Users, Shield, TrendingUp, ChevronLeft, ChevronRight, Sparkles, ArrowRight } from 'lucide-react';
 import { AnimatedButton } from '@/app/components/AnimatedButton';
 import { ZoomStorySection } from '@/app/components/ZoomStorySection';
 import { usePageMeta } from '@/app/hooks/usePageMeta';

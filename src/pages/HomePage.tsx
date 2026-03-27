@@ -1,24 +1,28 @@
 import { Hero } from '@/app/components/Hero';
-import { Features } from '@/app/components/Features';
+import { KeyboardSection } from '@/app/components/KeyboardSection';
 import { usePageMeta } from '@/app/hooks/usePageMeta';
 import { ProjectManagement } from '@/app/components/ProjectManagement';
 import { PayrollSection } from '@/app/components/PayrollSection';
 import { OKRSection } from '@/app/components/OKRSection';
-import { AIWorkflows } from '@/app/components/AIWorkflows';
-import { Pricing } from '@/app/components/Pricing';
+import { AISection } from '@/app/components/AISection';
+import { LanguagesSection } from '@/app/components/LanguagesSection';
+import { PrivacySection } from '@/app/components/PrivacySection';
+import { PricingCTA } from '@/app/components/PricingCTA';
 
 export function HomePage() {
   usePageMeta('', 'Transform your workforce management with Talio\'s AI-powered platform. Smart attendance, automated payroll, project management, OKRs, and MIRA AI assistant — all in one place.');
 
   return (
-    <div style={{ position: 'relative' }}>
+    <div style={{ position: 'relative' }} className="md:[scroll-snap-type:y_proximity]">
       <Hero />
-      <Features />
+      <KeyboardSection />
       <ProjectManagement />
       <PayrollSection />
       <OKRSection />
-      <AIWorkflows />
-      <Pricing />
+      <AISection />
+      <LanguagesSection />
+      <PrivacySection />
+      <PricingCTA />
     </div>
   );
 }

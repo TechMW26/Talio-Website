@@ -1,6 +1,6 @@
 import { motion, useInView, useScroll, useTransform } from 'motion/react';
 import { useRef, useState } from 'react';
-import { Lightbulb, Users, Shield, TrendingUp, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Lightbulb, Users, Shield, TrendingUp, ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
 import { AnimatedButton } from '@/app/components/AnimatedButton';
 import { ZoomStorySection } from '@/app/components/ZoomStorySection';
 import { usePageMeta } from '@/app/hooks/usePageMeta';
@@ -507,7 +507,7 @@ export function About() {
               className="mb-4"
             >
               <span className="inline-flex items-center gap-2 text-xs md:text-sm font-semibold text-gray-400 uppercase tracking-widest">
-                💫 THE WAY WE WORK
+                <Sparkles className="w-4 h-4" /> THE WAY WE WORK
               </span>
             </motion.div>
 

@@ -1,0 +1,353 @@
+import { motion, useInView, useScroll, useTransform } from 'motion/react';
+import { useRef, useEffect, useState } from 'react';
+import {
+  Sparkles,
+  CalendarCheck,
+  DollarSign,
+  BarChart3,
+  Users,
+  Brain,
+  ShieldCheck,
+} from 'lucide-react';
+
+/* ── Integration icons (6 icons at top) ── */
+const ICONS = [
+  { icon: CalendarCheck, color: '#3E86C6', label: 'Attendance' },
+  { icon: DollarSign, color: '#A666AA', label: 'Payroll' },
+  { icon: BarChart3, color: '#EC4492', label: 'Analytics' },
+  { icon: Users, color: '#EC4492', label: 'Teams' },
+  { icon: Brain, color: '#A666AA', label: 'AI' },
+  { icon: ShieldCheck, color: '#3E86C6', label: 'Compliance' },
+];
+
+/* ── Stats data ── */
+const STATS = [
+  { value: '10M+', desc: 'workforce data points processed' },
+  { value: '19,000+', desc: 'teams and organizations onboarded' },
+  { value: '27%', desc: 'average productivity lift across teams' },
+  { value: '95+', desc: 'countries supported for global teams' },
+];
+
+/* ── Gradient for stat numbers ── */
+const STAT_GRADIENT =
+  'linear-gradient(315deg, #3E86C6 0%, #A666AA 24.77%, #EC4492 50%, #EE4454 74.32%, #F05427 100%)';
+
+/*
+ * Icon X positions in SVG viewBox(0 0 600 220).
+ * Icons use justify-around in a container matched to the SVG width,
+ * giving each icon W/6 space → centers at W/12, 3W/12 … 11W/12.
+ * In viewBox 600: 50, 150, 250, 350, 450, 550.
+ */
+const ICON_X = [50, 150, 250, 350, 450, 550];
+const CONVERGE = { x: 300, y: 220 };
+
+const CONNECTOR_PATHS = ICON_X.map((x, i) => ({
+  d: `M${x} 0 C${x} ${85 + Math.abs(x - 300) * 0.04}, 300 ${165 - Math.abs(x - 300) * 0.02}, ${CONVERGE.x} ${CONVERGE.y}`,
+  color: ICONS[i].color,
+  dur: 2.4 + i * 0.12,
+}));
+
+/* ── Unified SVG connector lines ── */
+function ConnectorLines({ isInView }: { isInView: boolean }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={isInView ? { opacity: 1 } : {}}
+      transition={{ duration: 1, delay: 0.3 }}
+      className="hidden md:flex justify-center -mt-1"
+    >
+      <svg viewBox="0 0 600 220" className="w-full max-w-[700px] h-auto" fill="none">
+        <defs>
+          {CONNECTOR_PATHS.map((p, i) => (
+            <linearGradient key={`g${i}`} id={`aiLineGrad-${i}`} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor={p.color} stopOpacity="0.8" />
+              <stop offset="100%" stopColor={p.color} stopOpacity="0.1" />
+            </linearGradient>
+          ))}
+          <radialGradient id="aiCenterGlow">
+            <stop offset="0%" stopColor="#EC4492" />
+            <stop offset="100%" stopColor="#3E86C6" />
+          </radialGradient>
+        </defs>
+
+        {CONNECTOR_PATHS.map((p, i) => (
+          <g key={i}>
+            {/* Static faint trail */}
+            <path d={p.d} stroke="rgba(255,255,255,0.04)" strokeWidth="1.5" strokeLinecap="round" />
+
+            {/* Animated wave — slow start then sudden rush to bottom */}
+            <path
+              d={p.d}
+              stroke={`url(#aiLineGrad-${i})`}
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              pathLength="100"
+              strokeDasharray="18 82"
+            >
+              <animate
+                attributeName="stroke-dashoffset"
+                values="100;72;0"
+                keyTimes="0;0.55;1"
+                calcMode="spline"
+                keySplines="0.08 0 0.25 1; 0.75 0 1 0.5"
+                dur={`${p.dur}s`}
+                repeatCount="indefinite"
+              />
+            </path>
+
+            {/* Flowing dot */}
+            <circle r="2.5" fill={p.color} opacity="0.9">
+              <animateMotion
+                dur={`${p.dur}s`}
+                repeatCount="indefinite"
+                keyPoints="0;0.28;1"
+                keyTimes="0;0.55;1"
+                calcMode="spline"
+                keySplines="0.08 0 0.25 1; 0.75 0 1 0.5"
+              >
+                <mpath href={`#aiMotionPath-${i}`} />
+              </animateMotion>
+            </circle>
+            {/* Dot glow */}
+            <circle r="6" fill={p.color} opacity="0.15">
+              <animateMotion
+                dur={`${p.dur}s`}
+                repeatCount="indefinite"
+                keyPoints="0;0.28;1"
+                keyTimes="0;0.55;1"
+                calcMode="spline"
+                keySplines="0.08 0 0.25 1; 0.75 0 1 0.5"
+              >
+                <mpath href={`#aiMotionPath-${i}`} />
+              </animateMotion>
+            </circle>
+
+            {/* Origin glow burst at icon — pulses each cycle */}
+            <circle cx={ICON_X[i]} cy="0" r="14" fill={p.color} opacity="0">
+              <animate
+                attributeName="opacity"
+                values="0;0.25;0"
+                keyTimes="0;0.06;0.25"
+                dur={`${p.dur}s`}
+                repeatCount="indefinite"
+              />
+              <animate
+                attributeName="r"
+                values="10;22;10"
+                keyTimes="0;0.06;0.25"
+                dur={`${p.dur}s`}
+                repeatCount="indefinite"
+              />
+            </circle>
+
+            <path id={`aiMotionPath-${i}`} d={p.d} />
+          </g>
+        ))}
+
+        {/* Converge point glow */}
+        <circle cx={CONVERGE.x} cy={CONVERGE.y} r="3.5" fill="url(#aiCenterGlow)" opacity="0.8" />
+        <circle cx={CONVERGE.x} cy={CONVERGE.y} r="8" fill="url(#aiCenterGlow)" opacity="0.15">
+          <animate attributeName="r" values="8;14;8" dur="2s" repeatCount="indefinite" />
+          <animate attributeName="opacity" values="0.15;0.05;0.15" dur="2s" repeatCount="indefinite" />
+        </circle>
+      </svg>
+    </motion.div>
+  );
+}
+
+/* ── Icon box with repeating glow ── */
+function IconBox({
+  icon: Icon,
+  color,
+  label,
+  index,
+  isInView,
+}: {
+  icon: typeof CalendarCheck;
+  color: string;
+  label: string;
+  index: number;
+  isInView: boolean;
+}) {
+  const dur = CONNECTOR_PATHS[index]?.dur ?? 2.5;
+  const [glowing, setGlowing] = useState(false);
+
+  useEffect(() => {
+    if (!isInView) return;
+    // Start glow cycle — matches the SVG wave departure timing
+    const ms = dur * 1000;
+    const startDelay = setTimeout(() => {
+      setGlowing(true);
+      const id = setInterval(() => {
+        setGlowing(true);
+        setTimeout(() => setGlowing(false), 280);
+      }, ms);
+      setTimeout(() => setGlowing(false), 280);
+      return () => clearInterval(id);
+    }, 300); // match SVG entry delay
+    return () => clearTimeout(startDelay);
+  }, [isInView, dur]);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={isInView ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.5, delay: 0.3 + index * 0.06 }}
+      whileHover={{ scale: 1.15, y: -4 }}
+      className="relative group cursor-default"
+    >
+      <div
+        className="w-12 h-12 md:w-14 md:h-14 rounded-2xl flex items-center justify-center border backdrop-blur-sm"
+        style={{
+          background: `linear-gradient(135deg, ${color}18 0%, ${color}08 100%)`,
+          borderColor: glowing ? `${color}60` : `${color}25`,
+          boxShadow: glowing
+            ? `0 0 24px 6px ${color}35, 0 0 8px 2px ${color}20`
+            : `0 0 0 0 ${color}00`,
+          transition: 'box-shadow 0.15s ease-out, border-color 0.15s ease-out',
+        }}
+      >
+        <Icon className="w-5 h-5 md:w-6 md:h-6" style={{ color }} />
+      </div>
+      <span
+        className="absolute -bottom-7 left-1/2 -translate-x-1/2 text-[10px] font-medium opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap"
+        style={{ color }}
+      >
+        {label}
+      </span>
+    </motion.div>
+  );
+}
+
+export function AISection() {
+  const sectionRef = useRef(null);
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: '-80px' });
+
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ['start end', 'end start'],
+  });
+
+  const iconY = useTransform(scrollYProgress, [0, 1], [15, -15]);
+
+  return (
+    <section ref={sectionRef} className="relative py-20 md:py-28 bg-black overflow-hidden">
+      {/* Background texture */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div
+          className="absolute inset-0 opacity-[0.02]"
+          style={{
+            backgroundImage:
+              'radial-gradient(circle, rgba(255,255,255,0.15) 1px, transparent 1px)',
+            backgroundSize: '32px 32px',
+          }}
+        />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-to-b from-violet-600/5 via-blue-500/4 to-transparent rounded-full blur-[140px]" />
+      </div>
+
+      <div ref={ref} className="relative max-w-[1200px] mx-auto px-6 md:px-8 lg:px-12">
+        {/* ── Heading ── */}
+        <div className="flex flex-col items-center text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.6 }}
+            className="inline-flex items-center gap-2 text-sm font-semibold text-gray-400 uppercase tracking-widest mb-10"
+          >
+            <Sparkles className="w-4 h-4" />
+            AI Intelligence
+          </motion.div>
+
+          <motion.h2
+            initial={{ opacity: 0, y: 30 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+            className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-10 leading-[1.05] tracking-tighter text-center"
+          >
+            AI trained on millions of{' '}
+            <br className="hidden md:block" />
+            workforce insights from{' '}
+            <br className="hidden md:block" />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#3E86C6] via-[#EC4492] to-[#F05427]">
+              top organizations
+            </span>
+          </motion.h2>
+        </div>
+
+        {/* ── Icon Stack — justify-around keeps centers at viewBox 50,150,…,550 ── */}
+        <motion.div
+          style={{ y: iconY }}
+          className="flex items-center justify-around max-w-[700px] mx-auto mt-4 mb-0 relative z-10"
+        >
+          {ICONS.map(({ icon: Icon, color, label }, i) => (
+            <IconBox key={label} icon={Icon} color={color} label={label} index={i} isInView={isInView} />
+          ))}
+        </motion.div>
+
+        {/* ── SVG Connector Paths ── */}
+        <ConnectorLines isInView={isInView} />
+
+        {/* ── Sub-heading ── */}
+        <div className="flex flex-col items-center text-center mt-12 md:mt-16">
+          <motion.h3
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.8, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            className="text-2xl md:text-4xl lg:text-5xl font-bold text-white leading-tight tracking-tight"
+          >
+            This isn&apos;t just AI.{' '}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#3E86C6] via-[#A666AA] to-[#EC4492]">
+              It&apos;s workforce intelligence.
+            </span>
+          </motion.h3>
+        </div>
+
+        {/* ── Stats Grid ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.8, delay: 0.6 }}
+          className="grid grid-cols-2 md:grid-cols-4 gap-5 md:gap-6 mt-12 md:mt-16 max-w-[1000px] mx-auto"
+        >
+          {STATS.map((stat, i) => (
+            <motion.div
+              key={stat.value}
+              initial={{ opacity: 0, y: 20 }}
+              animate={isInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.6, delay: 0.7 + i * 0.1 }}
+              whileHover={{ y: -4, scale: 1.02 }}
+              className="relative rounded-2xl border px-5 py-7 md:px-6 md:py-9 text-center cursor-default group overflow-visible min-h-[160px] md:min-h-[190px] flex flex-col items-center justify-center"
+              style={{
+                background: 'rgba(18,18,22,0.6)',
+                borderColor: 'rgba(255,255,255,0.06)',
+              }}
+            >
+              {/* Hover glow */}
+              <div
+                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                style={{
+                  background:
+                    'radial-gradient(circle at 50% 0%, rgba(236,68,146,0.06) 0%, transparent 70%)',
+                }}
+              />
+
+              {/* Gradient number */}
+              <div
+                className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight mb-2 bg-clip-text text-transparent whitespace-nowrap"
+                style={{ backgroundImage: STAT_GRADIENT }}
+              >
+                {stat.value}
+              </div>
+
+              {/* Description */}
+              <p className="text-[13px] md:text-sm text-zinc-500 leading-relaxed font-light">
+                {stat.desc}
+              </p>
+            </motion.div>
+          ))}
+        </motion.div>
+      </div>
+    </section>
+  );
+}

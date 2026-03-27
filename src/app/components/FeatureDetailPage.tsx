@@ -148,7 +148,7 @@ export function FeatureDetailPage({
             initial={{ opacity: 0, y: 20 }}
             animate={featuresInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.8 }}
-            className="flex flex-col items-center text-center mb-20 md:mb-28"
+            className="flex flex-col items-center text-center "
           >
             <h2 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white leading-[1.05] tracking-tighter mb-10 text-center">
               Key Capabilities
@@ -193,7 +193,7 @@ export function FeatureDetailPage({
             initial={{ opacity: 0, y: 20 }}
             animate={stepsInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.8 }}
-            className="flex flex-col items-center text-center mb-20 md:mb-28"
+            className="flex flex-col items-center text-center "
           >
             <h2 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-10 leading-[1.05] tracking-tighter text-center">
               How It Works

@@ -28,7 +28,7 @@ export function AnimatedButton({
   const sizeClasses = {
     sm: 'px-8 py-3.5 text-sm',
     md: 'px-8 py-4 text-base',
-    lg: 'px-8 md:px-12 py-6 md:py-8 text-base md:text-lg',
+    lg: 'px-8 md:px-12 py-3.5 md:py-4 text-base md:text-lg',
   };
 
   const isPrimary = variant === 'primary';
@@ -73,27 +73,6 @@ export function AnimatedButton({
           </span>
           {icon || <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />}
         </span>
-        <div
-          className={`absolute inset-0 -translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out ${isPrimary ? 'bg-gradient-to-r from-purple-600 to-blue-600' : 'bg-white'}`}
-        />
-        {/* For secondary: change text to dark when gradient slides in */}
-        {!isPrimary && (
-          <span className="absolute inset-0 z-10 flex items-center justify-center gap-2 text-black opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-200 pointer-events-none">
-            <span className="flex overflow-hidden">
-              {label.split('').map((char, i) => (
-                <span key={i} className="relative inline-flex flex-col h-[1.5em] overflow-hidden">
-                  <span
-                    className="translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-[0.22,1,0.36,1]"
-                    style={{ transitionDelay: `${i * 0.025}s` }}
-                  >
-                    {char === ' ' ? '\u00A0' : char}
-                  </span>
-                </span>
-              ))}
-            </span>
-            {icon || <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />}
-          </span>
-        )}
       </button>
     </MagneticButton>
   );

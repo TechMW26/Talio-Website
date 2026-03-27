@@ -138,7 +138,7 @@ export function FeaturesOverview() {
             initial={{ opacity: 0, y: 30 }}
             animate={coreInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            className="flex flex-col items-center text-center mb-20 md:mb-28"
+            className="flex flex-col items-center text-center "
           >
             <span className="inline-flex items-center gap-2 text-xs md:text-sm font-semibold text-gray-500 uppercase tracking-widest mb-6">CORE PLATFORM</span>
             <h2 className="text-3xl md:text-5xl lg:text-6xl font-bold text-white tracking-tighter leading-[1.05] text-center" style={{ marginBottom: '1rem' }}>
@@ -182,7 +182,7 @@ export function FeaturesOverview() {
             initial={{ opacity: 0, y: 30 }}
             animate={commInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            className="flex flex-col items-center text-center mb-20 md:mb-28"
+            className="flex flex-col items-center text-center "
           >
             <span className="inline-flex items-center gap-2 text-xs md:text-sm font-semibold text-gray-500 uppercase tracking-widest mb-6">COMMUNICATION & AI</span>
             <h2 className="text-3xl md:text-5xl lg:text-6xl font-bold text-white tracking-tighter leading-[1.05] text-center" style={{ marginBottom: '1rem' }}>

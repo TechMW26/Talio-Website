@@ -57,7 +57,7 @@ export function OKRSection() {
     <section ref={containerRef} className="relative py-32 bg-black overflow-hidden perspective-1000" style={{ position: 'relative' }}>
       <div className="max-w-7xl mx-auto px-6 md:px-8 lg:px-12">
         {/* Header Section */}
-        <div className="flex flex-col items-center text-center mb-20 md:mb-28">
+        <div className="flex flex-col items-center text-center ">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}

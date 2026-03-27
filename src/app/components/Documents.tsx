@@ -1,6 +1,6 @@
 import { motion, useInView } from 'motion/react';
 import { useRef, useState } from 'react';
-import { Book, Code, Terminal, Copy, Check, CheckCircle2 } from 'lucide-react';
+import { Book, Code, Terminal, Copy, Check, CheckCircle2, AlertTriangle } from 'lucide-react';
 import { usePageMeta } from '@/app/hooks/usePageMeta';
 
 /* ─── Code Block with Copy ─── */
@@ -148,7 +148,7 @@ export function Documents() {
               <p className="text-gray-400 text-sm mb-5">Include your API key in all requests using OAuth 2.0 Bearer Token:</p>
               <CodeBlock label="HTTP Header" code="Authorization: Bearer YOUR_API_KEY" />
               <div className="mt-5 bg-amber-500/10 border border-amber-500/20 rounded-xl p-4">
-                <p className="text-amber-300 text-xs font-semibold mb-1">⚠ Keep Your Keys Secure</p>
+                <p className="text-amber-300 text-xs font-semibold mb-1 flex items-center gap-1.5"><AlertTriangle className="w-3.5 h-3.5" /> Keep Your Keys Secure</p>
                 <p className="text-gray-400 text-xs">Never expose your API keys in client-side code or public repositories.</p>
               </div>
             </motion.div>

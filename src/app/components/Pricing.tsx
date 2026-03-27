@@ -96,7 +96,7 @@ export function Pricing() {
 
       <div ref={ref} className="relative max-w-[1600px] mx-auto px-6 md:px-8 lg:px-12">
         {/* Section Header */}
-        <div className="flex flex-col items-center text-center mb-20 md:mb-28">
+        <div className="flex flex-col items-center text-center ">
           <motion.span
             initial={{ opacity: 0, y: 20 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}

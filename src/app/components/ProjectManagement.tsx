@@ -224,6 +224,87 @@ function DroppableColumn({
   );
 }
 
+/* ─── Handwritten SVG stroke-drawing text ─── */
+function HandwrittenText({ text, active }: { text: string; active: boolean }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [revealed, setRevealed] = useState(false);
+
+  useEffect(() => {
+    if (active && !revealed) {
+      // Small delay so the board finishes expanding first
+      const t = setTimeout(() => setRevealed(true), 200);
+      return () => clearTimeout(t);
+    }
+    if (!active) setRevealed(false);
+  }, [active]);
+
+  const words = text.split(' ');
+  const charDelay = 0.045; // seconds per character
+  let globalIdx = 0;
+
+  return (
+    <div ref={containerRef} className="relative w-[85%] md:w-[82%] mx-auto flex justify-center pb-2">
+      <p
+        className="text-center leading-[1.15]"
+        style={{
+          fontFamily: "'Indie Flower', cursive",
+          fontWeight: 400,
+          fontSize: 'clamp(2.8rem, 8vw, 7rem)',
+          filter: 'drop-shadow(0 0 40px rgba(168, 85, 247, 0.45)) drop-shadow(0 0 80px rgba(96, 165, 250, 0.2))',
+        }}
+      >
+        {words.map((word, wi) => {
+          const chars = word.split('');
+          const wordSpan = (
+            <span key={wi} className="inline-block whitespace-nowrap">
+              {chars.map((ch) => {
+                const idx = globalIdx++;
+                return (
+                  <motion.span
+                    key={`${wi}-${idx}`}
+                    className="inline-block bg-clip-text text-transparent"
+                    style={{
+                      backgroundImage: 'linear-gradient(90deg, #60a5fa 0%, #a78bfa 50%, #f472b6 100%)',
+                      backgroundSize: `${text.length * 0.6}em`,
+                      backgroundPosition: `${idx * 0.6}em`,
+                    }}
+                    initial={{ opacity: 0, y: 30, scale: 0.6, rotateZ: -8 }}
+                    animate={
+                      revealed
+                        ? { opacity: 1, y: 0, scale: 1, rotateZ: 0 }
+                        : { opacity: 0, y: 30, scale: 0.6, rotateZ: -8 }
+                    }
+                    transition={{
+                      duration: 0.5,
+                      delay: revealed ? idx * charDelay : 0,
+                      ease: [0.22, 1, 0.36, 1],
+                    }}
+                  >
+                    {ch}
+                  </motion.span>
+                );
+              })}
+            </span>
+          );
+          // Add space between words (not after last)
+          if (wi < words.length - 1) {
+            globalIdx++; // count the space
+            return (
+              <span key={`w${wi}`}>
+                {wordSpan}
+                <span className="inline-block w-[0.3em]" />
+              </span>
+            );
+          }
+          return wordSpan;
+        })}
+      </p>
+
+
+    </div>
+  );
+}
+
 function ProjectManagementContent() {
   const containerRef = useRef(null);
   
@@ -482,12 +563,12 @@ function ProjectManagementContent() {
                 </div>
 
                 {/* Handwriting tagline — only animates when board is fullscreen */}
-                <div className="relative flex flex-1 items-center justify-center min-h-[120px] md:min-h-[160px] lg:min-h-[200px]">
+                <div className="relative flex flex-1 items-center justify-center min-h-[140px] md:min-h-[200px] lg:min-h-[260px] w-full">
                   <motion.div
                     initial={{ opacity: 0 }}
                     animate={boardFullscreen ? { opacity: 1 } : { opacity: 0 }}
                     transition={{ duration: 0.6, ease: 'easeOut' }}
-                    className="relative select-none"
+                    className="relative select-none flex flex-col items-center w-full"
                   >
                     {/* Glow backdrop */}
                     <motion.div
@@ -496,38 +577,22 @@ function ProjectManagementContent() {
                       transition={{ duration: 1.5, delay: 0.3, ease: 'easeOut' }}
                       className="absolute inset-0 -inset-x-12 -inset-y-8 bg-gradient-to-r from-blue-500/10 via-purple-500/15 to-pink-500/10 rounded-full blur-3xl pointer-events-none"
                     />
-                    <motion.p
-                      className="relative text-4xl md:text-6xl lg:text-7xl xl:text-8xl text-center text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 pb-4"
-                      style={{
-                        fontFamily: "'Cedarville Cursive', cursive",
-                        lineHeight: 1.4,
-                        filter: 'drop-shadow(0 0 30px rgba(168, 85, 247, 0.5)) drop-shadow(0 0 60px rgba(96, 165, 250, 0.25))',
-                      }}
-                    >
-                      {"Drag. Drop. Done.".split('').map((char, i) => (
-                        <motion.span
-                          key={i}
-                          initial={{ opacity: 0, y: 20 }}
-                          animate={boardFullscreen ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-                          transition={{
-                            duration: 0.4,
-                            delay: boardFullscreen ? 0.3 + i * 0.06 : 0,
-                            ease: [0.16, 1, 0.3, 1],
-                          }}
-                          className="inline-block"
-                        >
-                          {char === ' ' ? '\u00A0' : char}
-                        </motion.span>
-                      ))}
-                    </motion.p>
+
+                    {/* SVG handwriting stroke animation */}
+                    <HandwrittenText
+                      text="Drag. Drop. Done."
+                      active={boardFullscreen}
+                    />
+
                     {/* Subheading */}
                     <motion.p
                       initial={{ opacity: 0, y: 10 }}
                       animate={boardFullscreen ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
-                      transition={{ duration: 0.8, delay: boardFullscreen ? 1.6 : 0, ease: [0.16, 1, 0.3, 1] }}
-                      className="text-sm md:text-base lg:text-lg text-white font-light text-center mt-2 tracking-wide"
+                      transition={{ duration: 0.8, delay: boardFullscreen ? 1.2 : 0, ease: [0.16, 1, 0.3, 1] }}
+                      className="text-base md:text-xl lg:text-2xl text-zinc-400 font-light text-center tracking-wide max-w-2xl"
+                      style={{ marginTop: '1.5em' }}
                     >
-                      Project management made smarter
+                      Organize anything — ship everything, on time
                     </motion.p>
                   </motion.div>
                 </div>

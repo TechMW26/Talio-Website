@@ -30,6 +30,8 @@ import { TeamChatFeature } from '@/app/components/features/TeamChatFeature';
 import { NotificationsFeature } from '@/app/components/features/NotificationsFeature';
 import { AdminDashboard } from '@/app/components/AdminDashboard';
 import { AnalyticsTracker } from '@/app/components/AnalyticsTracker';
+import { SoundProvider } from '@/app/components/SoundContext';
+import { SoundDisclaimer } from '@/app/components/SoundDisclaimer';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -107,9 +109,12 @@ function AppLayout() {
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <ScrollToTop />
-      <AppLayout />
-    </BrowserRouter>
+    <SoundProvider>
+      <BrowserRouter>
+        <ScrollToTop />
+        <SoundDisclaimer />
+        <AppLayout />
+      </BrowserRouter>
+    </SoundProvider>
   );
 }

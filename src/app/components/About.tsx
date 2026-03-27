@@ -3,8 +3,11 @@ import { useRef, useState } from 'react';
 import { ArrowRight, Lightbulb, Users, Shield, TrendingUp, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/app/components/ui/button';
 import { ZoomStorySection } from '@/app/components/ZoomStorySection';
+import { usePageMeta } from '@/app/hooks/usePageMeta';
 
 export function About() {
+  usePageMeta('About', 'Learn about Talio\'s mission to revolutionize workforce management with AI. Meet the team behind the platform transforming how businesses manage their people.');
+
   const heroRef = useRef(null);
   const visionRef = useRef(null);
   const ventureRef = useRef(null);
@@ -106,13 +109,13 @@ export function About() {
           />
         </div>
 
-        <div className="relative max-w-6xl mx-auto px-6 md:px-8 lg:px-16 text-center z-10">
+        <div className="relative max-w-7xl mx-auto px-6 md:px-8 lg:px-12 text-center z-10 flex flex-col items-center">
           {/* About Us Label */}
           <motion.div
-            initial={{ opacity: 0, y: -20 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={heroInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            className="mb-8"
+            className="mb-10"
           >
             <span className="inline-flex items-center gap-2 text-xs md:text-sm font-semibold text-blue-400 uppercase tracking-widest">
               ✦ ABOUT US
@@ -121,10 +124,10 @@ export function About() {
 
           {/* Main Heading - Simple without effects */}
           <motion.h1
-            initial={{ opacity: 0, y: -30 }}
+            initial={{ opacity: 0, y: 30 }}
             animate={heroInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 1, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
-            className="text-4xl md:text-6xl lg:text-7xl xl:text-8xl font-bold mb-8 leading-[1.1] tracking-tighter text-center"
+            className="text-4xl md:text-6xl lg:text-7xl font-bold mb-10 leading-[1.05] tracking-tighter text-center"
           >
             <span className="text-white">Building the Future </span>
             <span className="text-white">of </span>
@@ -135,10 +138,10 @@ export function About() {
 
           {/* Subtitle */}
           <motion.p
-            initial={{ opacity: 0, y: -15 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={heroInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.9, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
-            className="absolute left-1/2 -translate-x-1/2 text-lg md:text-xl lg:text-2xl text-gray-400 leading-relaxed font-light text-center"
+            className="text-lg md:text-xl text-gray-400 leading-relaxed font-light max-w-2xl text-center"
           >
             A merger of Mushroom World Umbrella, dedicated to transforming how teams work together.
           </motion.p>
@@ -204,7 +207,7 @@ export function About() {
           />
         </div>
 
-        <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-16">
+        <div className="max-w-7xl mx-auto px-6 md:px-8 lg:px-12">
           {/* Large Typography Section with Scroll Effects */}
           <div className="mb-32 relative">
             <motion.div

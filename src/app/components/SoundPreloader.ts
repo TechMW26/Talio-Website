@@ -12,7 +12,7 @@
 const CACHE_NAME = 'talio-sound-effects-v1';
 
 const SOUND_URLS = [
-  '/sounds/pop-reverb.mp3',
+  '/sounds/pop-checkin.mp3',
   '/sounds/key-pop.mp3',
   '/sounds/keyboard-click.mp3',
 ];

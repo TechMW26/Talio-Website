@@ -1,5 +1,5 @@
 import { motion, useInView } from 'motion/react';
-import { useRef } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { Globe } from 'lucide-react';
 import * as FlagIcons from 'country-flag-icons/react/3x2';
 
@@ -20,6 +20,15 @@ const ROWS: FlagCode[][] = [
 export function LanguagesSection() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: '-80px' });
+  const [showFlags, setShowFlags] = useState(false);
+
+  // Delay flag entrance by 0.8s after section enters viewport
+  useEffect(() => {
+    if (isInView) {
+      const timer = setTimeout(() => setShowFlags(true), 800);
+      return () => clearTimeout(timer);
+    }
+  }, [isInView]);
 
   return (
     <section className="relative py-20 md:py-28 bg-black overflow-hidden">
@@ -55,7 +64,10 @@ export function LanguagesSection() {
             className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-10 leading-[1.05] tracking-tighter text-center"
           >
             Available in{' '}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 via-blue-400 to-cyan-400">
+            <span
+              className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 via-blue-400 to-cyan-400"
+              style={{ fontFamily: "'DynaPuff', cursive" }}
+            >
               Every Language
             </span>
           </motion.h2>
@@ -73,8 +85,8 @@ export function LanguagesSection() {
         {/* Flag Grid — symmetric, bare icons */}
         <motion.div
           initial={{ opacity: 0, y: 40 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 1, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+          animate={showFlags ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 1, delay: 0, ease: [0.16, 1, 0.3, 1] }}
           className="mt-16 md:mt-20"
         >
           <div className="flex flex-col items-center gap-5 md:gap-6">
@@ -86,11 +98,14 @@ export function LanguagesSection() {
                   {showLabel && (
                     <motion.div
                       initial={{ opacity: 0, scale: 0.9 }}
-                      animate={isInView ? { opacity: 1, scale: 1 } : {}}
+                      animate={showFlags ? { opacity: 1, scale: 1 } : {}}
                       transition={{ duration: 0.6, delay: 0.5 }}
                       className="flex items-center justify-center mb-5 md:mb-6"
                     >
-                      <span className="text-2xl md:text-3xl lg:text-4xl font-bold text-white italic tracking-tight">
+                      <span
+                        className="text-2xl md:text-3xl lg:text-4xl font-bold text-white tracking-tight"
+                        style={{ fontFamily: "'DynaPuff', cursive" }}
+                      >
                         99+ languages
                       </span>
                     </motion.div>
@@ -104,10 +119,10 @@ export function LanguagesSection() {
                         <motion.div
                           key={`${code}-${flatIdx}`}
                           initial={{ opacity: 0, scale: 0.5 }}
-                          animate={isInView ? { opacity: 1, scale: 1 } : {}}
+                          animate={showFlags ? { opacity: 1, scale: 1 } : {}}
                           transition={{
                             duration: 0.35,
-                            delay: 0.3 + flatIdx * 0.012,
+                            delay: flatIdx * 0.012,
                             ease: [0.16, 1, 0.3, 1],
                           }}
                           whileHover={{ scale: 1.2, y: -3 }}

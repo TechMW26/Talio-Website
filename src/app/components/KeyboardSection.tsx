@@ -2,6 +2,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { useRef, useCallback, useEffect, useState, useMemo } from 'react';
 import logoImage from '@/assets/2090cd551224404a5a02329a4590597a32d19a1f.png';
 import { isSoundAllowed } from './SoundContext';
+import { adaptiveVolume } from './adaptiveVolume';
 
 // ---- Audio file sound effects ----
 const _clickAudio = new Audio('/sounds/keyboard-click.mp3');
@@ -30,6 +31,7 @@ function playTickSound() {
   _lastTickTime = now;
   const audio = _popAudios[_popIndex % POP_POOL_SIZE];
   _popIndex++;
+  audio.volume = adaptiveVolume(0.06);
   audio.currentTime = 0;
   audio.play().catch(() => {});
 }

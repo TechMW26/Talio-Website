@@ -8,29 +8,28 @@ const plans = [
   {
     icon: Sparkles,
     name: "Starter",
-    price: { monthly: 0, annual: 0 },
-    priceLabel: "Free",
-    period: "",
+    price: { monthly: 280, annual: 224 },
+    period: "/user/month",
     subtitle: "For small teams getting started",
     featured: false,
     gradient: "from-blue-500 to-cyan-500",
     features: [
-      { name: "Up to 10 employees", included: true },
-      { name: "Basic attendance tracking", included: true },
+      { name: "Up to 25 employees", included: true },
+      { name: "GPS attendance tracking", included: true },
       { name: "Leave management", included: true },
       { name: "Team chat", included: true },
       { name: "Mobile app access", included: true },
+      { name: "Basic reports", included: true },
       { name: "AI features", included: false },
-      { name: "Payroll automation", included: false },
     ],
-    cta: "Get Started Free",
+    cta: "Start Free Trial",
     ctaLink: "/get-started",
   },
   {
     icon: Rocket,
     name: "Professional",
     badge: "Most Popular",
-    price: { monthly: 12, annual: 10 },
+    price: { monthly: 380, annual: 304 },
     period: "/user/month",
     subtitle: "For growing teams that need more",
     featured: true,
@@ -74,7 +73,7 @@ const faqs = [
   {
     question: "Is there a free trial?",
     answer:
-      "Yes! All paid plans come with a 14-day free trial. No credit card required.",
+      "Yes! Both Starter and Professional plans come with a 14-day free trial. No credit card required.",
   },
   {
     question: "Can I change plans anytime?",
@@ -155,7 +154,7 @@ export function PricingPage() {
           </span>
         </h1>
         <p className="text-lg md:text-xl text-gray-400 font-light leading-relaxed max-w-xl text-center">
-          Choose the plan that works for your team. Start free, scale as you grow.
+          Choose the plan that works for your team. Both plans include a free trial.
         </p>
       </motion.section>
 
@@ -196,7 +195,7 @@ export function PricingPage() {
             const isHovered = hoveredIndex === index;
             const priceDisplay =
               plan.priceLabel ??
-              `$${billing === "monthly" ? plan.price.monthly : plan.price.annual}`;
+              `₹${billing === "monthly" ? plan.price.monthly : plan.price.annual}`;
 
             return (
               <motion.div

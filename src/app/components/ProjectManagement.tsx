@@ -247,7 +247,7 @@ function HandwrittenText({ text, active }: { text: string; active: boolean }) {
       <p
         className="text-center leading-[1.15]"
         style={{
-          fontFamily: "'Indie Flower', cursive",
+          fontFamily: "'DynaPuff', cursive",
           fontWeight: 400,
           fontSize: 'clamp(2.8rem, 8vw, 7rem)',
           filter: 'drop-shadow(0 0 40px rgba(168, 85, 247, 0.45)) drop-shadow(0 0 80px rgba(96, 165, 250, 0.2))',

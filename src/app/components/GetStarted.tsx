@@ -6,7 +6,7 @@ import { usePageMeta } from '@/app/hooks/usePageMeta';
 import { submitSignup } from '@/lib/firebase';
 
 export function GetStarted() {
-  usePageMeta('Get Started', 'Sign up for Talio and start managing your workforce smarter. Free 14-day trial, no credit card required.');
+  usePageMeta('Get Started', 'Book a free demo of Talio and see how it can transform your workforce management.');
 
   const heroRef = useRef(null);
   const contentRef = useRef(null);
@@ -99,7 +99,7 @@ export function GetStarted() {
               </span>
             </h1>
             <p className="text-lg md:text-xl text-gray-400 font-light leading-relaxed max-w-2xl text-center">
-              Start your free trial today and experience the future of HR management with Talio.
+              Book a free demo and experience the future of HR management with Talio.
             </p>
           </motion.div>
         </div>
@@ -152,8 +152,8 @@ export function GetStarted() {
             transition={{ duration: 0.6 }}
             className="rounded-3xl border border-gray-800 bg-gray-900 p-8 md:p-10"
           >
-            <h2 className="mb-4 text-2xl font-semibold text-white">Create Your Account</h2>
-            <p className="mb-8 text-sm text-gray-400">Get started in under 2 minutes — no credit card needed.</p>
+            <h2 className="mb-4 text-2xl font-semibold text-white">Book a Free Demo</h2>
+            <p className="mb-8 text-sm text-gray-400">See Talio in action — schedule a personalized demo with our team.</p>
 
             <form onSubmit={handleSubmit} className="space-y-5">
               <div className="grid gap-5 sm:grid-cols-2">
@@ -246,11 +246,11 @@ export function GetStarted() {
                 disabled={submitting || submitted}
                 className="w-full rounded-xl bg-gradient-to-r from-blue-500 to-purple-500 px-6 py-3 text-sm font-semibold text-white transition hover:from-blue-600 hover:to-purple-600 disabled:opacity-60"
               >
-                {submitted ? '✓ Account Created!' : submitting ? 'Creating Account...' : 'Start Free Trial →'}
+                {submitted ? '✓ Demo Booked!' : submitting ? 'Booking Demo...' : 'Book Free Demo →'}
               </button>
 
               <p className="text-center text-xs text-gray-500">
-                By signing up you agree to our{' '}
+                By booking a demo you agree to our{' '}
                 <Link to="/terms" className="text-gray-400 underline hover:text-white">
                   Terms of Service
                 </Link>{' '}

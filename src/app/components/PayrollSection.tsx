@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { isSoundAllowed } from './SoundContext';
+import { adaptiveVolume } from './adaptiveVolume';
 
 /* ─── Flow Node ─── */
 interface FlowNode {
@@ -98,10 +99,10 @@ function playPop() {
   try {
     let audio = popPool.find(a => a.paused);
     if (!audio) {
-      audio = new Audio('/sounds/pop-reverb.mp3');
-      audio.volume = 0.015;
+      audio = new Audio('/sounds/pop-checkin.mp3');
       popPool.push(audio);
     }
+    audio.volume = adaptiveVolume(0.015);
     audio.currentTime = 0;
     audio.play().catch(() => {});
   } catch {}

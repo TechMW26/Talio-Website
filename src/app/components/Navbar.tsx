@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Menu, X, ArrowRight, Clock, Calendar, DollarSign, LayoutGrid, Target, Sparkles, Bot, MessageSquare, Bell } from 'lucide-react';
+import { Menu, X, ArrowRight, Clock, Calendar, DollarSign, LayoutGrid, Target, Sparkles, Bot, MessageSquare, Bell, ChevronRight, Zap } from 'lucide-react';
 import { Button } from '@/app/components/ui/button';
 import { Link, useNavigate, useLocation } from 'react-router';
 import React from 'react';
@@ -125,125 +125,87 @@ export function Navbar() {
                         />
                       </motion.div>
 
-                      {/* Features Dropdown */}
+                      {/* Features Mega Menu */}
                       <AnimatePresence>
                         {showFeaturesDropdown && (
                           <motion.div
-                            initial={{ opacity: 0, y: 8, scale: 0.98 }}
+                            initial={{ opacity: 0, y: 10, scale: 0.96 }}
                             animate={{ opacity: 1, y: 0, scale: 1 }}
-                            exit={{ opacity: 0, y: 8, scale: 0.98 }}
-                            transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-                            className="absolute top-full left-1/2 -translate-x-1/2 mt-4 w-[820px]"
+                            exit={{ opacity: 0, y: 10, scale: 0.96 }}
+                            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                            className="absolute top-full left-1/2 -translate-x-1/2 mt-4 w-[920px]"
                           >
-                            {/* Invisible bridge to prevent gap hover-out */}
+                            {/* Invisible bridge */}
                             <div className="absolute -top-4 left-0 right-0 h-4" />
-                            <div className="bg-[#111318] rounded-2xl shadow-2xl shadow-black/50 border border-gray-800/80 overflow-hidden">
-                              <div className="grid grid-cols-3 divide-x divide-gray-800/60">
-                                {/* CORE FEATURES */}
-                                <div className="p-6">
-                                  <h3 className="text-[11px] font-semibold text-gray-500 uppercase tracking-widest mb-5 px-1">
-                                    Core Features
-                                  </h3>
-                                  <div className="space-y-1">
-                                    <FeatureItem
-                                      icon={Clock}
-                                      title="Smart Attendance"
-                                      description="GPS-enabled check-ins with geofencing"
-                                      color="text-purple-400"
-                                      bgColor="bg-purple-500/15"
-                                      href="/features/attendance"
-                                    />
-                                    <FeatureItem
-                                      icon={DollarSign}
-                                      title="Automated Payroll"
-                                      description="Calculate salaries and generate payslips"
-                                      color="text-blue-400"
-                                      bgColor="bg-blue-500/15"
-                                      href="/features/payroll"
-                                    />
-                                    <FeatureItem
-                                      icon={Calendar}
-                                      title="Leave Management"
-                                      description="Smart leave tracking and approvals"
-                                      color="text-green-400"
-                                      bgColor="bg-green-500/15"
-                                      href="/features/leaves"
-                                    />
+
+                            {/* Outer glow ring */}
+                            <div className="relative rounded-[20px] p-[1px] bg-gradient-to-b from-gray-700/60 via-gray-800/30 to-gray-900/20">
+                              {/* Background ambient glows */}
+                              <div className="absolute -top-20 left-1/4 w-60 h-60 bg-purple-600/8 rounded-full blur-3xl pointer-events-none" />
+                              <div className="absolute -top-16 right-1/4 w-48 h-48 bg-blue-600/8 rounded-full blur-3xl pointer-events-none" />
+                              <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-72 h-32 bg-cyan-600/5 rounded-full blur-3xl pointer-events-none" />
+
+                              <div className="bg-[#0c0e14]/95 backdrop-blur-2xl rounded-[20px] overflow-hidden shadow-[0_25px_60px_-12px_rgba(0,0,0,0.7)]">
+                                <div className="grid grid-cols-3">
+
+                                  {/* CORE FEATURES */}
+                                  <div className="p-5 relative">
+                                    <div className="flex items-center gap-2 mb-4 px-2">
+                                      <div className="w-1.5 h-1.5 rounded-full bg-purple-400 shadow-[0_0_6px_2px_rgba(168,85,247,0.4)]" />
+                                      <h3 className="text-[10px] font-bold text-purple-400/80 uppercase tracking-[0.2em]">
+                                        Core Features
+                                      </h3>
+                                    </div>
+                                    <div className="space-y-0.5">
+                                      <FeatureItem icon={Clock} title="Smart Attendance" description="GPS-enabled check-ins with geofencing" accentColor="purple" href="/features/attendance" delay={0} />
+                                      <FeatureItem icon={DollarSign} title="Automated Payroll" description="Calculate salaries and generate payslips" accentColor="blue" href="/features/payroll" delay={0.03} />
+                                      <FeatureItem icon={Calendar} title="Leave Management" description="Smart leave tracking and approvals" accentColor="emerald" href="/features/leaves" delay={0.06} />
+                                    </div>
+                                  </div>
+
+                                  {/* PRODUCTIVITY */}
+                                  <div className="p-5 relative border-x border-white/[0.04]">
+                                    <div className="flex items-center gap-2 mb-4 px-2">
+                                      <div className="w-1.5 h-1.5 rounded-full bg-blue-400 shadow-[0_0_6px_2px_rgba(96,165,250,0.4)]" />
+                                      <h3 className="text-[10px] font-bold text-blue-400/80 uppercase tracking-[0.2em]">
+                                        Productivity
+                                      </h3>
+                                    </div>
+                                    <div className="space-y-0.5">
+                                      <FeatureItem icon={LayoutGrid} title="Talio Projects" description="Kanban-style project management" accentColor="indigo" href="/features/projects" delay={0.04} />
+                                      <FeatureItem icon={Target} title="Goals & OKRs" description="Set and track company objectives" accentColor="cyan" href="/features/goals" delay={0.07} />
+                                      <FeatureItem icon={Sparkles} title="AI Workflows" description="Automate repetitive tasks" accentColor="amber" href="/features/workflows" delay={0.1} />
+                                    </div>
+                                  </div>
+
+                                  {/* COMMUNICATION */}
+                                  <div className="p-5 relative">
+                                    <div className="flex items-center gap-2 mb-4 px-2">
+                                      <div className="w-1.5 h-1.5 rounded-full bg-pink-400 shadow-[0_0_6px_2px_rgba(244,114,182,0.4)]" />
+                                      <h3 className="text-[10px] font-bold text-pink-400/80 uppercase tracking-[0.2em]">
+                                        Communication
+                                      </h3>
+                                    </div>
+                                    <div className="space-y-0.5">
+                                      <FeatureItem icon={Bot} title="MIRA AI Assistant" description="Your intelligent HR companion" accentColor="violet" href="/features/mira-ai" delay={0.05} badge="New" />
+                                      <FeatureItem icon={MessageSquare} title="Team Chat" description="Real-time messaging and channels" accentColor="pink" href="/features/team-chat" delay={0.08} />
+                                      <FeatureItem icon={Bell} title="Notifications" description="Stay updated with real-time alerts" accentColor="orange" href="/features/notifications" delay={0.11} />
+                                    </div>
                                   </div>
                                 </div>
 
-                                {/* PRODUCTIVITY */}
-                                <div className="p-6">
-                                  <h3 className="text-[11px] font-semibold text-gray-500 uppercase tracking-widest mb-5 px-1">
-                                    Productivity
-                                  </h3>
-                                  <div className="space-y-1">
-                                    <FeatureItem
-                                      icon={LayoutGrid}
-                                      title="Talio Projects"
-                                      description="Kanban-style project management"
-                                      color="text-indigo-400"
-                                      bgColor="bg-indigo-500/15"
-                                      href="/features/projects"
-                                    />
-                                    <FeatureItem
-                                      icon={Target}
-                                      title="Goals & OKRs"
-                                      description="Set and track company objectives"
-                                      color="text-cyan-400"
-                                      bgColor="bg-cyan-500/15"
-                                      href="/features/goals"
-                                    />
-                                    <FeatureItem
-                                      icon={Sparkles}
-                                      title="AI Workflows"
-                                      description="Automate repetitive tasks"
-                                      color="text-amber-400"
-                                      bgColor="bg-amber-500/15"
-                                      href="/features/workflows"
-                                    />
+                                {/* Bottom CTA bar */}
+                                <div className="border-t border-white/[0.05] px-6 py-3 flex items-center justify-between bg-white/[0.02]">
+                                  <Link to="/features" className="group/cta flex items-center gap-2 text-[13px] text-gray-400 hover:text-white transition-all duration-300 font-medium">
+                                    <Zap className="w-3.5 h-3.5 text-purple-400 group-hover/cta:text-purple-300 transition-colors" />
+                                    Explore all features
+                                    <ArrowRight className="w-3.5 h-3.5 group-hover/cta:translate-x-1 transition-transform duration-300" />
+                                  </Link>
+                                  <div className="flex items-center gap-1.5 text-[11px] text-gray-600">
+                                    <div className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" />
+                                    9 features available
                                   </div>
                                 </div>
-
-                                {/* COMMUNICATION */}
-                                <div className="p-6">
-                                  <h3 className="text-[11px] font-semibold text-gray-500 uppercase tracking-widest mb-5 px-1">
-                                    Communication
-                                  </h3>
-                                  <div className="space-y-1">
-                                    <FeatureItem
-                                      icon={Bot}
-                                      title="MIRA AI Assistant"
-                                      description="Your intelligent HR companion"
-                                      color="text-violet-400"
-                                      bgColor="bg-violet-500/15"
-                                      href="/features/mira-ai"
-                                    />
-                                    <FeatureItem
-                                      icon={MessageSquare}
-                                      title="Team Chat"
-                                      description="Real-time messaging and channels"
-                                      color="text-pink-400"
-                                      bgColor="bg-pink-500/15"
-                                      href="/features/team-chat"
-                                    />
-                                    <FeatureItem
-                                      icon={Bell}
-                                      title="Notifications"
-                                      description="Stay updated with real-time alerts"
-                                      color="text-orange-400"
-                                      bgColor="bg-orange-500/15"
-                                      href="/features/notifications"
-                                    />
-                                  </div>
-                                </div>
-                              </div>
-
-                              {/* Bottom bar */}
-                              <div className="border-t border-gray-800/60 px-6 py-3.5 flex items-center justify-between bg-gray-900/40">
-                                <Link to="/features" className="text-sm text-gray-400 hover:text-white transition-colors font-medium flex items-center gap-1.5">
-                                  View all features <ArrowRight className="w-3.5 h-3.5" />
-                                </Link>
                               </div>
                             </div>
                           </motion.div>
@@ -483,23 +445,68 @@ function MagneticButton({ children }: { children: React.ReactNode }) {
   );
 }
 
+// Accent color config for FeatureItem
+const ACCENT_COLORS: Record<string, { icon: string; bg: string; glow: string; ring: string }> = {
+  purple:  { icon: 'text-purple-400',  bg: 'bg-purple-500/10',  glow: 'shadow-purple-500/20',  ring: 'ring-purple-500/20' },
+  blue:    { icon: 'text-blue-400',    bg: 'bg-blue-500/10',    glow: 'shadow-blue-500/20',    ring: 'ring-blue-500/20' },
+  emerald: { icon: 'text-emerald-400', bg: 'bg-emerald-500/10', glow: 'shadow-emerald-500/20', ring: 'ring-emerald-500/20' },
+  indigo:  { icon: 'text-indigo-400',  bg: 'bg-indigo-500/10',  glow: 'shadow-indigo-500/20',  ring: 'ring-indigo-500/20' },
+  cyan:    { icon: 'text-cyan-400',    bg: 'bg-cyan-500/10',    glow: 'shadow-cyan-500/20',    ring: 'ring-cyan-500/20' },
+  amber:   { icon: 'text-amber-400',   bg: 'bg-amber-500/10',   glow: 'shadow-amber-500/20',   ring: 'ring-amber-500/20' },
+  violet:  { icon: 'text-violet-400',  bg: 'bg-violet-500/10',  glow: 'shadow-violet-500/20',  ring: 'ring-violet-500/20' },
+  pink:    { icon: 'text-pink-400',    bg: 'bg-pink-500/10',    glow: 'shadow-pink-500/20',    ring: 'ring-pink-500/20' },
+  orange:  { icon: 'text-orange-400',  bg: 'bg-orange-500/10',  glow: 'shadow-orange-500/20',  ring: 'ring-orange-500/20' },
+};
+
 // FeatureItem Component
-function FeatureItem({ icon: Icon, title, description, color, bgColor, href }: { icon: React.FC<{ className: string }>, title: string, description: string, color: string, bgColor: string, href?: string }) {
+function FeatureItem({ icon: Icon, title, description, accentColor, href, delay = 0, badge }: {
+  icon: React.FC<{ className: string }>;
+  title: string;
+  description: string;
+  accentColor: string;
+  href?: string;
+  delay?: number;
+  badge?: string;
+}) {
+  const colors = ACCENT_COLORS[accentColor] || ACCENT_COLORS.purple;
+
   const content = (
-    <div className="flex items-center gap-3.5 px-3 py-3 rounded-xl hover:bg-white/[0.04] transition-colors duration-200 cursor-pointer group/item">
-      <div className={`w-10 h-10 flex-shrink-0 ${bgColor} rounded-xl flex items-center justify-center`}>
-        <Icon className={`w-5 h-5 ${color}`} />
+    <motion.div
+      initial={{ opacity: 0, x: -8 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.35, delay, ease: [0.16, 1, 0.3, 1] }}
+      className="group/item relative flex items-center gap-3 px-2.5 py-2.5 rounded-xl cursor-pointer transition-all duration-300 hover:bg-white/[0.04]"
+    >
+      {/* Hover glow behind icon */}
+      <div className={`absolute left-2.5 top-1/2 -translate-y-1/2 w-10 h-10 rounded-xl ${colors.bg} opacity-0 group-hover/item:opacity-100 blur-lg transition-opacity duration-500 pointer-events-none`} />
+
+      {/* Icon container */}
+      <div className={`relative z-10 w-9 h-9 flex-shrink-0 rounded-[10px] ${colors.bg} ring-1 ${colors.ring} flex items-center justify-center group-hover/item:shadow-lg ${colors.glow} transition-all duration-300 group-hover/item:scale-110`}>
+        <Icon className={`w-[18px] h-[18px] ${colors.icon} transition-transform duration-300 group-hover/item:scale-110`} />
       </div>
-      <div className="min-w-0">
-        <h4 className="text-[13px] font-semibold text-gray-200 group-hover/item:text-white transition-colors leading-tight">
-          {title}
-        </h4>
-        <p className="text-[12px] text-gray-500 leading-snug mt-0.5 truncate">
+
+      {/* Text */}
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center gap-1.5">
+          <span className="text-[13px] font-semibold text-gray-300 group-hover/item:text-white transition-colors duration-200 leading-tight">
+            {title}
+          </span>
+          {badge && (
+            <span className="px-1.5 py-[1px] text-[9px] font-bold uppercase tracking-wider bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white rounded-full leading-none">
+              {badge}
+            </span>
+          )}
+        </div>
+        <span className="block text-[11px] text-gray-500 group-hover/item:text-gray-400 leading-snug truncate transition-colors duration-200">
           {description}
-        </p>
+        </span>
       </div>
-    </div>
+
+      {/* Hover arrow */}
+      <ChevronRight className="w-3.5 h-3.5 text-gray-700 group-hover/item:text-gray-400 opacity-0 group-hover/item:opacity-100 -translate-x-1 group-hover/item:translate-x-0 transition-all duration-300 flex-shrink-0" />
+    </motion.div>
   );
+
   if (href) {
     return <Link to={href}>{content}</Link>;
   }

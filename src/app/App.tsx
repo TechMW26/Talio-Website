@@ -36,8 +36,10 @@ import { SoundDisclaimer } from '@/app/components/SoundDisclaimer';
 function ScrollToTop() {
   const { pathname } = useLocation();
   useEffect(() => {
-    // Instant scroll to top — bypass Lenis smooth scroll for page navigation
+    // Reset Lenis smooth scroll AND native scroll position on route change
     window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
   }, [pathname]);
   return null;
 }

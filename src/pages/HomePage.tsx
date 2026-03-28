@@ -20,8 +20,8 @@ export function HomePage() {
       <PayrollSection />
       <OKRSection />
       <AISection />
-      <LanguagesSection />
       <PrivacySection />
+      <LanguagesSection />
       <PricingCTA />
     </div>
   );

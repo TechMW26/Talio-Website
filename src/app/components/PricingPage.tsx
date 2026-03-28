@@ -1,8 +1,9 @@
 import { useRef, useState } from "react";
-import { motion, useInView, useScroll, useTransform } from "motion/react";
+import { motion, useInView, useScroll, useTransform, AnimatePresence } from "motion/react";
 import { Check, X, ChevronDown, Sparkles, Rocket, Building2, ArrowRight } from "lucide-react";
 import { Link } from "react-router";
 import { usePageMeta } from '@/app/hooks/usePageMeta';
+import * as SwitchPrimitive from "@radix-ui/react-switch";
 
 const plans = [
   {
@@ -159,27 +160,50 @@ export function PricingPage() {
       </motion.section>
 
       {/* Billing Toggle */}
-      <div className="flex items-center justify-center gap-4 mb-16 mt-6">
-        <span className={`text-sm font-medium transition-colors ${billing === "monthly" ? "text-white" : "text-gray-500"}`}>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.3 }}
+        className="flex items-center justify-center gap-3 mb-16 mt-6"
+      >
+        <span className={`text-sm font-medium transition-colors duration-300 ${billing === "monthly" ? "text-white" : "text-gray-500"}`}>
           Monthly
         </span>
-        <button
-          onClick={() => setBilling(billing === "monthly" ? "annual" : "monthly")}
-          className="relative w-14 h-7 rounded-full bg-gray-800 border border-gray-700 transition-colors"
+        <SwitchPrimitive.Root
+          checked={billing === "annual"}
+          onCheckedChange={(checked) => setBilling(checked ? "annual" : "monthly")}
+          className="relative w-14 h-8 rounded-full bg-gray-800 border border-gray-700/80 transition-colors duration-300 data-[state=checked]:bg-gray-800 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50"
         >
-          <motion.div
-            className="absolute top-0.5 left-0.5 w-6 h-6 rounded-full bg-gradient-to-r from-purple-500 to-pink-500"
-            animate={{ x: billing === "annual" ? 28 : 0 }}
-            transition={{ type: "spring", stiffness: 500, damping: 30 }}
-          />
-        </button>
-        <span className={`text-sm font-medium transition-colors ${billing === "annual" ? "text-white" : "text-gray-500"}`}>
+          <SwitchPrimitive.Thumb asChild>
+            <motion.span
+              className="block w-6 h-6 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 shadow-lg shadow-purple-500/30"
+              layout
+              transition={{ type: "spring", stiffness: 500, damping: 30 }}
+              style={{
+                position: 'absolute',
+                top: 3,
+                left: billing === "annual" ? 29 : 3,
+              }}
+            />
+          </SwitchPrimitive.Thumb>
+        </SwitchPrimitive.Root>
+        <span className={`text-sm font-medium transition-colors duration-300 ${billing === "annual" ? "text-white" : "text-gray-500"}`}>
           Annual
         </span>
-        <span className="ml-1 px-2.5 py-0.5 rounded-full bg-green-500/10 border border-green-500/20 text-green-400 text-xs font-medium">
-          Save 20%
-        </span>
-      </div>
+        <AnimatePresence>
+          {billing === "annual" && (
+            <motion.span
+              initial={{ opacity: 0, scale: 0.8, x: -10 }}
+              animate={{ opacity: 1, scale: 1, x: 0 }}
+              exit={{ opacity: 0, scale: 0.8, x: -10 }}
+              transition={{ type: "spring", stiffness: 400, damping: 25 }}
+              className="ml-1 px-2.5 py-0.5 rounded-full bg-green-500/10 border border-green-500/20 text-green-400 text-xs font-medium"
+            >
+              Save 20%
+            </motion.span>
+          )}
+        </AnimatePresence>
+      </motion.div>
 
       {/* Plan Cards */}
       <motion.section
@@ -333,9 +357,6 @@ export function PricingPage() {
                       </span>
                     </motion.div>
                   </Link>
-
-                  {/* Divider */}
-                  <div className="w-full h-px bg-gray-800/60 mb-8" />
 
                   {/* Features */}
                   <div className="space-y-4 relative z-10">

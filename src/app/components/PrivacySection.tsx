@@ -1,5 +1,5 @@
-import { motion, useInView, useScroll, useTransform, useMotionValue, useSpring, AnimatePresence } from 'motion/react';
-import { useRef, useState, useEffect } from 'react';
+import { motion, useInView, useScroll, useTransform, useMotionValue, useSpring, useMotionValueEvent, AnimatePresence } from 'motion/react';
+import { useRef, useState, useEffect, useCallback, useMemo } from 'react';
 import { ShieldCheck, Lock, Eye, EyeOff, Database, Server, Fingerprint } from 'lucide-react';
 import Lottie from 'lottie-react';
 
@@ -47,6 +47,7 @@ export function PrivacySection() {
   const isInView = useInView(ref, { once: true, margin: '-80px' });
   const [lottieData, setLottieData] = useState<object | null>(null);
   const [hoveredCard, setHoveredCard] = useState<number | null>(null);
+  const [hasRevealed, setHasRevealed] = useState(false);
 
   // Load Lottie JSON
   useEffect(() => {
@@ -88,12 +89,127 @@ export function PrivacySection() {
     mouseY.set(e.clientY - rect.top);
   };
 
+  // ─── SVG Path Scroll Animation ───
+  const PATH_POINTS = useMemo(() => [
+    { x: 430, y: -60 },
+    { x: 430, y: 80 },
+    { x: 510, y: 80 },
+    { x: 510, y: 200 },
+    { x: 350, y: 200 },
+    { x: 350, y: 320 },
+    { x: 470, y: 320 },
+    { x: 470, y: 440 },
+    { x: 430, y: 440 },
+    { x: 430, y: 520 },
+  ], []);
+
+  const pathD = useMemo(
+    () =>
+      `M ${PATH_POINTS[0].x} ${PATH_POINTS[0].y} ` +
+      PATH_POINTS.slice(1)
+        .map((p) => `L ${p.x} ${p.y}`)
+        .join(' '),
+    [PATH_POINTS]
+  );
+
+  const { totalLength, segmentLengths } = useMemo(() => {
+    let total = 0;
+    const segs: { x: number; y: number; cumLen: number }[] = [];
+    for (let i = 1; i < PATH_POINTS.length; i++) {
+      const dx = PATH_POINTS[i].x - PATH_POINTS[i - 1].x;
+      const dy = PATH_POINTS[i].y - PATH_POINTS[i - 1].y;
+      total += Math.sqrt(dx * dx + dy * dy);
+      segs.push({ x: PATH_POINTS[i].x, y: PATH_POINTS[i].y, cumLen: total });
+    }
+    return { totalLength: total, segmentLengths: segs };
+  }, [PATH_POINTS]);
+
+  const getPointAtLength = useCallback(
+    (targetLen: number) => {
+      let accumulated = 0;
+      for (let i = 1; i < PATH_POINTS.length; i++) {
+        const dx = PATH_POINTS[i].x - PATH_POINTS[i - 1].x;
+        const dy = PATH_POINTS[i].y - PATH_POINTS[i - 1].y;
+        const segLen = Math.sqrt(dx * dx + dy * dy);
+        if (accumulated + segLen >= targetLen) {
+          const t = segLen === 0 ? 0 : (targetLen - accumulated) / segLen;
+          return {
+            x: PATH_POINTS[i - 1].x + dx * t,
+            y: PATH_POINTS[i - 1].y + dy * t,
+          };
+        }
+        accumulated += segLen;
+      }
+      return PATH_POINTS[PATH_POINTS.length - 1];
+    },
+    [PATH_POINTS]
+  );
+
+  // Scroll progress for the SVG path container
+  const svgContainerRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress: svgScroll } = useScroll({
+    target: svgContainerRef,
+    offset: ['start 0.85', 'start 0.25'],
+  });
+
+  const drawProgress = useTransform(svgScroll, [0, 1], [0, 1]);
+  const smoothDraw = useSpring(drawProgress, { stiffness: 60, damping: 25 });
+
+  const [drawnLength, setDrawnLength] = useState(0);
+  const [tipPos, setTipPos] = useState<{ x: number; y: number } | null>(null);
+
+  useMotionValueEvent(smoothDraw, 'change', (p) => {
+    const drawn = p * totalLength;
+    setDrawnLength(drawn);
+
+    if (p > 0.001 && p < 0.999) {
+      setTipPos(getPointAtLength(drawn));
+    } else {
+      setTipPos(null);
+    }
+  });
+
+  // Separate scroll tracker: reveal original content when privacy section is 40% visible
+  const { scrollYProgress: sectionScroll } = useScroll({
+    target: sectionRef,
+    offset: ['start end', 'end start'],
+  });
+
+  useMotionValueEvent(sectionScroll, 'change', (p) => {
+    // Reveal when the original content area (below path) reaches ~40% into viewport
+    if (p >= 0.45 && !hasRevealed) {
+      setHasRevealed(true);
+    } else if (p < 0.35 && hasRevealed) {
+      setHasRevealed(false);
+    }
+  });
+
   return (
     <section
       ref={sectionRef}
-      className="relative py-24 md:py-32 bg-black overflow-hidden"
+      className="relative bg-black"
+      style={{ marginTop: '-350px', paddingTop: '100px' }}
       onMouseMove={handleMouseMove}
     >
+      {/* Neon flicker CSS */}
+      <style>{`
+        @keyframes neonFlicker {
+          0%   { opacity: 0; filter: brightness(0); }
+          4%   { opacity: 0.9; filter: brightness(2.5); }
+          6%   { opacity: 0.2; filter: brightness(0.5); }
+          8%   { opacity: 1; filter: brightness(3); }
+          10%  { opacity: 0; filter: brightness(0); }
+          14%  { opacity: 0.85; filter: brightness(2); }
+          16%  { opacity: 0.1; filter: brightness(0.3); }
+          20%  { opacity: 1; filter: brightness(2.8); }
+          24%  { opacity: 0.6; filter: brightness(1.5); }
+          28%  { opacity: 1; filter: brightness(1); }
+          100% { opacity: 1; filter: brightness(1); }
+        }
+        .neon-hidden { opacity: 0; filter: brightness(0); }
+        .neon-flicker-in { animation: neonFlicker 1.2s ease-out forwards; }
+      `}</style>
+
       {/* Background effects */}
       <div className="absolute inset-0 pointer-events-none">
         <div
@@ -104,78 +220,186 @@ export function PrivacySection() {
             backgroundSize: '32px 32px',
           }}
         />
-        {/* Ambient glow */}
         <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-gradient-to-r from-blue-600/5 via-purple-600/5 to-pink-600/5 blur-3xl" />
       </div>
 
-      <div ref={ref} className="relative max-w-7xl mx-auto px-6 md:px-8 lg:px-12">
-        {/* Top section: Lottie + Heading side by side */}
-        <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-16 mb-20">
-          {/* Left - Lottie Animation */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={isInView ? { opacity: 1, scale: 1 } : {}}
-            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            className="relative w-48 h-48 md:w-64 md:h-64 lg:w-72 lg:h-72 flex-shrink-0"
+      {/* ─── SVG PATH SCROLL REVEAL ─── */}
+      <div ref={svgContainerRef} className="relative" style={{ minHeight: '580px' }}>
+        {/* Centered SVG with path animation */}
+        <div className="absolute inset-0 pointer-events-none z-10 px-4">
+          <div
+            className="absolute top-0 left-1/2"
+            style={{ transform: 'translateX(-50%)', width: 'min(900px, 100%)', height: '580px' }}
           >
-            {/* Glow ring behind the lock */}
-            <div className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 blur-2xl animate-pulse" />
-            <div className="absolute inset-2 rounded-full border border-white/[0.06] bg-white/[0.02] backdrop-blur-sm" />
-            <div className="relative w-full h-full flex items-center justify-center">
-              {lottieData && (
-                <Lottie
-                  lottieRef={lottieRef}
-                  animationData={lottieData}
-                  autoplay={false}
-                  loop={false}
-                  className="w-32 h-32 md:w-44 md:h-44 lg:w-48 lg:h-48"
-                />
+            <svg viewBox="-20 -70 900 630" width="100%" height="100%" preserveAspectRatio="xMidYMin meet" style={{ overflow: 'visible' }}>
+              <defs>
+                <filter id="privacy-glow" x="-80%" y="-80%" width="260%" height="260%">
+                  <feGaussianBlur stdDeviation="10" result="blur" />
+                  <feMerge>
+                    <feMergeNode in="blur" />
+                    <feMergeNode in="blur" />
+                    <feMergeNode in="SourceGraphic" />
+                  </feMerge>
+                </filter>
+                <filter id="privacy-glow-sm" x="-80%" y="-80%" width="260%" height="260%">
+                  <feGaussianBlur stdDeviation="4" result="blur" />
+                  <feMerge>
+                    <feMergeNode in="blur" />
+                    <feMergeNode in="SourceGraphic" />
+                  </feMerge>
+                </filter>
+                <linearGradient id="privacyLineGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#8fd7ff" />
+                  <stop offset="45%" stopColor="#4da3ff" />
+                  <stop offset="100%" stopColor="#6b7cff" />
+                </linearGradient>
+                <linearGradient id="privacyAuraGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#9be7ff" />
+                  <stop offset="50%" stopColor="#4da3ff" />
+                  <stop offset="100%" stopColor="#245dff" />
+                </linearGradient>
+              </defs>
+
+              {/* Ghost path */}
+              <path d={pathD} fill="none" stroke="#8fd7ff" strokeWidth="1.2" opacity="0.15" />
+
+              {/* Seamless connector line matching AI section's vertical line */}
+              <line x1="430" y1="-70" x2="430" y2="0" stroke="#8fd7ff" strokeWidth="1.2" opacity="0.8" />
+              <line x1="430" y1="-70" x2="430" y2="0" stroke="#4da3ff" strokeWidth="8" opacity="0.08" />
+
+              {/* Main line — no glow, matches AI section style */}
+              <path
+                d={pathD}
+                fill="none"
+                stroke="#8fd7ff"
+                strokeWidth="1.2"
+                opacity="0.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeDasharray={totalLength}
+                strokeDashoffset={totalLength - drawnLength}
+              />
+
+              {/* Thin white core */}
+              <path
+                d={pathD}
+                fill="none"
+                stroke="#ffffff"
+                strokeWidth="0.6"
+                opacity="0.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeDasharray={totalLength}
+                strokeDashoffset={totalLength - drawnLength}
+              />
+
+              {/* Junction nodes */}
+              {segmentLengths.slice(0, -1).map((node, i) => {
+                const isActive = drawnLength >= node.cumLen;
+                return (
+                  <g key={i}>
+                    <circle cx={node.x} cy={node.y} r={6.5} fill="none" stroke="rgba(255,255,255,0.16)" strokeWidth={1} />
+                    <circle
+                      cx={node.x}
+                      cy={node.y}
+                      r={3.8}
+                      fill={isActive ? '#ffffff' : '#000000'}
+                      stroke={isActive ? '#8fd7ff' : 'none'}
+                      strokeWidth={isActive ? 1.5 : 0}
+                      style={{ transition: 'all 0.14s ease-out' }}
+                    />
+                  </g>
+                );
+              })}
+
+              {/* Moving tip */}
+              {tipPos && (
+                <g>
+                  <circle cx={tipPos.x} cy={tipPos.y} r={6} fill="#4da3ff" opacity={0.2} />
+                  <circle cx={tipPos.x} cy={tipPos.y} r={3} fill="#8fd7ff" opacity={0.9} />
+                  <circle cx={tipPos.x} cy={tipPos.y} r={1.5} fill="#ffffff" />
+                </g>
               )}
-            </div>
-          </motion.div>
-
-          {/* Right - Heading */}
-          <div className="flex flex-col items-center lg:items-start text-center lg:text-left">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.6 }}
-              className="inline-flex items-center gap-2 text-sm font-semibold text-gray-400 uppercase tracking-widest mb-10"
-            >
-              <ShieldCheck className="w-4 h-4" />
-              Privacy First
-            </motion.div>
-
-            <motion.h2
-              initial={{ opacity: 0, y: 30 }}
-              animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-              className="text-4xl md:text-6xl lg:text-7xl font-bold text-white leading-[1.05] tracking-tighter"
-            >
-              Great powers come
-              <br />
-              <span className="text-white">with great </span>
-              <span
-                className="bg-clip-text text-transparent"
-                style={{ backgroundImage: PRIVACY_GRADIENT }}
-              >
-                privacy.
-              </span>
-            </motion.h2>
-
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="text-lg md:text-xl text-gray-400 font-light leading-relaxed max-w-xl mt-8"
-            >
-              Your data is your greatest asset. We protect it with full encryption,
-              zero sharing, and absolute control in your hands.
-            </motion.p>
+            </svg>
           </div>
         </div>
 
-        {/* Feature Cards Grid */}
+      </div>
+
+      {/* ─── ORIGINAL SECTION CONTENT ─── */}
+      <div
+        ref={ref}
+        className={`relative ${hasRevealed ? 'neon-flicker-in' : 'neon-hidden'}`}
+        style={{ marginTop: '-60px' }}
+      >
+        <div className="max-w-7xl mx-auto px-6 md:px-8 lg:px-12 pt-8 pb-24 md:pb-32">
+          {/* Top section: Lottie + Heading side by side */}
+          <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-16 mb-20">
+            {/* Left - Lottie Animation */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={isInView ? { opacity: 1, scale: 1 } : {}}
+              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+              className="relative w-48 h-48 md:w-64 md:h-64 lg:w-72 lg:h-72 flex-shrink-0"
+            >
+              {/* Glow ring behind the lock */}
+              <div className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 blur-2xl animate-pulse" />
+              <div className="absolute inset-2 rounded-full border border-white/[0.06] bg-white/[0.02] backdrop-blur-sm" />
+              <div className="relative w-full h-full flex items-center justify-center">
+                {lottieData && (
+                  <Lottie
+                    lottieRef={lottieRef}
+                    animationData={lottieData}
+                    autoplay={false}
+                    loop={false}
+                    className="w-32 h-32 md:w-44 md:h-44 lg:w-48 lg:h-48"
+                  />
+                )}
+              </div>
+            </motion.div>
+
+            {/* Right - Heading */}
+            <div className="flex flex-col items-center lg:items-start text-center lg:text-left">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={isInView ? { opacity: 1, y: 0 } : {}}
+                transition={{ duration: 0.6 }}
+                className="inline-flex items-center gap-2 text-sm font-semibold text-gray-400 uppercase tracking-widest mb-10"
+              >
+                <ShieldCheck className="w-4 h-4" />
+                Privacy First
+              </motion.div>
+
+              <motion.h2
+                initial={{ opacity: 0, y: 30 }}
+                animate={isInView ? { opacity: 1, y: 0 } : {}}
+                transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+                className="text-4xl md:text-6xl lg:text-7xl font-bold text-white leading-[1.05] tracking-tighter"
+              >
+                Great powers come
+                <br />
+                <span className="text-white">with great </span>
+                <span
+                  className="bg-clip-text text-transparent"
+                  style={{ backgroundImage: PRIVACY_GRADIENT }}
+                >
+                  privacy.
+                </span>
+              </motion.h2>
+
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={isInView ? { opacity: 1, y: 0 } : {}}
+                transition={{ duration: 0.6, delay: 0.2 }}
+                className="text-lg md:text-xl text-gray-400 font-light leading-relaxed max-w-xl mt-8"
+              >
+                Your data is your greatest asset. We protect it with full encryption,
+                zero sharing, and absolute control in your hands.
+              </motion.p>
+            </div>
+          </div>
+
+          {/* Feature Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {PRIVACY_FEATURES.map((feature, i) => (
             <motion.div
@@ -237,6 +461,7 @@ export function PrivacySection() {
             </div>
           ))}
         </motion.div>
+        </div>
       </div>
     </section>
   );

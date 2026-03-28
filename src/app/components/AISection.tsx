@@ -54,9 +54,10 @@ function ConnectorLines({ isInView }: { isInView: boolean }) {
       initial={{ opacity: 0 }}
       animate={isInView ? { opacity: 1 } : {}}
       transition={{ duration: 1, delay: 0.3 }}
-      className="hidden md:flex justify-center -mt-1"
+      className="hidden md:flex justify-center -mt-1 relative z-0"
+      style={{ overflow: 'visible' }}
     >
-      <svg viewBox="0 0 600 220" className="w-full max-w-[700px] h-auto" fill="none">
+      <svg viewBox="0 0 600 280" className="w-full max-w-[700px]" style={{ overflow: 'visible', height: 'auto', minHeight: '220px' }} fill="none">
         <defs>
           {CONNECTOR_PATHS.map((p, i) => (
             <linearGradient key={`g${i}`} id={`aiLineGrad-${i}`} x1="0" y1="0" x2="0" y2="1">
@@ -150,6 +151,16 @@ function ConnectorLines({ isInView }: { isInView: boolean }) {
           <animate attributeName="r" values="8;14;8" dur="2s" repeatCount="indefinite" />
           <animate attributeName="opacity" values="0.15;0.05;0.15" dur="2s" repeatCount="indefinite" />
         </circle>
+
+        {/* Vertical line from converge point downward (extends past viewBox via overflow:visible) */}
+        <line x1={CONVERGE.x} y1={CONVERGE.y} x2={CONVERGE.x} y2="500" stroke="url(#aiCenterGlow)" strokeWidth="2" opacity="0.5" />
+        <line x1={CONVERGE.x} y1={CONVERGE.y} x2={CONVERGE.x} y2="500" stroke="#8fd7ff" strokeWidth="1.2" opacity="0.8" />
+        {/* Glow around the vertical line */}
+        <line x1={CONVERGE.x} y1={CONVERGE.y} x2={CONVERGE.x} y2="500" stroke="#4da3ff" strokeWidth="8" opacity="0.08" />
+        {/* Flowing dot down the connector */}
+        <circle r="2.5" fill="#8fd7ff" opacity="0.7">
+          <animateMotion dur="2s" repeatCount="indefinite" path={`M${CONVERGE.x},${CONVERGE.y} L${CONVERGE.x},500`} />
+        </circle>
       </svg>
     </motion.div>
   );
@@ -232,7 +243,7 @@ export function AISection() {
   const iconY = useTransform(scrollYProgress, [0, 1], [15, -15]);
 
   return (
-    <section ref={sectionRef} className="relative py-20 md:py-28 bg-black overflow-hidden">
+    <section ref={sectionRef} className="relative z-10 py-20 md:py-28 bg-black" style={{ overflow: 'visible' }}>
       {/* Background texture */}
       <div className="absolute inset-0 pointer-events-none">
         <div
@@ -289,12 +300,19 @@ export function AISection() {
         <ConnectorLines isInView={isInView} />
 
         {/* ── Sub-heading ── */}
-        <div className="flex flex-col items-center text-center mt-12 md:mt-16">
+        <div className="flex flex-col items-center text-center -mt-4 md:-mt-8 relative z-10">
+          {/* Black gradient backdrop for readability over the line */}
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background: 'radial-gradient(ellipse 60% 100% at 50% 50%, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.7) 40%, transparent 70%)',
+            }}
+          />
           <motion.h3
             initial={{ opacity: 0, y: 20 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.8, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
-            className="text-2xl md:text-4xl lg:text-5xl font-bold text-white leading-tight tracking-tight"
+            className="relative text-2xl md:text-4xl lg:text-5xl font-bold text-white leading-tight tracking-tight"
           >
             This isn&apos;t just AI.{' '}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#3E86C6] via-[#A666AA] to-[#EC4492]">
@@ -308,7 +326,7 @@ export function AISection() {
           initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.8, delay: 0.6 }}
-          className="grid grid-cols-2 md:grid-cols-4 gap-5 md:gap-6 mt-12 md:mt-16 max-w-[1000px] mx-auto"
+          className="relative z-10 grid grid-cols-2 md:grid-cols-4 gap-5 md:gap-6 mt-12 md:mt-16 max-w-[1000px] mx-auto"
         >
           {STATS.map((stat, i) => (
             <motion.div

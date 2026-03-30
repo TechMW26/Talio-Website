@@ -1,8 +1,10 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, type ChangeEvent, type FormEvent } from 'react';
 import { motion, useInView } from 'motion/react';
-import { Bot, Clock, Shield, Headphones, CheckCircle2, Calendar } from 'lucide-react';
+import { Bot, Clock, Shield, Headphones, CheckCircle2 } from 'lucide-react';
 import { Link } from 'react-router';
 import { usePageMeta } from '@/app/hooks/usePageMeta';
+import { DemoBookingStepper } from '@/app/components/DemoBookingStepper';
+import { createEmptyDemoBookingForm } from '@/app/components/demoBookingTypes';
 import { submitSignup } from '@/lib/firebase';
 
 export function GetStarted() {
@@ -14,23 +16,12 @@ export function GetStarted() {
   const heroInView = useInView(heroRef, { once: true, margin: '-100px' });
   const contentInView = useInView(contentRef, { once: true, margin: '-100px' });
 
-  const [form, setForm] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    phone: '',
-    company: '',
-    jobTitle: '',
-    industry: '',
-    companySize: '',
-    preferredDate: '',
-    preferredTime: '',
-  });
+  const [form, setForm] = useState(createEmptyDemoBookingForm());
 
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
@@ -39,14 +30,7 @@ export function GetStarted() {
   tomorrow.setDate(tomorrow.getDate() + 1);
   const minDate = tomorrow.toISOString().split('T')[0];
 
-  const timeSlots = [
-    '10:00 AM', '10:30 AM', '11:00 AM', '11:30 AM',
-    '12:00 PM', '12:30 PM', '2:00 PM', '2:30 PM',
-    '3:00 PM', '3:30 PM', '4:00 PM', '4:30 PM',
-    '5:00 PM', '5:30 PM',
-  ];
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setSubmitting(true);
     try {
@@ -68,11 +52,7 @@ export function GetStarted() {
       }
 
       setSubmitted(true);
-      setForm({
-        firstName: '', lastName: '', email: '', phone: '',
-        company: '', jobTitle: '', industry: '', companySize: '',
-        preferredDate: '', preferredTime: '',
-      });
+      setForm(createEmptyDemoBookingForm());
     } catch {
       alert('Something went wrong. Please try again.');
     } finally {
@@ -105,15 +85,12 @@ export function GetStarted() {
 
   const trustBadges = ['14-day free trial', 'No credit card required', 'Cancel anytime'];
 
-  const inputClass =
-    'w-full rounded-xl border border-gray-800 bg-gray-900 px-4 py-3 text-sm text-white placeholder-gray-500 outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500';
-
   return (
     <div className="min-h-screen bg-gray-950 text-white">
       {/* Hero */}
       <section ref={heroRef} className="relative overflow-hidden pt-32 pb-16">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(59,130,246,0.08),transparent_60%)]" />
-        <div className="relative mx-auto max-w-4xl px-6 md:px-8 lg:px-12 text-center">
+        <div className="relative mx-auto max-w-4xl px-4 md:px-8 lg:px-12 text-center">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={heroInView ? { opacity: 1, y: 0 } : {}}
@@ -136,13 +113,14 @@ export function GetStarted() {
       </section>
 
       {/* Two-column: Benefits + Form */}
-      <section ref={contentRef} className="mx-auto max-w-7xl px-6 md:px-8 lg:px-12 pb-32">
-        <div className="grid items-start gap-12 lg:grid-cols-2">
+      <section ref={contentRef} className="mx-auto max-w-7xl px-4 pb-24 md:px-8 lg:px-12 lg:pb-32">
+        <div className="grid items-start gap-8 lg:grid-cols-2 lg:gap-12">
           {/* Left – Benefits */}
           <motion.div
             initial={{ opacity: 0, x: -40 }}
             animate={contentInView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.6 }}
+            className="order-2 lg:order-1"
           >
             <div className="space-y-6">
               {benefits.map((item, i) => (
@@ -180,162 +158,64 @@ export function GetStarted() {
             initial={{ opacity: 0, x: 40 }}
             animate={contentInView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.6 }}
-            className="rounded-3xl border border-gray-800 bg-gray-900 p-8 md:p-10"
+            className="order-1 rounded-[2rem] border border-gray-800 bg-gray-900 p-5 md:p-8 lg:order-2"
           >
-            <h2 className="mb-4 text-2xl font-semibold text-white">Book a Free Demo</h2>
-            <p className="mb-8 text-sm text-gray-400">See Talio in action — schedule a personalized demo with our team.</p>
-
-            <form onSubmit={handleSubmit} className="space-y-5">
-              <div className="grid gap-5 sm:grid-cols-2">
-                <input
-                  name="firstName"
-                  value={form.firstName}
-                  onChange={handleChange}
-                  placeholder="First Name"
-                  className={inputClass}
-                  required
-                />
-                <input
-                  name="lastName"
-                  value={form.lastName}
-                  onChange={handleChange}
-                  placeholder="Last Name"
-                  className={inputClass}
-                  required
-                />
-              </div>
-              <div className="grid gap-5 sm:grid-cols-2">
-                <input
-                  name="email"
-                  type="email"
-                  value={form.email}
-                  onChange={handleChange}
-                  placeholder="Work Email"
-                  className={inputClass}
-                  required
-                />
-                <input
-                  name="phone"
-                  type="tel"
-                  value={form.phone}
-                  onChange={handleChange}
-                  placeholder="Phone"
-                  className={inputClass}
-                  required
-                />
-              </div>
-              <div className="grid gap-5 sm:grid-cols-2">
-                <input
-                  name="company"
-                  value={form.company}
-                  onChange={handleChange}
-                  placeholder="Company Name"
-                  className={inputClass}
-                  required
-                />
-                <input
-                  name="jobTitle"
-                  value={form.jobTitle}
-                  onChange={handleChange}
-                  placeholder="Job Title"
-                  className={inputClass}
-                  required
-                />
-              </div>
-              <div className="grid gap-5 sm:grid-cols-2">
-                <select
-                  name="industry"
-                  value={form.industry}
-                  onChange={handleChange}
-                  className={inputClass}
-                  required
-                >
-                  <option value="" disabled>
-                    Select Industry
-                  </option>
-                  <option value="Technology">Technology</option>
-                  <option value="Healthcare">Healthcare</option>
-                  <option value="Finance">Finance</option>
-                  <option value="Retail">Retail</option>
-                  <option value="Manufacturing">Manufacturing</option>
-                  <option value="Education">Education</option>
-                  <option value="Other">Other</option>
-                </select>
-                <select
-                  name="companySize"
-                  value={form.companySize}
-                  onChange={handleChange}
-                  className={inputClass}
-                  required
-                >
-                  <option value="" disabled>
-                    Company Size
-                  </option>
-                  <option value="1-10">1–10 employees</option>
-                  <option value="11-50">11–50 employees</option>
-                  <option value="51-200">51–200 employees</option>
-                  <option value="201-500">201–500 employees</option>
-                  <option value="501+">501+ employees</option>
-                </select>
-              </div>
-
-              {/* Calendar Booking */}
-              <div className="border border-gray-700/40 rounded-xl p-5 bg-gray-800/30">
-                <div className="flex items-center gap-2 mb-4">
-                  <Calendar className="w-4 h-4 text-blue-400" />
-                  <span className="text-sm font-medium text-white">Schedule Your Demo</span>
-                </div>
-                <div className="grid gap-5 sm:grid-cols-2">
-                  <div>
-                    <label className="block text-xs text-gray-500 mb-1.5">Preferred Date</label>
-                    <input
-                      type="date"
-                      name="preferredDate"
-                      value={form.preferredDate}
-                      onChange={handleChange}
-                      min={minDate}
-                      className={inputClass}
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs text-gray-500 mb-1.5">Preferred Time (IST)</label>
-                    <select
-                      name="preferredTime"
-                      value={form.preferredTime}
-                      onChange={handleChange}
-                      className={inputClass}
-                      required
-                    >
-                      <option value="" disabled>Select Time</option>
-                      {timeSlots.map((slot) => (
-                        <option key={slot} value={slot}>{slot}</option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-              </div>
-
-              <button
-                type="submit"
-                disabled={submitting || submitted}
-                className="w-full rounded-full bg-white px-8 py-4 text-base font-semibold text-black transition hover:bg-gray-100 hover:shadow-lg hover:shadow-white/10 disabled:opacity-60"
+            {submitted ? (
+              <motion.div
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex flex-col items-center text-center py-8"
               >
-                {submitted ? '✓ Demo Booked!' : submitting ? 'Booking Demo...' : 'Book Free Demo →'}
-              </button>
+                <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-500/10">
+                  <CheckCircle2 className="h-8 w-8 text-green-400" />
+                </div>
+                <span className="block text-2xl font-semibold text-white">Demo booked successfully</span>
+                <span className="mt-2 block max-w-sm text-sm leading-relaxed text-gray-400">
+                  We've sent a confirmation to your email. Our team will reach out shortly with the next steps.
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setSubmitted(false)}
+                  className="mt-6 inline-flex items-center justify-center rounded-full bg-white px-6 py-3 text-sm font-semibold text-black transition hover:bg-gray-100"
+                >
+                  Book another demo
+                </button>
+              </motion.div>
+            ) : (
+              <>
+                <span className="block text-xl font-semibold text-white md:text-2xl">Book a Free Demo</span>
+                <span className="mt-2 block text-sm leading-relaxed text-gray-400">
+                  See Talio in action with a guided walkthrough tailored to your workforce setup.
+                </span>
 
-              <p className="text-center text-xs text-gray-500">
-                By booking a demo you agree to our{' '}
-                <Link to="/terms" className="text-gray-400 underline hover:text-white">
-                  Terms of Service
-                </Link>{' '}
-                and{' '}
-                <Link to="/privacy" className="text-gray-400 underline hover:text-white">
-                  Privacy Policy
-                </Link>
-                .
-              </p>
-            </form>
+                <div className="mt-5">
+                  <DemoBookingStepper
+                    form={form}
+                    onFieldChange={handleChange}
+                    onSubmit={handleSubmit}
+                    submitting={submitting}
+                    submitted={submitted}
+                    minDate={minDate}
+                    submitLabel="Book Free Demo"
+                    submittingLabel="Booking Demo..."
+                    resetKey="get-started"
+                    legalNotice={
+                      <p className="text-center text-[11px] leading-relaxed text-gray-500">
+                        By booking a demo you agree to our{' '}
+                        <Link to="/terms" className="text-gray-400 underline hover:text-white">
+                          Terms of Service
+                        </Link>{' '}
+                        and{' '}
+                        <Link to="/privacy" className="text-gray-400 underline hover:text-white">
+                          Privacy Policy
+                        </Link>
+                        .
+                      </p>
+                    }
+                  />
+                </div>
+              </>
+            )}
           </motion.div>
         </div>
       </section>

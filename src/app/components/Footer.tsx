@@ -2,10 +2,18 @@ import { motion } from 'motion/react';
 import { Github, Twitter, Linkedin, Instagram, ArrowUp, Mail, MapPin, Phone } from 'lucide-react';
 import { Link } from 'react-router';
 import { AnimatedButton } from '@/app/components/AnimatedButton';
+import { MobileFooter } from '@/app/components/MobileFooter';
+import { useIsMobileViewport } from '@/app/hooks/useIsMobileViewport';
 import logoImage from '@/assets/2090cd551224404a5a02329a4590597a32d19a1f.png';
 import foxMascot from '@/assets/6966dd6bb9e98b4e32d6852e29b51847da2ba9cd.png';
 
 export function Footer() {
+  const isMobileViewport = useIsMobileViewport();
+
+  if (isMobileViewport) {
+    return <MobileFooter />;
+  }
+
   const footerSections = [
     {
       title: 'Product',
@@ -43,10 +51,10 @@ export function Footer() {
   ];
 
   const socialLinks = [
-    { icon: Twitter, href: '#', label: 'Twitter' },
+    { icon: Twitter, href: 'https://x.com/talioapp', label: 'Twitter' },
     { icon: Github, href: '#', label: 'GitHub' },
-    { icon: Linkedin, href: '#', label: 'LinkedIn' },
-    { icon: Instagram, href: '#', label: 'Instagram' }
+    { icon: Linkedin, href: 'https://www.linkedin.com/company/talio/', label: 'LinkedIn' },
+    { icon: Instagram, href: 'https://www.instagram.com/talioapp/', label: 'Instagram' }
   ];
 
   return (

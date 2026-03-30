@@ -86,16 +86,16 @@ export function Navbar() {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => navigate('/')}
-              className="flex items-center gap-3 cursor-pointer relative z-10"
+              className="flex items-center gap-2.5 cursor-pointer relative z-10"
             >
               <motion.img
                 src={logoImage}
                 alt="Talio Logo"
                 whileHover={{ rotate: 15, scale: 1.1 }}
                 transition={{ duration: 0.4 }}
-                className="w-11 h-11 object-contain"
+                className="h-7 w-7 object-contain"
               />
-              <span className="text-2xl font-bold text-white tracking-tight">
+              <span className="text-2xl font-normal text-white tracking-tight">
                 Talio
               </span>
             </motion.div>

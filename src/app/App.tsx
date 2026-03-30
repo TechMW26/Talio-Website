@@ -1,37 +1,43 @@
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router';
-import { useEffect, useRef } from 'react';
+import { Suspense, lazy, useEffect, useRef } from 'react';
 import Lenis from 'lenis';
 import { Navbar } from '@/app/components/Navbar';
 import { Footer } from '@/app/components/Footer';
 import { CustomCursor } from '@/app/components/CustomCursor';
-import { HomePage } from '@/pages/HomePage';
-import { About } from '@/app/components/About';
-import { Downloads } from '@/app/components/Downloads';
-import { Documents } from '@/app/components/Documents';
-import { MiraComingSoon } from '@/app/components/MiraComingSoon';
 import { MouseFollower } from '@/app/components/MouseFollower';
-import { FeaturesOverview } from '@/app/components/FeaturesOverview';
-import { Contact } from '@/app/components/Contact';
-import { GetStarted } from '@/app/components/GetStarted';
-import { HelpCenter } from '@/app/components/HelpCenter';
-import { Partners } from '@/app/components/Partners';
-import { Solutions } from '@/app/components/Solutions';
-import { PricingPage } from '@/app/components/PricingPage';
-import { PrivacyPolicy } from '@/app/components/PrivacyPolicy';
-import { TermsOfService } from '@/app/components/TermsOfService';
-import { AttendanceFeature } from '@/app/components/features/AttendanceFeature';
-import { PayrollFeature } from '@/app/components/features/PayrollFeature';
-import { LeavesFeature } from '@/app/components/features/LeavesFeature';
-import { ProjectsFeature } from '@/app/components/features/ProjectsFeature';
-import { GoalsFeature } from '@/app/components/features/GoalsFeature';
-import { WorkflowsFeature } from '@/app/components/features/WorkflowsFeature';
-import { MiraAIFeature } from '@/app/components/features/MiraAIFeature';
-import { TeamChatFeature } from '@/app/components/features/TeamChatFeature';
-import { NotificationsFeature } from '@/app/components/features/NotificationsFeature';
-import { AdminDashboard } from '@/app/components/AdminDashboard';
 import { AnalyticsTracker } from '@/app/components/AnalyticsTracker';
 import { SoundProvider } from '@/app/components/SoundContext';
 import { SoundDisclaimer } from '@/app/components/SoundDisclaimer';
+import { useIsMobileViewport } from '@/app/hooks/useIsMobileViewport';
+
+const HomePage = lazy(() => import('@/pages/HomePage').then((module) => ({ default: module.HomePage })));
+const AboutPage = lazy(() => import('@/pages/AboutPage').then((module) => ({ default: module.AboutPage })));
+const FeaturesPage = lazy(() => import('@/pages/FeaturesPage').then((module) => ({ default: module.FeaturesPage })));
+const SolutionsPage = lazy(() => import('@/pages/SolutionsPage').then((module) => ({ default: module.SolutionsPage })));
+const HelpPage = lazy(() => import('@/pages/HelpPage').then((module) => ({ default: module.HelpPage })));
+const PricingPage = lazy(() => import('@/app/components/PricingPage').then((module) => ({ default: module.PricingPage })));
+const Downloads = lazy(() => import('@/app/components/Downloads').then((module) => ({ default: module.Downloads })));
+const Documents = lazy(() => import('@/app/components/Documents').then((module) => ({ default: module.Documents })));
+const MiraComingSoon = lazy(() => import('@/app/components/MiraComingSoon').then((module) => ({ default: module.MiraComingSoon })));
+const Contact = lazy(() => import('@/app/components/Contact').then((module) => ({ default: module.Contact })));
+const GetStarted = lazy(() => import('@/app/components/GetStarted').then((module) => ({ default: module.GetStarted })));
+const Partners = lazy(() => import('@/app/components/Partners').then((module) => ({ default: module.Partners })));
+const PrivacyPolicy = lazy(() => import('@/app/components/PrivacyPolicy').then((module) => ({ default: module.PrivacyPolicy })));
+const TermsOfService = lazy(() => import('@/app/components/TermsOfService').then((module) => ({ default: module.TermsOfService })));
+const AttendanceFeature = lazy(() => import('@/app/components/features/AttendanceFeature').then((module) => ({ default: module.AttendanceFeature })));
+const PayrollFeature = lazy(() => import('@/app/components/features/PayrollFeature').then((module) => ({ default: module.PayrollFeature })));
+const LeavesFeature = lazy(() => import('@/app/components/features/LeavesFeature').then((module) => ({ default: module.LeavesFeature })));
+const ProjectsFeature = lazy(() => import('@/app/components/features/ProjectsFeature').then((module) => ({ default: module.ProjectsFeature })));
+const GoalsFeature = lazy(() => import('@/app/components/features/GoalsFeature').then((module) => ({ default: module.GoalsFeature })));
+const WorkflowsFeature = lazy(() => import('@/app/components/features/WorkflowsFeature').then((module) => ({ default: module.WorkflowsFeature })));
+const MiraAIFeature = lazy(() => import('@/app/components/features/MiraAIFeature').then((module) => ({ default: module.MiraAIFeature })));
+const TeamChatFeature = lazy(() => import('@/app/components/features/TeamChatFeature').then((module) => ({ default: module.TeamChatFeature })));
+const NotificationsFeature = lazy(() => import('@/app/components/features/NotificationsFeature').then((module) => ({ default: module.NotificationsFeature })));
+const AdminDashboard = lazy(() => import('@/app/components/AdminDashboard').then((module) => ({ default: module.AdminDashboard })));
+
+function RouteFallback() {
+  return <div className="min-h-[60vh] bg-gray-950" />;
+}
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -47,44 +53,57 @@ function ScrollToTop() {
 function AppLayout() {
   const { pathname } = useLocation();
   const isAdmin = pathname === '/admin';
+  const isMobileViewport = useIsMobileViewport();
   const lenisRef = useRef<Lenis | null>(null);
 
-  // Initialize Lenis smooth scroll
   useEffect(() => {
+    if (isMobileViewport) {
+      lenisRef.current?.destroy();
+      lenisRef.current = null;
+      document.documentElement.classList.remove('lenis', 'lenis-smooth', 'lenis-stopped');
+      document.body.classList.remove('lenis', 'lenis-smooth', 'lenis-stopped');
+      document.documentElement.style.scrollBehavior = 'auto';
+      document.body.style.scrollBehavior = 'auto';
+      return;
+    }
+
     const lenis = new Lenis({
-      lerp: 0.08,          // Lower = smoother/slower interpolation (default 0.1)
-      duration: 1.4,        // Scroll duration
+      lerp: 0.08,
+      duration: 1.4,
       smoothWheel: true,
-      wheelMultiplier: 0.8, // Slightly slower wheel scroll
-      touchMultiplier: 1.5, // Good for mobile
+      wheelMultiplier: 0.8,
+      touchMultiplier: 1,
     });
     lenisRef.current = lenis;
+    let rafId = 0;
 
     function raf(time: number) {
       lenis.raf(time);
-      requestAnimationFrame(raf);
+      rafId = requestAnimationFrame(raf);
     }
-    requestAnimationFrame(raf);
+    rafId = requestAnimationFrame(raf);
 
     return () => {
+      cancelAnimationFrame(rafId);
       lenis.destroy();
       lenisRef.current = null;
     };
-  }, []);
+  }, [isMobileViewport]);
 
   return (
-    <div className="min-h-screen bg-gray-950 transition-colors duration-300 cursor-none relative" style={{ position: 'relative' }}>
-      <CustomCursor />
-      <MouseFollower />
+    <div className={`min-h-screen bg-gray-950 transition-colors duration-300 relative ${isMobileViewport ? '' : 'cursor-none'}`} style={{ position: 'relative' }}>
+      {!isMobileViewport && <CustomCursor />}
+      {!isMobileViewport && <MouseFollower />}
       {!isAdmin && <AnalyticsTracker />}
       {!isAdmin && <Navbar />}
-      <Routes>
+      <Suspense fallback={<RouteFallback />}>
+        <Routes>
           <Route path="/" element={<HomePage />} />
-          <Route path="/about" element={<About />} />
+          <Route path="/about" element={<AboutPage />} />
           <Route path="/downloads" element={<Downloads />} />
           <Route path="/documents" element={<Documents />} />
           <Route path="/mira-ai" element={<MiraComingSoon />} />
-          <Route path="/features" element={<FeaturesOverview />} />
+          <Route path="/features" element={<FeaturesPage />} />
           <Route path="/features/attendance" element={<AttendanceFeature />} />
           <Route path="/features/payroll" element={<PayrollFeature />} />
           <Route path="/features/leaves" element={<LeavesFeature />} />
@@ -97,24 +116,27 @@ function AppLayout() {
           <Route path="/pricing" element={<PricingPage />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/get-started" element={<GetStarted />} />
-          <Route path="/help" element={<HelpCenter />} />
+          <Route path="/help" element={<HelpPage />} />
           <Route path="/partners" element={<Partners />} />
-          <Route path="/solutions" element={<Solutions />} />
+          <Route path="/solutions" element={<SolutionsPage />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/terms" element={<TermsOfService />} />
           <Route path="/admin" element={<AdminDashboard />} />
         </Routes>
-        {!isAdmin && <Footer />}
-      </div>
+      </Suspense>
+      {!isAdmin && <Footer />}
+    </div>
   );
 }
 
 export default function App() {
+  const isMobileViewport = useIsMobileViewport();
+
   return (
     <SoundProvider>
       <BrowserRouter>
         <ScrollToTop />
-        <SoundDisclaimer />
+        {!isMobileViewport && <SoundDisclaimer />}
         <AppLayout />
       </BrowserRouter>
     </SoundProvider>

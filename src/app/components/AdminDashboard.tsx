@@ -178,7 +178,7 @@ export function AdminDashboard() {
               <button
                 type="submit"
                 disabled={logging}
-                className="w-full py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold rounded-xl transition hover:from-blue-600 hover:to-purple-600 disabled:opacity-60"
+                className="w-full rounded-full bg-white px-8 py-4 text-base font-semibold text-black transition hover:bg-gray-100 hover:shadow-lg hover:shadow-white/10 disabled:opacity-60"
               >
                 {logging ? 'Signing in...' : 'Sign In'}
               </button>

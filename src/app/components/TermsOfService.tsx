@@ -150,7 +150,7 @@ const sections = [
       <p className="text-gray-400 leading-relaxed mb-4">
         These Terms are governed by and construed in accordance with the laws of
         India. Any disputes shall be subject to the exclusive jurisdiction of the
-        courts of Bhopal, Madhya Pradesh.
+        courts of Bangalore, Karnataka.
       </p>
     ),
   },

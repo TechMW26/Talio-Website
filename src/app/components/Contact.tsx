@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import { motion, useInView } from 'motion/react';
-import { MapPin, Phone, Mail, Clock, FileText, HelpCircle, MessageCircle, Send, CheckCircle2 } from 'lucide-react';
+import { MapPin, Phone, Mail, Clock, FileText, HelpCircle, MessageCircle, Send, CheckCircle2, Twitter, Linkedin, Instagram } from 'lucide-react';
 import { Link } from 'react-router';
 import { usePageMeta } from '@/app/hooks/usePageMeta';
 import { submitContact } from '@/lib/firebase';
@@ -54,25 +54,37 @@ export function Contact() {
 
   const contactCards = [
     {
-      icon: MapPin,
-      title: 'Address',
-      lines: ['226, Jain Nagar, Gufa Mandir Road,', 'Lalghati, Bhopal, MP 462030'],
-    },
-    {
       icon: Phone,
       title: 'Phone',
-      lines: ['+91 7909 444 999', '+91 9826 322 445'],
+      lines: [
+        { label: '+91 7909 444 999', href: 'tel:+917909444999' },
+        { label: '+91 9826 322 445', href: 'tel:+919826322445' },
+      ],
     },
     {
       icon: Mail,
       title: 'Email',
-      lines: ['hello@talio.app', 'support@talio.app'],
+      lines: [
+        { label: 'info@talio.in', href: 'mailto:info@talio.in' },
+        { label: 'support@talio.app', href: 'mailto:support@talio.app' },
+      ],
+    },
+    {
+      icon: MapPin,
+      title: 'Location',
+      lines: [{ label: 'Bangalore, India', href: 'https://maps.google.com/?q=Bangalore,India' }],
     },
     {
       icon: Clock,
       title: 'Hours',
-      lines: ['Monday – Saturday: 9 AM – 6 PM IST', 'Sunday: Closed'],
+      lines: [{ label: 'Monday – Saturday: 9 AM – 6 PM IST' }, { label: 'Sunday: Closed' }],
     },
+  ];
+
+  const socialLinks = [
+    { icon: Twitter, label: 'X (Twitter)', href: 'https://x.com/talioapp' },
+    { icon: Linkedin, label: 'LinkedIn', href: 'https://www.linkedin.com/company/talio/' },
+    { icon: Instagram, label: 'Instagram', href: 'https://www.instagram.com/talioapp/' },
   ];
 
   const quickHelp = [
@@ -81,7 +93,7 @@ export function Contact() {
       title: 'Documentation',
       description: 'Browse our detailed guides and API references.',
       linkText: 'View Docs',
-      href: '#',
+      href: '/documents',
     },
     {
       icon: HelpCircle,
@@ -208,7 +220,7 @@ export function Contact() {
               <button
                 type="submit"
                 disabled={submitting || submitted}
-                className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-500 to-purple-500 px-6 py-3 text-sm font-semibold text-white transition hover:from-blue-600 hover:to-purple-600 disabled:opacity-60"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-white px-8 py-4 text-base font-semibold text-black transition hover:bg-gray-100 hover:shadow-lg hover:shadow-white/10 disabled:opacity-60"
               >
                 {submitted ? (
                   <><CheckCircle2 className="h-4 w-4" /> Message Sent!</>
@@ -238,11 +250,23 @@ export function Contact() {
                   <card.icon className="h-5 w-5 text-blue-400" />
                 </div>
                 <div>
-                  <h3 className="mb-1 font-semibold text-white">{card.title}</h3>
+                  <span className="mb-1 block font-semibold text-white">{card.title}</span>
                   {card.lines.map((line, i) => (
-                    <p key={i} className="text-sm text-gray-400">
-                      {line}
-                    </p>
+                    line.href ? (
+                      <a
+                        key={i}
+                        href={line.href}
+                        target={line.href.startsWith('http') ? '_blank' : undefined}
+                        rel={line.href.startsWith('http') ? 'noopener noreferrer' : undefined}
+                        className="block text-sm text-gray-400 transition hover:text-blue-300"
+                      >
+                        <span>{line.label}</span>
+                      </a>
+                    ) : (
+                      <span key={i} className="block text-sm text-gray-400">
+                        {line.label}
+                      </span>
+                    )
                   ))}
                 </div>
               </div>
@@ -250,15 +274,18 @@ export function Contact() {
 
             {/* Social Links */}
             <div className="rounded-3xl border border-gray-800 bg-gray-900 p-6">
-              <h3 className="mb-4 font-semibold text-white">Follow Us</h3>
+              <span className="mb-4 block font-semibold text-white">Follow Us</span>
               <div className="flex gap-3">
-                {['Twitter', 'LinkedIn', 'Instagram'].map((name) => (
+                {socialLinks.map((social) => (
                   <a
-                    key={name}
-                    href="#"
-                    className="rounded-xl border border-gray-800 bg-gray-800/50 px-5 py-2.5 text-sm text-gray-300 transition hover:border-blue-500/50 hover:text-white"
+                    key={social.label}
+                    href={social.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={social.label}
+                    className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-gray-800 bg-gray-800/50 text-gray-300 transition hover:border-blue-500/50 hover:text-white"
                   >
-                    {name}
+                    <social.icon className="h-5 w-5" />
                   </a>
                 ))}
               </div>
@@ -284,8 +311,8 @@ export function Contact() {
                 <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500/20 to-purple-500/20">
                   <item.icon className="h-6 w-6 text-blue-400" />
                 </div>
-                <h3 className="mb-2 text-lg font-semibold text-white">{item.title}</h3>
-                <p className="mb-4 text-sm text-gray-400">{item.description}</p>
+                <span className="mb-2 block text-lg font-semibold text-white">{item.title}</span>
+                <span className="mb-4 block text-sm text-gray-400">{item.description}</span>
                 {item.badge ? (
                   <span className="inline-block rounded-full bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/20 px-4 py-1.5 text-xs font-medium text-blue-400">
                     Coming Soon

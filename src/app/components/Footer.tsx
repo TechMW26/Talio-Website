@@ -145,13 +145,13 @@ export function Footer() {
 
               {/* Contact Info */}
               <div className="space-y-3 mb-8">
-                <a href="mailto:hello@talio.io" className="flex items-center gap-3 text-sm text-gray-500 hover:text-white transition-colors duration-300 group">
+                <a href="mailto:info@talio.in" className="flex items-center gap-3 text-sm text-gray-500 hover:text-white transition-colors duration-300 group">
                   <Mail className="w-4 h-4 text-gray-600 group-hover:text-white transition-colors" />
-                  hello@talio.io
+                  info@talio.in
                 </a>
                 <div className="flex items-center gap-3 text-sm text-gray-500">
                   <MapPin className="w-4 h-4 text-gray-600" />
-                  Indore, India
+                  Bangalore, India
                 </div>
               </div>
 

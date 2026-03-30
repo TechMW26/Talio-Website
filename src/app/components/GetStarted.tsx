@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import { motion, useInView } from 'motion/react';
-import { Bot, Clock, Shield, Headphones, CheckCircle2 } from 'lucide-react';
+import { Bot, Clock, Shield, Headphones, CheckCircle2, Calendar } from 'lucide-react';
 import { Link } from 'react-router';
 import { usePageMeta } from '@/app/hooks/usePageMeta';
 import { submitSignup } from '@/lib/firebase';
@@ -23,6 +23,8 @@ export function GetStarted() {
     jobTitle: '',
     industry: '',
     companySize: '',
+    preferredDate: '',
+    preferredTime: '',
   });
 
   const [submitting, setSubmitting] = useState(false);
@@ -31,6 +33,18 @@ export function GetStarted() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
+
+  // Min date: tomorrow
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const minDate = tomorrow.toISOString().split('T')[0];
+
+  const timeSlots = [
+    '10:00 AM', '10:30 AM', '11:00 AM', '11:30 AM',
+    '12:00 PM', '12:30 PM', '2:00 PM', '2:30 PM',
+    '3:00 PM', '3:30 PM', '4:00 PM', '4:30 PM',
+    '5:00 PM', '5:30 PM',
+  ];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,8 +55,24 @@ export function GetStarted() {
         source: 'get-started',
         submittedAt: new Date().toISOString(),
       });
+
+      // Send booking confirmation email
+      try {
+        await fetch('/api/send-booking-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ...form, source: 'get-started' }),
+        });
+      } catch {
+        // Email send failure shouldn't block the booking
+      }
+
       setSubmitted(true);
-      setForm({ firstName: '', lastName: '', email: '', phone: '', company: '', jobTitle: '', industry: '', companySize: '' });
+      setForm({
+        firstName: '', lastName: '', email: '', phone: '',
+        company: '', jobTitle: '', industry: '', companySize: '',
+        preferredDate: '', preferredTime: '',
+      });
     } catch {
       alert('Something went wrong. Please try again.');
     } finally {
@@ -127,8 +157,8 @@ export function GetStarted() {
                     <item.icon className="h-5 w-5 text-blue-400" />
                   </div>
                   <div>
-                    <h3 className="mb-1 font-semibold text-white">{item.title}</h3>
-                    <p className="text-sm text-gray-400">{item.description}</p>
+                    <span className="mb-1 block font-semibold text-white">{item.title}</span>
+                    <span className="block text-sm text-gray-400">{item.description}</span>
                   </div>
                 </motion.div>
               ))}
@@ -174,77 +204,122 @@ export function GetStarted() {
                   required
                 />
               </div>
-              <input
-                name="email"
-                type="email"
-                value={form.email}
-                onChange={handleChange}
-                placeholder="Work Email"
-                className={inputClass}
-                required
-              />
-              <input
-                name="phone"
-                type="tel"
-                value={form.phone}
-                onChange={handleChange}
-                placeholder="Phone (Optional)"
-                className={inputClass}
-              />
-              <input
-                name="company"
-                value={form.company}
-                onChange={handleChange}
-                placeholder="Company Name"
-                className={inputClass}
-                required
-              />
-              <input
-                name="jobTitle"
-                value={form.jobTitle}
-                onChange={handleChange}
-                placeholder="Job Title (Optional)"
-                className={inputClass}
-              />
-              <select
-                name="industry"
-                value={form.industry}
-                onChange={handleChange}
-                className={inputClass}
-                required
-              >
-                <option value="" disabled>
-                  Select Industry
-                </option>
-                <option value="Technology">Technology</option>
-                <option value="Healthcare">Healthcare</option>
-                <option value="Finance">Finance</option>
-                <option value="Retail">Retail</option>
-                <option value="Manufacturing">Manufacturing</option>
-                <option value="Education">Education</option>
-                <option value="Other">Other</option>
-              </select>
-              <select
-                name="companySize"
-                value={form.companySize}
-                onChange={handleChange}
-                className={inputClass}
-                required
-              >
-                <option value="" disabled>
-                  Company Size
-                </option>
-                <option value="1-10">1–10 employees</option>
-                <option value="11-50">11–50 employees</option>
-                <option value="51-200">51–200 employees</option>
-                <option value="201-500">201–500 employees</option>
-                <option value="501+">501+ employees</option>
-              </select>
+              <div className="grid gap-5 sm:grid-cols-2">
+                <input
+                  name="email"
+                  type="email"
+                  value={form.email}
+                  onChange={handleChange}
+                  placeholder="Work Email"
+                  className={inputClass}
+                  required
+                />
+                <input
+                  name="phone"
+                  type="tel"
+                  value={form.phone}
+                  onChange={handleChange}
+                  placeholder="Phone"
+                  className={inputClass}
+                  required
+                />
+              </div>
+              <div className="grid gap-5 sm:grid-cols-2">
+                <input
+                  name="company"
+                  value={form.company}
+                  onChange={handleChange}
+                  placeholder="Company Name"
+                  className={inputClass}
+                  required
+                />
+                <input
+                  name="jobTitle"
+                  value={form.jobTitle}
+                  onChange={handleChange}
+                  placeholder="Job Title"
+                  className={inputClass}
+                  required
+                />
+              </div>
+              <div className="grid gap-5 sm:grid-cols-2">
+                <select
+                  name="industry"
+                  value={form.industry}
+                  onChange={handleChange}
+                  className={inputClass}
+                  required
+                >
+                  <option value="" disabled>
+                    Select Industry
+                  </option>
+                  <option value="Technology">Technology</option>
+                  <option value="Healthcare">Healthcare</option>
+                  <option value="Finance">Finance</option>
+                  <option value="Retail">Retail</option>
+                  <option value="Manufacturing">Manufacturing</option>
+                  <option value="Education">Education</option>
+                  <option value="Other">Other</option>
+                </select>
+                <select
+                  name="companySize"
+                  value={form.companySize}
+                  onChange={handleChange}
+                  className={inputClass}
+                  required
+                >
+                  <option value="" disabled>
+                    Company Size
+                  </option>
+                  <option value="1-10">1–10 employees</option>
+                  <option value="11-50">11–50 employees</option>
+                  <option value="51-200">51–200 employees</option>
+                  <option value="201-500">201–500 employees</option>
+                  <option value="501+">501+ employees</option>
+                </select>
+              </div>
+
+              {/* Calendar Booking */}
+              <div className="border border-gray-700/40 rounded-xl p-5 bg-gray-800/30">
+                <div className="flex items-center gap-2 mb-4">
+                  <Calendar className="w-4 h-4 text-blue-400" />
+                  <span className="text-sm font-medium text-white">Schedule Your Demo</span>
+                </div>
+                <div className="grid gap-5 sm:grid-cols-2">
+                  <div>
+                    <label className="block text-xs text-gray-500 mb-1.5">Preferred Date</label>
+                    <input
+                      type="date"
+                      name="preferredDate"
+                      value={form.preferredDate}
+                      onChange={handleChange}
+                      min={minDate}
+                      className={inputClass}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-500 mb-1.5">Preferred Time (IST)</label>
+                    <select
+                      name="preferredTime"
+                      value={form.preferredTime}
+                      onChange={handleChange}
+                      className={inputClass}
+                      required
+                    >
+                      <option value="" disabled>Select Time</option>
+                      {timeSlots.map((slot) => (
+                        <option key={slot} value={slot}>{slot}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              </div>
 
               <button
                 type="submit"
                 disabled={submitting || submitted}
-                className="w-full rounded-xl bg-gradient-to-r from-blue-500 to-purple-500 px-6 py-3 text-sm font-semibold text-white transition hover:from-blue-600 hover:to-purple-600 disabled:opacity-60"
+                className="w-full rounded-full bg-white px-8 py-4 text-base font-semibold text-black transition hover:bg-gray-100 hover:shadow-lg hover:shadow-white/10 disabled:opacity-60"
               >
                 {submitted ? '✓ Demo Booked!' : submitting ? 'Booking Demo...' : 'Book Free Demo →'}
               </button>

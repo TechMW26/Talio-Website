@@ -1,11 +1,32 @@
 import { useRef, useState } from "react";
 import { motion, useInView, useScroll, useTransform, AnimatePresence } from "motion/react";
-import { Check, X, ChevronDown, Sparkles, Rocket, Building2, ArrowRight } from "lucide-react";
+import { Check, X, ChevronDown, Sparkles, Rocket, Building2, ArrowRight, Wallet } from "lucide-react";
 import { Link } from "react-router";
 import { usePageMeta } from '@/app/hooks/usePageMeta';
 import * as SwitchPrimitive from "@radix-ui/react-switch";
+import { BookDemoPopup, type PlanInfo } from './BookDemoPopup';
 
 const plans = [
+  {
+    icon: Wallet,
+    name: "Budget",
+    price: { monthly: 99, annual: 79 },
+    period: "/user/month",
+    subtitle: "For startups on a budget",
+    featured: false,
+    gradient: "from-emerald-500 to-teal-500",
+    features: [
+      { name: "Up to 50 users", included: true },
+      { name: "GPS attendance tracking", included: true },
+      { name: "Leave management", included: true },
+      { name: "Mobile app access", included: true },
+      { name: "Basic reports", included: true },
+      { name: "Team chat", included: false },
+      { name: "AI features", included: false },
+    ],
+    cta: "Start Free Trial",
+    ctaLink: "/get-started",
+  },
   {
     icon: Sparkles,
     name: "Starter",
@@ -15,7 +36,7 @@ const plans = [
     featured: false,
     gradient: "from-blue-500 to-cyan-500",
     features: [
-      { name: "Up to 25 employees", included: true },
+      { name: "Up to 100 users", included: true },
       { name: "GPS attendance tracking", included: true },
       { name: "Leave management", included: true },
       { name: "Team chat", included: true },
@@ -36,7 +57,7 @@ const plans = [
     featured: true,
     gradient: "from-purple-500 to-pink-500",
     features: [
-      { name: "Unlimited employees", included: true },
+      { name: "Up to 200 users", included: true },
       { name: "GPS & geofencing", included: true },
       { name: "Auto payroll", included: true },
       { name: "Project management", included: true },
@@ -99,6 +120,18 @@ export function PricingPage() {
   const [billing, setBilling] = useState<"monthly" | "annual">("monthly");
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const [showDemoPopup, setShowDemoPopup] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState<PlanInfo | null>(null);
+
+  const openDemoForPlan = (plan: typeof plans[number]) => {
+    const priceDisplay = plan.priceLabel ?? `₹${billing === 'monthly' ? plan.price.monthly : plan.price.annual}${plan.period}`;
+    setSelectedPlan({
+      name: plan.name,
+      price: priceDisplay,
+      gradient: plan.gradient,
+    });
+    setShowDemoPopup(true);
+  };
 
   const containerRef = useRef(null);
   const heroRef = useRef(null);
@@ -211,9 +244,9 @@ export function PricingPage() {
         initial={{ opacity: 0, y: 30 }}
         animate={plansInView ? { opacity: 1, y: 0 } : {}}
         transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-        className="relative max-w-[1200px] mx-auto px-6 md:px-8 lg:px-12 pb-28"
+        className="relative max-w-[1600px] mx-auto px-6 md:px-8 lg:px-12 pb-28"
       >
-        <div className="grid md:grid-cols-3 gap-6 items-start">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 items-start">
           {plans.map((plan, index) => {
             const Icon = plan.icon;
             const isHovered = hoveredIndex === index;
@@ -324,7 +357,7 @@ export function PricingPage() {
                   </div>
 
                   {/* CTA Button — centered */}
-                  <Link to={plan.ctaLink} className="block mb-10 relative z-10">
+                  <button onClick={() => openDemoForPlan(plan)} className="block mb-10 relative z-10 w-full">
                     <motion.div
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
@@ -356,7 +389,7 @@ export function PricingPage() {
                         <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                       </span>
                     </motion.div>
-                  </Link>
+                  </button>
 
                   {/* Features */}
                   <div className="space-y-4 relative z-10">
@@ -490,6 +523,13 @@ export function PricingPage() {
           </motion.div>
         </Link>
       </motion.section>
+
+      {/* Book Demo Popup */}
+      <BookDemoPopup
+        isOpen={showDemoPopup}
+        onClose={() => { setShowDemoPopup(false); setSelectedPlan(null); }}
+        planInfo={selectedPlan}
+      />
     </div>
   );
 }

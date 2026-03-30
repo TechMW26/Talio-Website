@@ -5,11 +5,13 @@ import { Button } from '@/app/components/ui/button';
 import { Link, useNavigate, useLocation } from 'react-router';
 import React from 'react';
 import logoImage from '@/assets/2090cd551224404a5a02329a4590597a32d19a1f.png';
+import { BookDemoPopup } from './BookDemoPopup';
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showFeaturesDropdown, setShowFeaturesDropdown] = useState(false);
+  const [showDemoPopup, setShowDemoPopup] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -148,23 +150,8 @@ export function Navbar() {
                               <div className="bg-[#0c0e14]/95 backdrop-blur-2xl rounded-[20px] overflow-hidden shadow-[0_25px_60px_-12px_rgba(0,0,0,0.7)]">
                                 <div className="grid grid-cols-3">
 
-                                  {/* CORE FEATURES */}
-                                  <div className="p-5 relative">
-                                    <div className="flex items-center gap-2 mb-4 px-2">
-                                      <div className="w-1.5 h-1.5 rounded-full bg-purple-400 shadow-[0_0_6px_2px_rgba(168,85,247,0.4)]" />
-                                      <h3 className="text-[10px] font-bold text-purple-400/80 uppercase tracking-[0.2em]">
-                                        Core Features
-                                      </h3>
-                                    </div>
-                                    <div className="space-y-0.5">
-                                      <FeatureItem icon={Clock} title="Smart Attendance" description="GPS-enabled check-ins with geofencing" accentColor="purple" href="/features/attendance" delay={0} />
-                                      <FeatureItem icon={DollarSign} title="Automated Payroll" description="Calculate salaries and generate payslips" accentColor="blue" href="/features/payroll" delay={0.03} />
-                                      <FeatureItem icon={Calendar} title="Leave Management" description="Smart leave tracking and approvals" accentColor="emerald" href="/features/leaves" delay={0.06} />
-                                    </div>
-                                  </div>
-
                                   {/* PRODUCTIVITY */}
-                                  <div className="p-5 relative border-x border-white/[0.04]">
+                                  <div className="p-5 relative">
                                     <div className="flex items-center gap-2 mb-4 px-2">
                                       <div className="w-1.5 h-1.5 rounded-full bg-blue-400 shadow-[0_0_6px_2px_rgba(96,165,250,0.4)]" />
                                       <h3 className="text-[10px] font-bold text-blue-400/80 uppercase tracking-[0.2em]">
@@ -172,14 +159,14 @@ export function Navbar() {
                                       </h3>
                                     </div>
                                     <div className="space-y-0.5">
-                                      <FeatureItem icon={LayoutGrid} title="Talio Projects" description="Kanban-style project management" accentColor="indigo" href="/features/projects" delay={0.04} />
-                                      <FeatureItem icon={Target} title="Goals & OKRs" description="Set and track company objectives" accentColor="cyan" href="/features/goals" delay={0.07} />
-                                      <FeatureItem icon={Sparkles} title="AI Workflows" description="Automate repetitive tasks" accentColor="amber" href="/features/workflows" delay={0.1} />
+                                      <FeatureItem icon={LayoutGrid} title="Talio Projects" description="Kanban-style project management" accentColor="indigo" href="/features/projects" delay={0} />
+                                      <FeatureItem icon={Target} title="Goals & OKRs" description="Set and track company objectives" accentColor="cyan" href="/features/goals" delay={0.03} />
+                                      <FeatureItem icon={Sparkles} title="AI Workflows" description="Automate repetitive tasks" accentColor="amber" href="/features/workflows" delay={0.06} />
                                     </div>
                                   </div>
 
                                   {/* COMMUNICATION */}
-                                  <div className="p-5 relative">
+                                  <div className="p-5 relative border-x border-white/[0.04]">
                                     <div className="flex items-center gap-2 mb-4 px-2">
                                       <div className="w-1.5 h-1.5 rounded-full bg-pink-400 shadow-[0_0_6px_2px_rgba(244,114,182,0.4)]" />
                                       <h3 className="text-[10px] font-bold text-pink-400/80 uppercase tracking-[0.2em]">
@@ -187,9 +174,24 @@ export function Navbar() {
                                       </h3>
                                     </div>
                                     <div className="space-y-0.5">
-                                      <FeatureItem icon={Bot} title="MIRA AI Assistant" description="Your intelligent HR companion" accentColor="violet" href="/features/mira-ai" delay={0.05} badge="New" />
-                                      <FeatureItem icon={MessageSquare} title="Team Chat" description="Real-time messaging and channels" accentColor="pink" href="/features/team-chat" delay={0.08} />
-                                      <FeatureItem icon={Bell} title="Notifications" description="Stay updated with real-time alerts" accentColor="orange" href="/features/notifications" delay={0.11} />
+                                      <FeatureItem icon={Bot} title="MIRA AI Assistant" description="Your intelligent HR companion" accentColor="violet" href="/features/mira-ai" delay={0.04} badge="New" />
+                                      <FeatureItem icon={MessageSquare} title="Team Chat" description="Real-time messaging and channels" accentColor="pink" href="/features/team-chat" delay={0.07} />
+                                      <FeatureItem icon={Bell} title="Notifications" description="Stay updated with real-time alerts" accentColor="orange" href="/features/notifications" delay={0.1} />
+                                    </div>
+                                  </div>
+
+                                  {/* HRMS FEATURES */}
+                                  <div className="p-5 relative">
+                                    <div className="flex items-center gap-2 mb-4 px-2">
+                                      <div className="w-1.5 h-1.5 rounded-full bg-purple-400 shadow-[0_0_6px_2px_rgba(168,85,247,0.4)]" />
+                                      <h3 className="text-[10px] font-bold text-purple-400/80 uppercase tracking-[0.2em]">
+                                        HRMS Features
+                                      </h3>
+                                    </div>
+                                    <div className="space-y-0.5">
+                                      <FeatureItem icon={Clock} title="Smart Attendance" description="GPS-enabled check-ins with geofencing" accentColor="purple" href="/features/attendance" delay={0.05} />
+                                      <FeatureItem icon={DollarSign} title="Automated Payroll" description="Calculate salaries and generate payslips" accentColor="blue" href="/features/payroll" delay={0.08} />
+                                      <FeatureItem icon={Calendar} title="Leave Management" description="Smart leave tracking and approvals" accentColor="emerald" href="/features/leaves" delay={0.11} />
                                     </div>
                                   </div>
                                 </div>
@@ -263,10 +265,21 @@ export function Navbar() {
             </div>
 
             {/* CTA Button - Desktop */}
-            <div className="hidden lg:flex items-center gap-4">
+            <div className="hidden lg:flex items-center gap-3">
+              <motion.button
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.4 }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setShowDemoPopup(true)}
+                className="px-6 py-2.5 text-sm font-medium text-gray-300 hover:text-white transition-colors duration-300 rounded-full border border-gray-700 hover:border-gray-500 hover:bg-gray-800/50"
+              >
+                Book Free Demo
+              </motion.button>
               <MagneticButton>
                 <Link to="/get-started">
-                <Button className="bg-white hover:bg-gray-100 text-black px-8 py-6 rounded-full text-base font-semibold shadow-xl shadow-white/10 hover:shadow-2xl hover:shadow-white/20 transition-all duration-500 group relative overflow-hidden">
+                <Button className="bg-white hover:bg-gray-100 text-black px-6 py-2.5 rounded-full text-sm font-semibold shadow-xl shadow-white/10 hover:shadow-2xl hover:shadow-white/20 transition-all duration-500 group relative overflow-hidden">
                   <span className="relative z-10 flex items-center gap-2">
                     <span className="flex overflow-hidden">
                       {"Start Today".split('').map((char, i) => (
@@ -393,7 +406,14 @@ export function Navbar() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3, delay: 0.2 }}
+                  className="space-y-3"
                 >
+                  <button
+                    onClick={() => { setIsMobileMenuOpen(false); setShowDemoPopup(true); }}
+                    className="w-full py-4 rounded-2xl text-base font-semibold border border-gray-700 text-gray-300 hover:text-white hover:border-gray-500 transition-all duration-300"
+                  >
+                    Book Free Demo
+                  </button>
                   <Link to="/get-started" onClick={() => setIsMobileMenuOpen(false)}>
                     <Button className="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white py-7 rounded-2xl text-base font-semibold shadow-xl shadow-purple-500/30 hover:shadow-2xl hover:shadow-purple-500/40 transition-all duration-300">
                       Start Today
@@ -405,6 +425,9 @@ export function Navbar() {
           </>
         )}
       </AnimatePresence>
+
+      {/* Book Demo Popup */}
+      <BookDemoPopup isOpen={showDemoPopup} onClose={() => setShowDemoPopup(false)} />
     </motion.nav>
   );
 }

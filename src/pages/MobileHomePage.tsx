@@ -183,7 +183,7 @@ export function MobileHomePage() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-              className="mt-6 text-[clamp(2.8rem,11vw,4.4rem)] font-bold leading-[0.95] tracking-tighter"
+              className="mt-9 text-[clamp(2.8rem,11vw,4.4rem)] font-bold leading-[0.95] tracking-tighter"
             >
               <span className="block text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-200 to-white">
                 Manage Your Team
@@ -339,7 +339,7 @@ export function MobileHomePage() {
                   className="rounded-[2rem] border border-white/10 bg-gray-950/70 p-5"
                 >
                   <div className="flex items-start gap-4">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500/20 to-purple-500/20">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-500/20 to-purple-500/20">
                       <item.icon className="h-5 w-5 text-blue-400" />
                     </div>
                     <div>
@@ -410,7 +410,7 @@ export function MobileHomePage() {
                 transition={{ duration: 0.55, delay: index * 0.06 }}
                 className="rounded-[1.75rem] border border-white/10 bg-gray-950/75 p-4"
               >
-                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-500/20 to-blue-500/20">
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-violet-500/20 to-blue-500/20">
                   <item.icon className="h-5 w-5 text-violet-300" />
                 </div>
                 <span className="mt-4 block text-sm font-semibold text-white">{item.title}</span>
@@ -441,7 +441,7 @@ export function MobileHomePage() {
                 className="rounded-[2rem] border border-white/10 bg-gray-950/80 p-5"
               >
                 <div className="flex items-start gap-4">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500/15 to-cyan-500/15">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-emerald-500/15 to-cyan-500/15">
                     <feature.icon className="h-5 w-5 text-emerald-300" />
                   </div>
                   <div>

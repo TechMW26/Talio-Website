@@ -3,6 +3,7 @@ import { motion, useInView } from 'motion/react';
 import { Bot, Clock, Shield, Headphones, CheckCircle2 } from 'lucide-react';
 import { Link } from 'react-router';
 import { usePageMeta } from '@/app/hooks/usePageMeta';
+import { createDemoBookingEmailPayload, sendDemoBookingEmail } from '@/app/components/demoBookingEmail';
 import { DemoBookingStepper } from '@/app/components/DemoBookingStepper';
 import { createEmptyDemoBookingForm } from '@/app/components/demoBookingTypes';
 import { submitSignup } from '@/lib/firebase';
@@ -34,27 +35,15 @@ export function GetStarted() {
     e.preventDefault();
     setSubmitting(true);
     try {
-      await submitSignup({
-        ...form,
-        source: 'get-started',
-        submittedAt: new Date().toISOString(),
-      });
+      const submissionData = createDemoBookingEmailPayload(form, 'get-started');
 
-      // Send booking confirmation email
-      try {
-        await fetch('/api/send-booking-email', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ...form, source: 'get-started' }),
-        });
-      } catch {
-        // Email send failure shouldn't block the booking
-      }
+      await submitSignup(submissionData);
+      await sendDemoBookingEmail(submissionData);
 
       setSubmitted(true);
       setForm(createEmptyDemoBookingForm());
     } catch {
-      alert('Something went wrong. Please try again.');
+      alert('We could not send your booking confirmation email. Please try again.');
     } finally {
       setSubmitting(false);
     }

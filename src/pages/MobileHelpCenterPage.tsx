@@ -55,7 +55,7 @@ export function MobileHelpCenterPage() {
                     className="flex w-full items-start justify-between gap-4 px-5 py-5 text-left"
                   >
                     <div className="flex items-start gap-4">
-                      <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/5">
+                      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white/5">
                         <category.icon className="h-5 w-5 text-green-400" />
                       </div>
                       <div>
@@ -160,7 +160,7 @@ export function MobileHelpCenterPage() {
             {resources.map((resource, index) => {
               const inner = (
                 <div className="rounded-[2rem] border border-white/10 bg-gray-900/60 p-5 transition hover:border-white/15">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/5">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white/5">
                     <resource.icon className="h-5 w-5 text-green-400" />
                   </div>
                   <span className="mt-5 block text-xl font-semibold text-white">{resource.title}</span>

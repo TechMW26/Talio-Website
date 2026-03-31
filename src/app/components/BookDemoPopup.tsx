@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { X, CheckCircle2 } from 'lucide-react';
 import { Link } from 'react-router';
 import { DemoBookingStepper } from '@/app/components/DemoBookingStepper';
+import { createDemoBookingEmailPayload, sendDemoBookingEmail } from '@/app/components/demoBookingEmail';
 import { createEmptyDemoBookingForm, type PlanInfo } from '@/app/components/demoBookingTypes';
 import { submitSignup } from '@/lib/firebase';
 
@@ -28,31 +29,19 @@ export function BookDemoPopup({ isOpen, onClose, planInfo }: BookDemoPopupProps)
     e.preventDefault();
     setSubmitting(true);
     try {
-      const submissionData = {
-        ...form,
-        source: planInfo ? `pricing-${planInfo.name.toLowerCase()}` : 'book-demo-popup',
-        selectedPlan: planInfo?.name || '',
-        selectedPlanPrice: planInfo?.price || '',
-        submittedAt: new Date().toISOString(),
-      };
+      const submissionData = createDemoBookingEmailPayload(
+        form,
+        planInfo ? `pricing-${planInfo.name.toLowerCase()}` : 'book-demo-popup',
+        planInfo,
+      );
 
       await submitSignup(submissionData);
-
-      // Send booking confirmation email
-      try {
-        await fetch('/api/send-booking-email', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(submissionData),
-        });
-      } catch {
-        // Email send failure shouldn't block the booking
-      }
+      await sendDemoBookingEmail(submissionData);
 
       setSubmitted(true);
       setForm(createEmptyDemoBookingForm());
     } catch {
-      alert('Something went wrong. Please try again.');
+      alert('We could not send your booking confirmation email. Please try again.');
     } finally {
       setSubmitting(false);
     }

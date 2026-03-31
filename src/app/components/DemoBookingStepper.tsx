@@ -65,6 +65,7 @@ export function DemoBookingStepper({
   resetKey,
 }: DemoBookingStepperProps) {
   const [currentStep, setCurrentStep] = useState(0);
+  const isLastStep = currentStep === steps.length - 1;
 
   useEffect(() => {
     setCurrentStep(0);
@@ -76,12 +77,19 @@ export function DemoBookingStepper({
   const canOpenStep = (stepIndex: number) =>
     stepIndex <= currentStep || steps.slice(0, stepIndex).every((_, index) => isStepComplete(index));
 
+  const goToPreviousStep = () => {
+    setCurrentStep((previous) => Math.max(previous - 1, 0));
+  };
+
   const handleFormSubmit = (event: FormEvent<HTMLFormElement>) => {
     if (currentStep < steps.length - 1) {
       event.preventDefault();
-      if (isStepComplete(currentStep)) {
-        setCurrentStep((previous) => Math.min(previous + 1, steps.length - 1));
+      if (!isStepComplete(currentStep)) {
+        event.currentTarget.reportValidity();
+        return;
       }
+
+      setCurrentStep((previous) => Math.min(previous + 1, steps.length - 1));
       return;
     }
 
@@ -133,11 +141,26 @@ export function DemoBookingStepper({
       </div>
 
       <div className="rounded-[1.75rem] border border-gray-800/80 bg-gray-950/70 p-4 md:p-5">
-        <span className="block text-[11px] font-semibold uppercase tracking-[0.18em] text-blue-300">
-          Step {currentStep + 1} of {steps.length}
-        </span>
-        <span className="mt-2 block text-lg font-semibold text-white">{steps[currentStep].title}</span>
-        <span className="mt-1 block text-sm leading-relaxed text-gray-400">{steps[currentStep].description}</span>
+        <div className="flex items-start gap-3">
+          {currentStep > 0 && (
+            <button
+              type="button"
+              onClick={goToPreviousStep}
+              aria-label="Go back to previous step"
+              className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/[0.04] text-white transition hover:bg-white/[0.08]"
+            >
+              <ArrowLeft className="h-4 w-4" />
+            </button>
+          )}
+
+          <div className="min-w-0">
+            <span className="block text-[11px] font-semibold uppercase tracking-[0.18em] text-blue-300">
+              Step {currentStep + 1} of {steps.length}
+            </span>
+            <span className="mt-2 block text-lg font-semibold text-white">{steps[currentStep].title}</span>
+            <span className="mt-1 block text-sm leading-relaxed text-gray-400">{steps[currentStep].description}</span>
+          </div>
+        </div>
 
         <div className="mt-4 overflow-hidden">
           <AnimatePresence mode="wait">
@@ -198,7 +221,7 @@ export function DemoBookingStepper({
                     <span className="text-sm font-medium text-white">Schedule Your Demo</span>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-2.5 md:gap-3">
+                  <div className="space-y-3">
                     <div>
                       <span className="mb-1 block text-[11px] text-gray-500">Preferred Date</span>
                       <StepInput
@@ -228,39 +251,14 @@ export function DemoBookingStepper({
         </div>
       </div>
 
-      <div className={`grid gap-3 ${currentStep === 0 ? 'grid-cols-1' : 'grid-cols-2'}`}>
-        {currentStep > 0 && (
-          <button
-            type="button"
-            onClick={() => setCurrentStep((previous) => Math.max(previous - 1, 0))}
-            className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/[0.08]"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            <span>Back</span>
-          </button>
-        )}
-
-        {currentStep < steps.length - 1 ? (
-          <button
-            type="button"
-            disabled={!isStepComplete(currentStep)}
-            onClick={() => setCurrentStep((previous) => Math.min(previous + 1, steps.length - 1))}
-            className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-semibold text-black transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            <span>Continue</span>
-            <ArrowRight className="h-4 w-4" />
-          </button>
-        ) : (
-          <button
-            type="submit"
-            disabled={!isStepComplete(currentStep) || submitting || submitted}
-            className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-semibold text-black transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            <span>{submitting ? submittingLabel : submitLabel}</span>
-            {!submitting && <ArrowRight className="h-4 w-4" />}
-          </button>
-        )}
-      </div>
+      <button
+        type="submit"
+        disabled={!isStepComplete(currentStep) || submitting || submitted}
+        className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-semibold text-black transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        <span>{isLastStep ? (submitting ? submittingLabel : submitLabel) : 'Next'}</span>
+        {(!submitting || !isLastStep) && <ArrowRight className="h-4 w-4" />}
+      </button>
 
       {legalNotice && <div className="pt-1">{legalNotice}</div>}
     </form>

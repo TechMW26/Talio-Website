@@ -47,7 +47,7 @@ export function MobileFeaturesPage() {
                 transition={{ duration: 0.55, delay: index * 0.05 }}
               >
                 <Link to={feature.href} className="block rounded-[2rem] border border-white/10 bg-gray-900/60 p-5 transition hover:border-white/15">
-                  <div className={`flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br ${feature.gradient}`}>
+                  <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br ${feature.gradient}`}>
                     <feature.icon className="h-5 w-5 text-white" />
                   </div>
                   <span className="mt-5 block text-xl font-semibold text-white">{feature.title}</span>
@@ -78,7 +78,7 @@ export function MobileFeaturesPage() {
                 transition={{ duration: 0.55, delay: index * 0.06 }}
               >
                 <Link to={feature.href} className="block rounded-[2rem] border border-white/10 bg-gray-800/40 p-5 transition hover:border-white/15">
-                  <div className={`flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br ${feature.gradient}`}>
+                  <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br ${feature.gradient}`}>
                     <feature.icon className="h-5 w-5 text-white" />
                   </div>
                   <span className="mt-5 block text-xl font-semibold text-white">{feature.title}</span>

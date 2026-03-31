@@ -1,5 +1,19 @@
 /* Global style overrides — loaded last to take priority */
 /* Scoped to public site only — admin panel (.admin-panel) is excluded */
+.blog-content p, .blog-content li, .blog-content h2{
+    color: white !important;
+}
+
+.blog-content li{
+    background: rgb(255,255,255,0.2) !important;
+    border-radius: 10px !important;
+    margin-bottom: 1em !important;
+    padding: 1em !important;
+}
+
+.blog-content h2{
+    font-size: 2rem !important;
+}
 
 p:not(.admin-panel p) {
     margin-top: 1em !important;

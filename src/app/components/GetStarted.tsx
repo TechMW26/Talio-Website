@@ -6,7 +6,7 @@ import { usePageMeta } from '@/app/hooks/usePageMeta';
 import { createDemoBookingEmailPayload, sendDemoBookingEmail } from '@/app/components/demoBookingEmail';
 import { DemoBookingStepper } from '@/app/components/DemoBookingStepper';
 import { createEmptyDemoBookingForm } from '@/app/components/demoBookingTypes';
-import { submitSignup } from '@/lib/firebase';
+import { submitSignup, enrichVisitorFromForm } from '@/lib/firebase';
 import { getPageLabelFromPath } from '@/lib/leadAttribution';
 
 export function GetStarted() {
@@ -46,6 +46,7 @@ export function GetStarted() {
 
       await submitSignup(submissionData);
       await sendDemoBookingEmail(submissionData);
+      enrichVisitorFromForm({ name: `${form.firstName} ${form.lastName}`.trim(), email: form.email, phone: form.phone });
 
       setSubmitted(true);
       setForm(createEmptyDemoBookingForm());

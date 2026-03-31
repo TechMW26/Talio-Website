@@ -152,7 +152,7 @@ export function About() {
             transition={{ duration: 0.9, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
             className="text-lg md:text-xl text-gray-400 leading-relaxed font-light max-w-2xl text-center"
           >
-            A merger of Mushroom World Umbrella, dedicated to transforming how teams work together.
+            A venture of MW FutureTech, dedicated to transforming how teams work together.
           </motion.p>
         </div>
       </section>
@@ -287,7 +287,7 @@ export function About() {
                       transition={{ duration: 1, delay: 1.1 }}
                       className="text-xl md:text-2xl text-white leading-relaxed font-normal"
                     >
-                      Mushroom World Umbrella is the modern catalyst and innovation arm of Mushroom World Holding.
+                      MW FutureTech is the modern catalyst and innovation arm driving Talio forward.
                     </motion.p>
                   </div>
                 </motion.div>

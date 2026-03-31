@@ -56,6 +56,7 @@ export function Navbar() {
     { name: 'Pricing', href: '/pricing', isRoute: true },
     { name: 'Downloads', href: '/downloads', isRoute: true },
     { name: 'About', href: '/about', isRoute: true },
+    { name: 'Blog', href: '/blog', isRoute: true },
     { name: 'Contact', href: '/contact', isRoute: true }
   ];
 

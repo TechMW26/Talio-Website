@@ -39,6 +39,7 @@ export function Footer() {
       links: [
         { label: 'Help Center', href: '/help' },
         { label: 'Documentation', href: '/documents' },
+        { label: 'Blog', href: '/blog' },
       ]
     },
     {
@@ -268,7 +269,7 @@ export function Footer() {
         >
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <p className="text-xs text-gray-600 font-light">
-              © {new Date().getFullYear()} Talio. A Venture of MW Umbrella. All rights reserved.
+              © {new Date().getFullYear()} Talio. A Venture of MW FutureTech. All rights reserved.
             </p>
             
             {/* Scroll to top */}

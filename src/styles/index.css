@@ -20,11 +20,17 @@ html.lenis, html.lenis body {
   overflow: hidden;
 }
 
-/* Hide default cursor — desktop only */
+/* Hide default cursor — desktop only (public site) */
 @media (pointer: fine) {
-  * {
+  *:not(.admin-panel *) {
     cursor: none !important;
   }
+}
+
+/* Restore cursor inside admin panel */
+.admin-panel,
+.admin-panel * {
+  cursor: auto !important;
 }
 
 /* Hide all scrollbars while keeping scrollable */

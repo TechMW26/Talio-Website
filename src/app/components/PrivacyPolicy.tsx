@@ -7,7 +7,7 @@ const sections = [
     title: "1. Introduction",
     content: (
       <p className="text-gray-400 leading-relaxed mb-4">
-        At Talio (operated by MW Umbrella), we are committed to protecting your
+        At Talio (operated by MW FutureTech), we are committed to protecting your
         privacy. This Privacy Policy explains how we collect, use, disclose, and
         safeguard your information when you use our workforce management
         platform.

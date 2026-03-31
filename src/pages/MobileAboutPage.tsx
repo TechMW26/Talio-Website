@@ -100,7 +100,7 @@ export function MobileAboutPage() {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="mt-8 max-w-md text-base font-light leading-relaxed text-gray-400"
             >
-              Talio is a venture of Mushroom World Umbrella, built to turn workforce operations into a more intelligent, measurable, and human-centered system.
+              Talio is a venture of MW FutureTech, built to turn workforce operations into a more intelligent, measurable, and human-centered system.
             </motion.p>
           </div>
         </div>
@@ -114,7 +114,7 @@ export function MobileAboutPage() {
               <div className="rounded-[2rem] border border-white/8 bg-white/[0.03] p-5">
                 <span className="block text-xs font-semibold uppercase tracking-[0.18em] text-blue-300">01 Core mission</span>
                 <span className="mt-3 block text-lg font-semibold text-white">
-                  Mushroom World Umbrella acts as the modern catalyst and innovation arm behind Talio.
+                  MW FutureTech acts as the modern catalyst and innovation arm behind Talio.
                 </span>
               </div>
               <div className="rounded-[2rem] border border-white/8 bg-white/[0.03] p-5">

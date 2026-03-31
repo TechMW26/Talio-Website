@@ -5,7 +5,7 @@ import { Link, useLocation } from 'react-router';
 import { DemoBookingStepper } from '@/app/components/DemoBookingStepper';
 import { createDemoBookingEmailPayload, sendDemoBookingEmail } from '@/app/components/demoBookingEmail';
 import { createEmptyDemoBookingForm, type PlanInfo } from '@/app/components/demoBookingTypes';
-import { submitSignup } from '@/lib/firebase';
+import { submitSignup, enrichVisitorFromForm } from '@/lib/firebase';
 import { getPageLabelFromPath } from '@/lib/leadAttribution';
 
 export type { PlanInfo } from '@/app/components/demoBookingTypes';
@@ -43,6 +43,7 @@ export function BookDemoPopup({ isOpen, onClose, planInfo }: BookDemoPopupProps)
 
       await submitSignup(submissionData);
       await sendDemoBookingEmail(submissionData);
+      enrichVisitorFromForm({ name: `${form.firstName} ${form.lastName}`.trim(), email: form.email, phone: form.phone });
 
       setSubmitted(true);
       setForm(createEmptyDemoBookingForm());

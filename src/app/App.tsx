@@ -34,6 +34,8 @@ const MiraAIFeature = lazy(() => import('@/app/components/features/MiraAIFeature
 const TeamChatFeature = lazy(() => import('@/app/components/features/TeamChatFeature').then((module) => ({ default: module.TeamChatFeature })));
 const NotificationsFeature = lazy(() => import('@/app/components/features/NotificationsFeature').then((module) => ({ default: module.NotificationsFeature })));
 const AdminDashboard = lazy(() => import('@/app/components/AdminDashboard').then((module) => ({ default: module.AdminDashboard })));
+const BlogPage = lazy(() => import('@/app/components/BlogPage').then((module) => ({ default: module.BlogPage })));
+const BlogPostPage = lazy(() => import('@/app/components/BlogPostPage').then((module) => ({ default: module.BlogPostPage })));
 
 function RouteFallback() {
   return <div className="min-h-[60vh] bg-gray-950" />;
@@ -121,6 +123,8 @@ function AppLayout() {
           <Route path="/solutions" element={<SolutionsPage />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/terms" element={<TermsOfService />} />
+          <Route path="/blog" element={<BlogPage />} />
+          <Route path="/blog/:slug" element={<BlogPostPage />} />
           <Route path="/admin" element={<AdminDashboard />} />
         </Routes>
       </Suspense>

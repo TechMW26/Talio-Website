@@ -9,6 +9,7 @@ const quickLinks = [
   { label: 'Docs', href: '/documents' },
   { label: 'Contact', href: '/contact' },
   { label: 'Help Center', href: '/help' },
+  { label: 'Blog', href: '/blog' },
 ];
 
 const socialLinks = [
@@ -106,7 +107,7 @@ export function MobileFooter() {
 
         <div className="mt-4 flex items-center justify-between gap-4">
           <span className="max-w-[220px] text-[11px] font-light leading-relaxed text-gray-600">
-            © {new Date().getFullYear()} Talio. A Venture of MW Umbrella.
+            © {new Date().getFullYear()} Talio. A Venture of MW FutureTech.
           </span>
           <button
             type="button"

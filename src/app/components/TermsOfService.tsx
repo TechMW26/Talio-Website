@@ -9,7 +9,7 @@ const sections = [
       <p className="text-gray-400 leading-relaxed mb-4">
         By accessing or using Talio's services, you agree to be bound by these
         Terms of Service. These terms constitute a binding legal agreement
-        between you and MW Umbrella, governed by the laws of India.
+        between you and MW FutureTech, governed by the laws of India.
       </p>
     ),
   },
@@ -123,7 +123,7 @@ const sections = [
     title: "9. Limitation of Liability",
     content: (
       <p className="text-gray-400 leading-relaxed mb-4">
-        In no event shall MW Umbrella be liable for any indirect, incidental,
+        In no event shall MW FutureTech be liable for any indirect, incidental,
         special, consequential, or punitive damages arising from your use of the
         Service.
       </p>

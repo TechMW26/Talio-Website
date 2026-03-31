@@ -1,29 +1,117 @@
 import { useState, useEffect, useMemo } from 'react';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, PieChart, Pie, Cell,
 } from 'recharts';
 import {
-  Globe, Monitor, Smartphone, Tablet, Filter, TrendingUp, Users,
-  Eye, Timer, ArrowDownRight, Percent, ChevronDown,
+  Globe, Monitor, Smartphone, Tablet, TrendingUp, Users,
+  Eye, Timer, ArrowDownRight, Percent, ChevronDown, Calendar,
+  MapPin, Activity, MousePointerClick, Clock, ArrowUp, ArrowDown,
+  Minus,
 } from 'lucide-react';
-import { MapContainer, TileLayer, CircleMarker, Popup, useMap } from 'react-leaflet';
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
 import { getPageVisits, getVisitors, getLeads, type PageVisit, type VisitorProfile, type LeadEntry } from '@/lib/firebase';
 
-// ── Helpers ──
+// ── Shared style ──
 
-function groupByDate(visits: PageVisit[]): { date: string; count: number }[] {
+const panelClassName =
+  'rounded-[28px] border border-white/10 bg-[#0b1323]/80 shadow-[0_24px_80px_rgba(2,8,23,0.55)] backdrop-blur-xl';
+
+const tooltipStyle = {
+  background: '#0d1526',
+  border: '1px solid rgba(255,255,255,0.1)',
+  borderRadius: 16,
+  color: '#fff',
+  fontSize: 12,
+  boxShadow: '0 16px 48px rgba(0,0,0,0.4)',
+};
+
+const CHART_COLORS = ['#22d3ee', '#818cf8', '#34d399', '#f59e0b', '#f43f5e', '#3b82f6', '#ec4899', '#a78bfa'];
+
+// ── Date helpers ──
+
+function todayStr() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function daysAgo(n: number) {
+  const d = new Date();
+  d.setDate(d.getDate() - n);
+  return d.toISOString().slice(0, 10);
+}
+
+function formatDateShort(d: string) {
+  const date = new Date(d + 'T00:00:00');
+  return date.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+}
+
+function formatDateFull(d: string) {
+  const date = new Date(d + 'T00:00:00');
+  return date.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+// ── Data helpers ──
+
+type TimeBucket = 'hour' | 'day' | 'month';
+
+function detectBucket(range: { from: string; to: string } | null): TimeBucket {
+  if (!range) return 'month';
+  const from = new Date(range.from + 'T00:00:00');
+  const to = new Date(range.to + 'T00:00:00');
+  const days = Math.round((to.getTime() - from.getTime()) / 86400000);
+  if (days <= 0) return 'hour';   // single day → 24-hour view
+  if (days <= 90) return 'day';   // up to ~3 months → daily
+  return 'month';                 // longer → monthly
+}
+
+function groupByTimeBucket(visits: PageVisit[], bucket: TimeBucket): { label: string; count: number }[] {
   const map: Record<string, number> = {};
+
+  if (bucket === 'hour') {
+    // Pre-fill all 24 hours
+    for (let i = 0; i < 24; i++) map[String(i).padStart(2, '0')] = 0;
+    visits.forEach(v => {
+      const h = v.timestamp?.slice(11, 13);
+      if (h) map[h] = (map[h] || 0) + 1;
+    });
+    return Object.entries(map)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([h, count]) => ({ label: `${h}:00`, count }));
+  }
+
+  if (bucket === 'day') {
+    visits.forEach(v => {
+      const d = v.timestamp?.slice(0, 10) || 'unknown';
+      map[d] = (map[d] || 0) + 1;
+    });
+    return Object.entries(map)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([date, count]) => ({ label: date, count }));
+  }
+
+  // month bucket
   visits.forEach(v => {
-    const d = v.timestamp?.slice(0, 10) || 'unknown';
-    map[d] = (map[d] || 0) + 1;
+    const m = v.timestamp?.slice(0, 7); // YYYY-MM
+    if (m) map[m] = (map[m] || 0) + 1;
   });
   return Object.entries(map)
     .sort(([a], [b]) => a.localeCompare(b))
-    .map(([date, count]) => ({ date, count }));
+    .map(([m, count]) => ({ label: m, count }));
+}
+
+function formatBucketLabel(label: string, bucket: TimeBucket): string {
+  if (bucket === 'hour') return label; // "09:00"
+  if (bucket === 'day') return formatDateShort(label);
+  // month: "2026-03" → "Mar 2026"
+  const d = new Date(label + '-01T00:00:00');
+  return d.toLocaleDateString('en-IN', { month: 'short', year: 'numeric' });
+}
+
+function formatBucketTooltip(label: string, bucket: TimeBucket): string {
+  if (bucket === 'hour') return label;
+  if (bucket === 'day') return formatDateFull(label);
+  const d = new Date(label + '-01T00:00:00');
+  return d.toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
 }
 
 function groupByPage(visits: PageVisit[]): { page: string; count: number }[] {
@@ -34,6 +122,18 @@ function groupByPage(visits: PageVisit[]): { page: string; count: number }[] {
   return Object.entries(map)
     .sort((a, b) => b[1] - a[1])
     .map(([page, count]) => ({ page, count }));
+}
+
+function groupByHour(visits: PageVisit[]): { hour: string; count: number }[] {
+  const map: Record<string, number> = {};
+  for (let i = 0; i < 24; i++) map[String(i).padStart(2, '0')] = 0;
+  visits.forEach(v => {
+    const h = v.timestamp?.slice(11, 13);
+    if (h) map[h] = (map[h] || 0) + 1;
+  });
+  return Object.entries(map)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([hour, count]) => ({ hour: `${hour}:00`, count }));
 }
 
 function avgDuration(visits: PageVisit[]): number {
@@ -59,139 +159,422 @@ function conversionRate(visitors: VisitorProfile[], leads: LeadEntry[]): number 
   return Math.round((leads.length / visitors.length) * 100 * 10) / 10;
 }
 
-const CHART_COLORS = ['#3b82f6', '#8b5cf6', '#10b981', '#f59e0b', '#ef4444', '#06b6d4', '#ec4899', '#6366f1'];
-
-const ALL_PAGES = 'All Pages';
-
-// Fix default Leaflet marker icon path issues in bundled builds
-delete (L.Icon.Default.prototype as unknown as Record<string, unknown>)._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-  iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-});
-
-// ── Leaflet World Heatmap ──
-
-interface HeatPoint {
-  lat: number;
-  lon: number;
-  count: number;
-  city: string;
-  country: string;
-  visitors: VisitorProfile[];
+function pctChange(current: number, previous: number): { value: number; direction: 'up' | 'down' | 'neutral' } {
+  if (previous === 0 && current === 0) return { value: 0, direction: 'neutral' };
+  if (previous === 0) return { value: 100, direction: 'up' };
+  const pct = Math.round(((current - previous) / previous) * 100);
+  return { value: Math.abs(pct), direction: pct > 0 ? 'up' : pct < 0 ? 'down' : 'neutral' };
 }
 
-function MapAutoFit({ points }: { points: HeatPoint[] }) {
-  const map = useMap();
-  useEffect(() => {
-    if (points.length === 0) return;
-    const bounds = L.latLngBounds(points.map(p => [p.lat, p.lon] as [number, number]));
-    map.fitBounds(bounds, { padding: [40, 40], maxZoom: 6 });
-  }, [points, map]);
-  return null;
+// Date range presets
+type DatePreset = 'today' | '7d' | '30d' | '90d' | 'all';
+const DATE_PRESETS: { key: DatePreset; label: string }[] = [
+  { key: 'today', label: 'Today' },
+  { key: '7d', label: '7 Days' },
+  { key: '30d', label: '30 Days' },
+  { key: '90d', label: '90 Days' },
+  { key: 'all', label: 'All Time' },
+];
+
+function getDateRangeForPreset(preset: DatePreset): { from: string; to: string } | null {
+  const to = todayStr();
+  switch (preset) {
+    case 'today': return { from: to, to };
+    case '7d': return { from: daysAgo(6), to };
+    case '30d': return { from: daysAgo(29), to };
+    case '90d': return { from: daysAgo(89), to };
+    case 'all': return null;
+  }
 }
 
-function WorldHeatMap({ visitors }: { visitors: VisitorProfile[] }) {
-  const heatPoints = useMemo<HeatPoint[]>(() => {
-    const grid: Record<string, HeatPoint> = {};
-    visitors.forEach(v => {
-      if (!v.lat && !v.lon) return;
-      const gx = Math.round(v.lon * 10) / 10;
-      const gy = Math.round(v.lat * 10) / 10;
-      const key = `${gx},${gy}`;
-      if (!grid[key]) grid[key] = { lat: gy, lon: gx, count: 0, city: v.city || 'Unknown', country: v.country || '', visitors: [] };
-      grid[key].count++;
-      grid[key].visitors.push(v);
-    });
-    return Object.values(grid);
-  }, [visitors]);
+function getPreviousDateRange(from: string, to: string): { from: string; to: string } {
+  const fromDate = new Date(from + 'T00:00:00');
+  const toDate = new Date(to + 'T00:00:00');
+  const days = Math.round((toDate.getTime() - fromDate.getTime()) / 86400000) + 1;
+  const prevTo = new Date(fromDate);
+  prevTo.setDate(prevTo.getDate() - 1);
+  const prevFrom = new Date(prevTo);
+  prevFrom.setDate(prevFrom.getDate() - days + 1);
+  return { from: prevFrom.toISOString().slice(0, 10), to: prevTo.toISOString().slice(0, 10) };
+}
 
-  const maxCount = Math.max(1, ...heatPoints.map(p => p.count));
+function filterByDateRange(visits: PageVisit[], range: { from: string; to: string } | null): PageVisit[] {
+  if (!range) return visits;
+  return visits.filter(v => {
+    const d = v.timestamp?.slice(0, 10);
+    return d && d >= range.from && d <= range.to;
+  });
+}
 
-  const countryBreakdown = useMemo(() => {
-    const map: Record<string, number> = {};
-    visitors.forEach(v => {
-      if (!v.country) return;
-      map[v.country] = (map[v.country] || 0) + 1;
-    });
-    return Object.entries(map).sort((a, b) => b[1] - a[1]).slice(0, 8);
-  }, [visitors]);
+function filterVisitorsByDateRange(visitors: VisitorProfile[], range: { from: string; to: string } | null): VisitorProfile[] {
+  if (!range) return visitors;
+  return visitors.filter(v => {
+    const d = v.firstSeen?.slice(0, 10) || v.lastSeen?.slice(0, 10);
+    return d && d >= range.from && d <= range.to;
+  });
+}
+
+function filterLeadsByDateRange(leads: LeadEntry[], range: { from: string; to: string } | null): LeadEntry[] {
+  if (!range) return leads;
+  return leads.filter(l => {
+    const d = l.submittedAt?.slice(0, 10);
+    return d && d >= range.from && d <= range.to;
+  });
+}
+
+function compactN(n: number): string {
+  if (n >= 1000000) return `${(n / 1000000).toFixed(1)}M`;
+  if (n >= 1000) return `${(n / 1000).toFixed(1)}K`;
+  return String(n);
+}
+
+// ── Stat card ──
+
+function StatCard({ label, value, icon: Icon, color, change }: {
+  label: string;
+  value: string | number;
+  icon: typeof Eye;
+  color: string;
+  change?: { value: number; direction: 'up' | 'down' | 'neutral' };
+}) {
+  const ChangeIcon = change?.direction === 'up' ? ArrowUp : change?.direction === 'down' ? ArrowDown : Minus;
+  const changeColor = change?.direction === 'up' ? 'text-emerald-400' : change?.direction === 'down' ? 'text-red-400' : 'text-slate-500';
 
   return (
-    <div className="w-full bg-gray-900/60 border border-gray-800/60 rounded-2xl p-6">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <Globe className="w-5 h-5 text-blue-400" />
-          <h3 className="text-lg font-semibold text-white">Visitor World Map</h3>
+    <motion.div
+      whileHover={{ y: -2 }}
+      className={`${panelClassName} relative overflow-hidden p-5`}
+    >
+      <div className="flex items-start justify-between">
+        <div className={`flex h-10 w-10 items-center justify-center rounded-2xl bg-${color}-500/10`}>
+          <Icon className={`h-5 w-5 text-${color}-400`} />
         </div>
-        <span className="text-xs text-gray-500">Scroll to zoom · Drag to pan</span>
+        {change && change.value > 0 && (
+          <div className={`flex items-center gap-0.5 text-xs font-medium ${changeColor}`}>
+            <ChangeIcon className="h-3 w-3" />
+            {change.value}%
+          </div>
+        )}
       </div>
+      <p className="mt-3 text-2xl font-bold text-white tracking-tight">{value}</p>
+      <p className="mt-1 text-xs text-slate-500">{label}</p>
+    </motion.div>
+  );
+}
 
-      <div className="w-full rounded-xl overflow-hidden border border-gray-800/40" style={{ height: 450 }}>
-        <MapContainer
-          center={[20, 0]}
-          zoom={2}
-          minZoom={2}
-          maxZoom={14}
-          scrollWheelZoom={true}
-          style={{ height: '100%', width: '100%', background: '#0a0f1a' }}
-        >
-          <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>'
-            url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-          />
-          {heatPoints.length > 0 && <MapAutoFit points={heatPoints} />}
-          {heatPoints.map((p, i) => {
-            const intensity = p.count / maxCount;
-            const radius = Math.max(6, Math.min(35, intensity * 30 + 6));
-            return (
-              <CircleMarker
-                key={i}
-                center={[p.lat, p.lon]}
-                radius={radius}
-                pathOptions={{
-                  color: 'rgba(239, 68, 68, 0.8)',
-                  fillColor: `rgba(239, 68, 68, ${0.3 + intensity * 0.5})`,
-                  fillOpacity: 0.3 + intensity * 0.5,
-                  weight: 2,
-                }}
-              >
-                <Popup>
-                  <div style={{ color: '#111', fontSize: 13, lineHeight: 1.5 }}>
-                    <strong>{p.city}, {p.country}</strong><br />
-                    {p.count} visitor{p.count > 1 ? 's' : ''}
-                    {p.visitors.slice(0, 3).map((v, j) => (
-                      <div key={j} style={{ fontSize: 11, color: '#555', marginTop: 2 }}>
-                        {v.ip} · {v.browser} · {v.device}
-                      </div>
-                    ))}
-                    {p.visitors.length > 3 && <div style={{ fontSize: 11, color: '#888' }}>+{p.visitors.length - 3} more</div>}
-                  </div>
-                </Popup>
-              </CircleMarker>
-            );
-          })}
-        </MapContainer>
-      </div>
+// ── Top Countries ──
 
-      {countryBreakdown.length > 0 && (
-        <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2 w-full">
-          {countryBreakdown.map(([country, count]) => (
-            <div key={country} className="bg-gray-800/50 rounded-lg px-3 py-2 text-sm">
-              <span className="text-white font-medium">{country}</span>
-              <span className="text-gray-500 ml-2">{count}</span>
+function TopCountries({ visitors }: { visitors: VisitorProfile[] }) {
+  const data = useMemo(() => {
+    const map: Record<string, { count: number; country: string }> = {};
+    visitors.forEach(v => {
+      if (!v.country) return;
+      if (!map[v.country]) map[v.country] = { count: 0, country: v.country };
+      map[v.country].count++;
+    });
+    return Object.values(map).sort((a, b) => b.count - a.count).slice(0, 10);
+  }, [visitors]);
+
+  const total = visitors.length || 1;
+  if (data.length === 0) return <p className="text-sm text-slate-500 py-6 text-center">No visitor location data</p>;
+
+  return (
+    <div className="space-y-3">
+      {data.map((d, i) => {
+        const pct = Math.round((d.count / total) * 100);
+        return (
+          <div key={d.country} className="flex items-center gap-3">
+            <span className="w-5 text-xs text-slate-500 font-mono text-right">{i + 1}</span>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-sm text-white truncate">{d.country}</span>
+                <span className="text-xs text-slate-400 ml-2 shrink-0">{d.count} ({pct}%)</span>
+              </div>
+              <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
+                <div className="h-full rounded-full bg-gradient-to-r from-cyan-500 to-blue-500" style={{ width: `${pct}%` }} />
+              </div>
             </div>
-          ))}
-        </div>
-      )}
+          </div>
+        );
+      })}
     </div>
   );
 }
 
-// ── Demographics Section ──
+// ── Top Cities ──
 
-function Demographics({ visitors }: { visitors: VisitorProfile[] }) {
+function TopCities({ visitors }: { visitors: VisitorProfile[] }) {
+  const data = useMemo(() => {
+    const map: Record<string, number> = {};
+    visitors.forEach(v => {
+      const key = v.city ? `${v.city}, ${v.country}` : v.country || 'Unknown';
+      map[key] = (map[key] || 0) + 1;
+    });
+    return Object.entries(map).sort((a, b) => b[1] - a[1]).slice(0, 8);
+  }, [visitors]);
+
+  if (data.length === 0) return <p className="text-sm text-slate-500 py-6 text-center">No city data</p>;
+
+  return (
+    <div className="space-y-2.5">
+      {data.map(([city, count]) => (
+        <div key={city} className="flex items-center justify-between py-1">
+          <div className="flex items-center gap-2 min-w-0">
+            <MapPin className="h-3.5 w-3.5 text-slate-500 shrink-0" />
+            <span className="text-sm text-slate-300 truncate">{city}</span>
+          </div>
+          <span className="text-sm font-medium text-white ml-2 shrink-0">{count}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ── Referrers ──
+
+function TopReferrers({ visits }: { visits: PageVisit[] }) {
+  const data = useMemo(() => {
+    const map: Record<string, number> = {};
+    visits.forEach(v => {
+      let ref = v.referrer || 'Direct';
+      if (ref === '' || ref === 'none') ref = 'Direct';
+      try {
+        if (ref.startsWith('http')) ref = new URL(ref).hostname;
+      } catch { /* keep as-is */ }
+      map[ref] = (map[ref] || 0) + 1;
+    });
+    return Object.entries(map).sort((a, b) => b[1] - a[1]).slice(0, 8);
+  }, [visits]);
+
+  const total = visits.length || 1;
+  if (data.length === 0) return <p className="text-sm text-slate-500 py-6 text-center">No referrer data</p>;
+
+  return (
+    <div className="space-y-2.5">
+      {data.map(([ref, count]) => (
+        <div key={ref} className="flex items-center justify-between py-1">
+          <span className="text-sm text-slate-300 truncate min-w-0">{ref}</span>
+          <div className="flex items-center gap-2 ml-2 shrink-0">
+            <span className="text-xs text-slate-500">{Math.round(count / total * 100)}%</span>
+            <span className="text-sm font-medium text-white">{count}</span>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ── Session Depth ──
+
+function SessionDepth({ visits }: { visits: PageVisit[] }) {
+  const data = useMemo(() => {
+    const sessPages: Record<string, number> = {};
+    visits.forEach(v => { sessPages[v.sessionId] = (sessPages[v.sessionId] || 0) + 1; });
+    const buckets: Record<string, number> = { '1 page': 0, '2 pages': 0, '3 pages': 0, '4 pages': 0, '5+ pages': 0 };
+    Object.values(sessPages).forEach(n => {
+      if (n >= 5) buckets['5+ pages']++;
+      else buckets[`${n} page${n > 1 ? 's' : ''}`]++;
+    });
+    return Object.entries(buckets).map(([name, value]) => ({ name, value }));
+  }, [visits]);
+
+  return (
+    <ResponsiveContainer width="100%" height={220}>
+      <BarChart data={data}>
+        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+        <XAxis dataKey="name" stroke="#475569" tick={{ fontSize: 11 }} />
+        <YAxis stroke="#475569" tick={{ fontSize: 11 }} />
+        <Tooltip contentStyle={tooltipStyle} />
+        <Bar dataKey="value" fill="#818cf8" radius={[8, 8, 0, 0]} />
+      </BarChart>
+    </ResponsiveContainer>
+  );
+}
+
+// ── Donut pie ──
+
+function DemoPie({ data }: { data: { name: string; value: number }[] }) {
+  if (data.length === 0) return <p className="text-sm text-slate-500 py-12 text-center">No data</p>;
+  const total = data.reduce((s, d) => s + d.value, 0);
+
+  return (
+    <div>
+      <ResponsiveContainer width="100%" height={190}>
+        <PieChart>
+          <Pie data={data} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={48} outerRadius={75} paddingAngle={2} strokeWidth={0}>
+            {data.map((_, i) => <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />)}
+          </Pie>
+          <Tooltip contentStyle={tooltipStyle} />
+        </PieChart>
+      </ResponsiveContainer>
+      <div className="mt-3 space-y-1.5">
+        {data.slice(0, 5).map((d, i) => (
+          <div key={d.name} className="flex items-center gap-2 text-xs">
+            <div className="h-2.5 w-2.5 rounded-full shrink-0" style={{ background: CHART_COLORS[i % CHART_COLORS.length] }} />
+            <span className="text-slate-400 truncate flex-1">{d.name}</span>
+            <span className="text-white font-medium">{Math.round((d.value / total) * 100)}%</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── Visitor Details Table ──
+
+function VisitorDetailsTable({ visitors }: { visitors: VisitorProfile[] }) {
+  const [expanded, setExpanded] = useState<string | null>(null);
+
+  return (
+    <div className={`${panelClassName} overflow-hidden`}>
+      <div className="px-6 py-5 border-b border-white/10 flex items-center gap-2">
+        <Users className="w-5 h-5 text-violet-400" />
+        <h3 className="text-base font-semibold text-white">Recent Visitors</h3>
+        <span className="text-xs text-slate-500 ml-auto">{visitors.length} total</span>
+      </div>
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="border-b border-white/5">
+              <th className="text-left px-5 py-3 text-[11px] font-semibold text-slate-500 uppercase tracking-wider">IP / Location</th>
+              <th className="text-left px-5 py-3 text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Device</th>
+              <th className="text-left px-5 py-3 text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Browser / OS</th>
+              <th className="text-left px-5 py-3 text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Pages</th>
+              <th className="text-left px-5 py-3 text-[11px] font-semibold text-slate-500 uppercase tracking-wider">First Seen</th>
+              <th className="text-left px-5 py-3 text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Autofill</th>
+            </tr>
+          </thead>
+          <tbody>
+            {visitors.slice(0, 50).map((v, i) => {
+              const isExpanded = expanded === (v.id || String(i));
+              const DeviceIcon = v.device === 'Mobile' ? Smartphone : v.device === 'Tablet' ? Tablet : Monitor;
+              return (
+                <tr
+                  key={v.id || i}
+                  onClick={() => setExpanded(isExpanded ? null : (v.id || String(i)))}
+                  className="border-b border-white/5 hover:bg-white/[0.02] transition-colors cursor-pointer"
+                >
+                  <td className="px-5 py-3">
+                    <div className="text-white font-mono text-xs">{v.ip || '—'}</div>
+                    <div className="text-slate-500 text-xs">{v.city}{v.city && v.country ? ', ' : ''}{v.country}</div>
+                  </td>
+                  <td className="px-5 py-3">
+                    <div className="flex items-center gap-2 text-slate-300">
+                      <DeviceIcon className="h-3.5 w-3.5 text-slate-500" />
+                      {v.device}
+                    </div>
+                  </td>
+                  <td className="px-5 py-3">
+                    <span className="text-slate-300">{v.browser}</span>
+                    <span className="text-slate-600 mx-1">/</span>
+                    <span className="text-slate-400">{v.os}</span>
+                  </td>
+                  <td className="px-5 py-3 text-slate-300">{v.pageViews || 0}</td>
+                  <td className="px-5 py-3 text-slate-500 text-xs">
+                    {v.firstSeen ? new Date(v.firstSeen).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}
+                  </td>
+                  <td className="px-5 py-3">
+                    {v.autoEmail || v.autoName || v.autoPhone ? (
+                      <div className="text-xs">
+                        {v.autoName && <div className="text-emerald-400">{v.autoName}</div>}
+                        {v.autoEmail && <div className="text-cyan-400">{v.autoEmail}</div>}
+                        {v.autoPhone && <div className="text-violet-400">{v.autoPhone}</div>}
+                        {isExpanded && v.autoAddress && <div className="text-slate-400 mt-1">{v.autoAddress}</div>}
+                      </div>
+                    ) : (
+                      <span className="text-slate-600 text-xs">—</span>
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+// ── Main Performance Tab ──
+
+export function PerformanceTab() {
+  const [allVisits, setAllVisits] = useState<PageVisit[]>([]);
+  const [allVisitors, setAllVisitors] = useState<VisitorProfile[]>([]);
+  const [allLeads, setAllLeads] = useState<LeadEntry[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [datePreset, setDatePreset] = useState<DatePreset>('today');
+  const [customFrom, setCustomFrom] = useState(todayStr());
+  const [customTo, setCustomTo] = useState(todayStr());
+  const [showCustomDate, setShowCustomDate] = useState(false);
+  const [pageFilter, setPageFilter] = useState('All Pages');
+  const [showPageDropdown, setShowPageDropdown] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      setLoading(true);
+      try {
+        const [v, vis, l] = await Promise.all([getPageVisits(), getVisitors(), getLeads()]);
+        setAllVisits(v);
+        setAllVisitors(vis);
+        setAllLeads(l);
+      } catch (err) {
+        console.error('Failed to load analytics:', err);
+      }
+      setLoading(false);
+    })();
+  }, []);
+
+  const dateRange = useMemo(() => {
+    if (showCustomDate) return { from: customFrom, to: customTo };
+    return getDateRangeForPreset(datePreset);
+  }, [datePreset, showCustomDate, customFrom, customTo]);
+
+  const prevRange = useMemo(() => {
+    if (!dateRange) return null;
+    return getPreviousDateRange(dateRange.from, dateRange.to);
+  }, [dateRange]);
+
+  const visits = useMemo(() => {
+    let v = filterByDateRange(allVisits, dateRange);
+    if (pageFilter !== 'All Pages') v = v.filter(x => x.page === pageFilter);
+    return v;
+  }, [allVisits, dateRange, pageFilter]);
+
+  const prevVisits = useMemo(() => {
+    if (!prevRange) return [];
+    let v = filterByDateRange(allVisits, prevRange);
+    if (pageFilter !== 'All Pages') v = v.filter(x => x.page === pageFilter);
+    return v;
+  }, [allVisits, prevRange, pageFilter]);
+
+  const visitors = useMemo(() => filterVisitorsByDateRange(allVisitors, dateRange), [allVisitors, dateRange]);
+  const prevVisitors = useMemo(() => !prevRange ? [] : filterVisitorsByDateRange(allVisitors, prevRange), [allVisitors, prevRange]);
+  const leads = useMemo(() => filterLeadsByDateRange(allLeads, dateRange), [allLeads, dateRange]);
+  const prevLeads = useMemo(() => !prevRange ? [] : filterLeadsByDateRange(allLeads, prevRange), [allLeads, prevRange]);
+
+  const pages = useMemo(() => {
+    const set = new Set(allVisits.map(v => v.page));
+    return ['All Pages', ...Array.from(set).sort()];
+  }, [allVisits]);
+
+  const totalVisits = visits.length;
+  const uniqueSessions = new Set(visits.map(v => v.sessionId)).size;
+  const avgTime = avgDuration(visits);
+  const bounce = bounceRate(visits);
+  const conversion = conversionRate(visitors, leads);
+  const avgPagesPerSession = uniqueSessions === 0 ? 0 : Math.round((totalVisits / uniqueSessions) * 10) / 10;
+
+  const prevTotalVisits = prevVisits.length;
+  const prevUniqueSessions = new Set(prevVisits.map(v => v.sessionId)).size;
+  const prevAvgTime = avgDuration(prevVisits);
+  const prevBounce = bounceRate(prevVisits);
+  const prevConversion = conversionRate(prevVisitors, prevLeads);
+
+  const timeBucket = useMemo(() => detectBucket(dateRange), [dateRange]);
+  const trafficData = useMemo(() => groupByTimeBucket(visits, timeBucket), [visits, timeBucket]);
+  const hourlyData = useMemo(() => groupByHour(visits), [visits]);
+  const pageData = useMemo(() => groupByPage(visits).slice(0, 10), [visits]);
+
   const browserData = useMemo(() => {
     const map: Record<string, number> = {};
     visitors.forEach(v => { map[v.browser] = (map[v.browser] || 0) + 1; });
@@ -210,314 +593,247 @@ function Demographics({ visitors }: { visitors: VisitorProfile[] }) {
     return Object.entries(map).map(([name, value]) => ({ name, value })).sort((a, b) => b.value - a.value);
   }, [visitors]);
 
-  const deviceIcons: Record<string, typeof Monitor> = {
-    Desktop: Monitor,
-    Mobile: Smartphone,
-    Tablet: Tablet,
-  };
-
-  return (
-    <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-5">
-      <div className="w-full bg-gray-900/60 border border-gray-800/60 rounded-2xl p-6">
-        <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">Browser</h3>
-        {browserData.length === 0 ? (
-          <p className="text-gray-500 text-sm">No data</p>
-        ) : (
-          <ResponsiveContainer width="100%" height={200}>
-            <PieChart>
-              <Pie data={browserData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={75} label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}>
-                {browserData.map((_, i) => <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />)}
-              </Pie>
-              <Tooltip contentStyle={{ background: '#1f2937', border: '1px solid #374151', borderRadius: 8, color: '#fff', fontSize: 12 }} />
-            </PieChart>
-          </ResponsiveContainer>
-        )}
-      </div>
-
-      <div className="w-full bg-gray-900/60 border border-gray-800/60 rounded-2xl p-6">
-        <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">Operating System</h3>
-        {osData.length === 0 ? (
-          <p className="text-gray-500 text-sm">No data</p>
-        ) : (
-          <ResponsiveContainer width="100%" height={200}>
-            <PieChart>
-              <Pie data={osData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={75} label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}>
-                {osData.map((_, i) => <Cell key={i} fill={CHART_COLORS[(i + 2) % CHART_COLORS.length]} />)}
-              </Pie>
-              <Tooltip contentStyle={{ background: '#1f2937', border: '1px solid #374151', borderRadius: 8, color: '#fff', fontSize: 12 }} />
-            </PieChart>
-          </ResponsiveContainer>
-        )}
-      </div>
-
-      <div className="w-full bg-gray-900/60 border border-gray-800/60 rounded-2xl p-6">
-        <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">Device Type</h3>
-        <div className="space-y-4 mt-2">
-          {deviceData.length === 0 ? (
-            <p className="text-gray-500 text-sm">No data</p>
-          ) : (
-            deviceData.map((d, i) => {
-              const Icon = deviceIcons[d.name] || Monitor;
-              const pct = visitors.length ? Math.round((d.value / visitors.length) * 100) : 0;
-              return (
-                <div key={d.name} className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ background: `${CHART_COLORS[i]}20` }}>
-                    <Icon className="w-4 h-4" style={{ color: CHART_COLORS[i] }} />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-sm text-white">{d.name}</span>
-                      <span className="text-xs text-gray-400">{d.value} ({pct}%)</span>
-                    </div>
-                    <div className="w-full h-1.5 bg-gray-800 rounded-full overflow-hidden">
-                      <div className="h-full rounded-full" style={{ width: `${pct}%`, background: CHART_COLORS[i] }} />
-                    </div>
-                  </div>
-                </div>
-              );
-            })
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ── Visitor Details Table ──
-
-function VisitorDetailsTable({ visitors }: { visitors: VisitorProfile[] }) {
-  const [expanded, setExpanded] = useState<string | null>(null);
-
-  return (
-    <div className="w-full bg-gray-900/60 border border-gray-800/60 rounded-2xl overflow-hidden">
-      <div className="px-6 py-4 border-b border-gray-800/60">
-        <h3 className="text-lg font-semibold text-white flex items-center gap-2">
-          <Users className="w-5 h-5 text-purple-400" />
-          Visitor Details
-        </h3>
-      </div>
-      <div className="overflow-x-auto w-full">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-gray-800/60">
-              <th className="text-left px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">IP / Location</th>
-              <th className="text-left px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Device</th>
-              <th className="text-left px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Browser / OS</th>
-              <th className="text-left px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Pages</th>
-              <th className="text-left px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">First Seen</th>
-              <th className="text-left px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Autofill</th>
-            </tr>
-          </thead>
-          <tbody>
-            {visitors.slice(0, 50).map((v, i) => {
-              const isExpanded = expanded === (v.id || String(i));
-              return (
-                <tr
-                  key={v.id || i}
-                  onClick={() => setExpanded(isExpanded ? null : (v.id || String(i)))}
-                  className="border-b border-gray-800/40 hover:bg-gray-800/30 transition-colors cursor-pointer"
-                >
-                  <td className="px-5 py-3">
-                    <div className="text-white font-mono text-xs">{v.ip || '—'}</div>
-                    <div className="text-gray-500 text-xs">{v.city}{v.city && v.country ? ', ' : ''}{v.country}</div>
-                  </td>
-                  <td className="px-5 py-3 text-gray-300">{v.device}</td>
-                  <td className="px-5 py-3">
-                    <span className="text-gray-300">{v.browser}</span>
-                    <span className="text-gray-600 mx-1">/</span>
-                    <span className="text-gray-400">{v.os}</span>
-                  </td>
-                  <td className="px-5 py-3 text-gray-300">{v.pageViews || 0}</td>
-                  <td className="px-5 py-3 text-gray-500 text-xs">
-                    {v.firstSeen ? new Date(v.firstSeen).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}
-                  </td>
-                  <td className="px-5 py-3">
-                    {v.autoEmail || v.autoName || v.autoPhone ? (
-                      <div className="text-xs">
-                        {v.autoName && <div className="text-emerald-400">{v.autoName}</div>}
-                        {v.autoEmail && <div className="text-blue-400">{v.autoEmail}</div>}
-                        {v.autoPhone && <div className="text-purple-400">{v.autoPhone}</div>}
-                        {isExpanded && v.autoAddress && <div className="text-gray-400 mt-1">{v.autoAddress}</div>}
-                      </div>
-                    ) : (
-                      <span className="text-gray-600 text-xs">—</span>
-                    )}
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
-}
-
-// ── Main Performance Tab ──
-
-export function PerformanceTab() {
-  const [visits, setVisits] = useState<PageVisit[]>([]);
-  const [visitors, setVisitors] = useState<VisitorProfile[]>([]);
-  const [leads, setLeads] = useState<LeadEntry[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [pageFilter, setPageFilter] = useState(ALL_PAGES);
-  const [showFilter, setShowFilter] = useState(false);
-
-  useEffect(() => {
-    (async () => {
-      setLoading(true);
-      try {
-        const [v, vis, l] = await Promise.all([
-          getPageVisits(), getVisitors(), getLeads(),
-        ]);
-        setVisits(v);
-        setVisitors(vis);
-        setLeads(l);
-      } catch (err) {
-        console.error('Failed to load analytics:', err);
-      }
-      setLoading(false);
-    })();
-  }, []);
-
-  const filteredVisits = useMemo(() => {
-    if (pageFilter === ALL_PAGES) return visits;
-    return visits.filter(v => v.page === pageFilter);
-  }, [visits, pageFilter]);
-
-  const pages = useMemo(() => {
-    const set = new Set(visits.map(v => v.page));
-    return [ALL_PAGES, ...Array.from(set).sort()];
-  }, [visits]);
-
-  const trafficData = useMemo(() => groupByDate(filteredVisits), [filteredVisits]);
-  const pageData = useMemo(() => groupByPage(filteredVisits).slice(0, 10), [filteredVisits]);
-  const avgTime = useMemo(() => avgDuration(filteredVisits), [filteredVisits]);
-  const bounce = useMemo(() => bounceRate(filteredVisits), [filteredVisits]);
-  const conversion = useMemo(() => conversionRate(visitors, leads), [visitors, leads]);
-  const uniqueSessions = useMemo(() => new Set(filteredVisits.map(v => v.sessionId)).size, [filteredVisits]);
+  const dateLabel = useMemo(() => {
+    if (showCustomDate) return `${formatDateFull(customFrom)} — ${formatDateFull(customTo)}`;
+    if (!dateRange) return 'All Time';
+    if (dateRange.from === dateRange.to) return formatDateFull(dateRange.from);
+    return `${formatDateShort(dateRange.from)} — ${formatDateShort(dateRange.to)}`;
+  }, [dateRange, showCustomDate, customFrom, customTo]);
 
   if (loading) {
     return (
       <div className="flex items-center justify-center py-32 w-full">
-        <div className="animate-spin w-8 h-8 border-2 border-blue-400 border-t-transparent rounded-full" />
+        <div className="flex flex-col items-center gap-4">
+          <div className="animate-spin w-8 h-8 border-2 border-cyan-400 border-t-transparent rounded-full" />
+          <p className="text-sm text-slate-500">Loading analytics…</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="w-full space-y-8">
-      {/* Page Filter */}
-      <div className="relative inline-block">
-        <button
-          onClick={() => setShowFilter(!showFilter)}
-          className="flex items-center gap-2 px-4 py-2.5 text-sm bg-gray-900 hover:bg-gray-800 border border-gray-800 rounded-xl transition text-white"
-        >
-          <Filter className="w-4 h-4 text-gray-400" />
-          {pageFilter}
-          <ChevronDown className="w-4 h-4 text-gray-500" />
-        </button>
-        {showFilter && (
-          <div className="absolute z-40 top-full mt-2 left-0 bg-gray-900 border border-gray-700 rounded-xl shadow-xl overflow-hidden max-h-72 overflow-y-auto min-w-[200px]">
-            {pages.map(p => (
+    <div className="w-full space-y-6">
+      {/* ── Filters Bar ── */}
+      <div className={`${panelClassName} relative z-50 px-5 py-4`}>
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div className="flex items-center gap-2 flex-wrap">
+            <Calendar className="h-4 w-4 text-slate-500 shrink-0" />
+            {DATE_PRESETS.map(p => (
               <button
-                key={p}
-                onClick={() => { setPageFilter(p); setShowFilter(false); }}
-                className={`w-full text-left px-4 py-2.5 text-sm hover:bg-gray-800 transition ${
-                  p === pageFilter ? 'text-blue-400 bg-gray-800/50' : 'text-gray-300'
+                key={p.key}
+                onClick={() => { setDatePreset(p.key); setShowCustomDate(false); }}
+                className={`px-3.5 py-1.5 text-xs font-medium rounded-full transition-all ${
+                  !showCustomDate && datePreset === p.key
+                    ? 'bg-cyan-500/15 text-cyan-300 border border-cyan-500/30'
+                    : 'text-slate-400 hover:text-white hover:bg-white/[0.04] border border-transparent'
                 }`}
               >
-                {p}
+                {p.label}
               </button>
             ))}
-          </div>
-        )}
-      </div>
-
-      {/* Stat cards */}
-      <div className="w-full grid grid-cols-2 md:grid-cols-5 gap-4">
-        {[
-          { label: 'Total Visits', value: filteredVisits.length, icon: Eye, color: 'blue' },
-          { label: 'Unique Sessions', value: uniqueSessions, icon: Users, color: 'purple' },
-          { label: 'Avg. Duration', value: `${avgTime}s`, icon: Timer, color: 'emerald' },
-          { label: 'Bounce Rate', value: `${bounce}%`, icon: ArrowDownRight, color: 'amber' },
-          { label: 'Conversion Rate', value: `${conversion}%`, icon: Percent, color: 'rose' },
-        ].map((s) => {
-          const Icon = s.icon;
-          return (
-            <motion.div
-              key={s.label}
-              whileHover={{ y: -2 }}
-              className="w-full bg-gray-900/60 border border-gray-800/60 rounded-2xl p-5"
+            <div className="h-4 w-px bg-white/10 mx-1" />
+            <button
+              onClick={() => setShowCustomDate(!showCustomDate)}
+              className={`px-3.5 py-1.5 text-xs font-medium rounded-full transition-all ${
+                showCustomDate
+                  ? 'bg-violet-500/15 text-violet-300 border border-violet-500/30'
+                  : 'text-slate-400 hover:text-white hover:bg-white/[0.04] border border-transparent'
+              }`}
             >
-              <div className={`w-9 h-9 rounded-xl bg-${s.color}-500/10 flex items-center justify-center mb-3`}>
-                <Icon className={`w-4 h-4 text-${s.color}-400`} />
+              Custom Range
+            </button>
+          </div>
+
+          <div className="relative">
+            <button
+              onClick={() => setShowPageDropdown(!showPageDropdown)}
+              className="flex items-center gap-2 px-4 py-2 text-xs font-medium rounded-2xl border border-white/10 bg-white/[0.03] text-slate-300 hover:bg-white/[0.06] transition"
+            >
+              <Eye className="h-3.5 w-3.5 text-slate-500" />
+              {pageFilter}
+              <ChevronDown className="h-3.5 w-3.5 text-slate-500" />
+            </button>
+            {showPageDropdown && (
+              <div className="absolute z-[100] top-full mt-2 right-0 bg-[#0b1323] border border-white/10 rounded-2xl shadow-2xl overflow-hidden max-h-72 overflow-y-auto min-w-[220px]">
+                {pages.map(p => (
+                  <button
+                    key={p}
+                    onClick={() => { setPageFilter(p); setShowPageDropdown(false); }}
+                    className={`w-full text-left px-4 py-2.5 text-xs hover:bg-white/[0.04] transition ${
+                      p === pageFilter ? 'text-cyan-400 bg-white/[0.04]' : 'text-slate-300'
+                    }`}
+                  >
+                    {p}
+                  </button>
+                ))}
               </div>
-              <p className="text-2xl font-bold text-white">{s.value}</p>
-              <p className="text-xs text-gray-500 mt-1">{s.label}</p>
+            )}
+          </div>
+        </div>
+
+        <AnimatePresence>
+          {showCustomDate && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              className="overflow-hidden"
+            >
+              <div className="flex items-center gap-3 pt-4 mt-4 border-t border-white/5">
+                <label className="text-xs text-slate-500">From</label>
+                <input
+                  type="date"
+                  value={customFrom}
+                  onChange={e => setCustomFrom(e.target.value)}
+                  className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-xs text-white [color-scheme:dark]"
+                />
+                <label className="text-xs text-slate-500">To</label>
+                <input
+                  type="date"
+                  value={customTo}
+                  onChange={e => setCustomTo(e.target.value)}
+                  className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-xs text-white [color-scheme:dark]"
+                />
+              </div>
             </motion.div>
-          );
-        })}
+          )}
+        </AnimatePresence>
       </div>
 
-      {/* Traffic chart */}
-      <div className="w-full bg-gray-900/60 border border-gray-800/60 rounded-2xl p-6">
-        <div className="flex items-center gap-2 mb-4">
-          <TrendingUp className="w-5 h-5 text-blue-400" />
-          <h3 className="text-lg font-semibold text-white">Traffic Over Time</h3>
+      {/* ── Stat Cards ── */}
+      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4">
+        <StatCard label="Total Visits" value={compactN(totalVisits)} icon={Eye} color="cyan" change={pctChange(totalVisits, prevTotalVisits)} />
+        <StatCard label="Unique Sessions" value={compactN(uniqueSessions)} icon={Activity} color="blue" change={pctChange(uniqueSessions, prevUniqueSessions)} />
+        <StatCard label="Avg. Duration" value={`${avgTime}s`} icon={Timer} color="emerald" change={pctChange(avgTime, prevAvgTime)} />
+        <StatCard label="Bounce Rate" value={`${bounce}%`} icon={ArrowDownRight} color="amber" change={pctChange(bounce, prevBounce)} />
+        <StatCard label="Conversion Rate" value={`${conversion}%`} icon={Percent} color="rose" change={pctChange(conversion, prevConversion)} />
+        <StatCard label="Pages / Session" value={avgPagesPerSession} icon={MousePointerClick} color="violet" />
+      </div>
+
+      {/* ── Traffic Over Time ── */}
+      <div className={`${panelClassName} p-6`}>
+        <div className="flex items-center justify-between mb-5">
+          <div className="flex items-center gap-2">
+            <TrendingUp className="h-5 w-5 text-cyan-400" />
+            <h3 className="text-base font-semibold text-white">Traffic Over Time</h3>
+          </div>
+          <span className="text-xs text-slate-500">{dateLabel}</span>
         </div>
         {trafficData.length === 0 ? (
-          <p className="text-gray-500 text-center py-12">No traffic data yet</p>
+          <p className="text-slate-500 text-center py-16 text-sm">No traffic data for this period</p>
         ) : (
           <ResponsiveContainer width="100%" height={280}>
             <AreaChart data={trafficData}>
               <defs>
                 <linearGradient id="trafficGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
-                  <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                  <stop offset="5%" stopColor="#22d3ee" stopOpacity={0.25} />
+                  <stop offset="95%" stopColor="#22d3ee" stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" />
-              <XAxis dataKey="date" stroke="#6b7280" tick={{ fontSize: 11 }} tickFormatter={d => d.slice(5)} />
-              <YAxis stroke="#6b7280" tick={{ fontSize: 11 }} />
-              <Tooltip contentStyle={{ background: '#1f2937', border: '1px solid #374151', borderRadius: 8, color: '#fff', fontSize: 12 }} />
-              <Area type="monotone" dataKey="count" stroke="#3b82f6" fill="url(#trafficGrad)" strokeWidth={2} />
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+              <XAxis dataKey="label" stroke="#475569" tick={{ fontSize: 11 }} tickFormatter={d => formatBucketLabel(d, timeBucket)} interval={timeBucket === 'hour' ? 2 : undefined} />
+              <YAxis stroke="#475569" tick={{ fontSize: 11 }} allowDecimals={false} />
+              <Tooltip contentStyle={tooltipStyle} labelFormatter={d => formatBucketTooltip(d, timeBucket)} />
+              <Area type="monotone" dataKey="count" name="Visits" stroke="#22d3ee" fill="url(#trafficGrad)" strokeWidth={2} />
             </AreaChart>
           </ResponsiveContainer>
         )}
       </div>
 
-      {/* Page visits bar chart */}
-      <div className="w-full bg-gray-900/60 border border-gray-800/60 rounded-2xl p-6">
-        <div className="flex items-center gap-2 mb-4">
-          <Eye className="w-5 h-5 text-purple-400" />
-          <h3 className="text-lg font-semibold text-white">Top Pages</h3>
-        </div>
-        {pageData.length === 0 ? (
-          <p className="text-gray-500 text-center py-12">No page data yet</p>
-        ) : (
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={pageData} layout="vertical">
-              <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" />
-              <XAxis type="number" stroke="#6b7280" tick={{ fontSize: 11 }} />
-              <YAxis type="category" dataKey="page" stroke="#6b7280" tick={{ fontSize: 11 }} width={150} />
-              <Tooltip contentStyle={{ background: '#1f2937', border: '1px solid #374151', borderRadius: 8, color: '#fff', fontSize: 12 }} />
-              <Bar dataKey="count" fill="#8b5cf6" radius={[0, 6, 6, 0]} />
+      {/* ── Hourly Activity + Top Pages ── */}
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+        <div className={`${panelClassName} p-6`}>
+          <div className="flex items-center gap-2 mb-5">
+            <Clock className="h-5 w-5 text-violet-400" />
+            <h3 className="text-base font-semibold text-white">Hourly Activity</h3>
+          </div>
+          <ResponsiveContainer width="100%" height={240}>
+            <BarChart data={hourlyData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+              <XAxis dataKey="hour" stroke="#475569" tick={{ fontSize: 10 }} interval={2} />
+              <YAxis stroke="#475569" tick={{ fontSize: 11 }} />
+              <Tooltip contentStyle={tooltipStyle} />
+              <Bar dataKey="count" name="Visits" fill="#818cf8" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
-        )}
+        </div>
+
+        <div className={`${panelClassName} p-6`}>
+          <div className="flex items-center gap-2 mb-5">
+            <Eye className="h-5 w-5 text-emerald-400" />
+            <h3 className="text-base font-semibold text-white">Top Pages</h3>
+          </div>
+          {pageData.length === 0 ? (
+            <p className="text-slate-500 text-center py-16 text-sm">No page data</p>
+          ) : (
+            <ResponsiveContainer width="100%" height={240}>
+              <BarChart data={pageData} layout="vertical">
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+                <XAxis type="number" stroke="#475569" tick={{ fontSize: 11 }} />
+                <YAxis type="category" dataKey="page" stroke="#475569" tick={{ fontSize: 11 }} width={130} />
+                <Tooltip contentStyle={tooltipStyle} />
+                <Bar dataKey="count" name="Visits" fill="#34d399" radius={[0, 6, 6, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          )}
+        </div>
       </div>
 
-      {/* World Heatmap - OpenStreetMap via Leaflet */}
-      <WorldHeatMap visitors={visitors} />
+      {/* ── Session Depth + Referrers ── */}
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+        <div className={`${panelClassName} p-6`}>
+          <div className="flex items-center gap-2 mb-5">
+            <Activity className="h-5 w-5 text-amber-400" />
+            <h3 className="text-base font-semibold text-white">Session Depth</h3>
+          </div>
+          <SessionDepth visits={visits} />
+        </div>
 
-      {/* Demographics */}
-      <div className="w-full">
-        <h3 className="text-lg font-semibold text-white mb-4">Demographics</h3>
-        <Demographics visitors={visitors} />
+        <div className={`${panelClassName} p-6`}>
+          <div className="flex items-center gap-2 mb-5">
+            <Globe className="h-5 w-5 text-blue-400" />
+            <h3 className="text-base font-semibold text-white">Traffic Sources</h3>
+          </div>
+          <TopReferrers visits={visits} />
+        </div>
       </div>
 
-      {/* Visitor Details */}
+      {/* ── Geography: Countries + Cities ── */}
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+        <div className={`${panelClassName} p-6`}>
+          <div className="flex items-center gap-2 mb-5">
+            <Globe className="h-5 w-5 text-cyan-400" />
+            <h3 className="text-base font-semibold text-white">Top Countries</h3>
+          </div>
+          <TopCountries visitors={visitors} />
+        </div>
+
+        <div className={`${panelClassName} p-6`}>
+          <div className="flex items-center gap-2 mb-5">
+            <MapPin className="h-5 w-5 text-rose-400" />
+            <h3 className="text-base font-semibold text-white">Top Cities</h3>
+          </div>
+          <TopCities visitors={visitors} />
+        </div>
+      </div>
+
+      {/* ── Demographics: Device / Browser / OS ── */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className={`${panelClassName} p-6`}>
+          <h3 className="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500 mb-4">Device Type</h3>
+          <DemoPie data={deviceData} />
+        </div>
+        <div className={`${panelClassName} p-6`}>
+          <h3 className="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500 mb-4">Browser</h3>
+          <DemoPie data={browserData} />
+        </div>
+        <div className={`${panelClassName} p-6`}>
+          <h3 className="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500 mb-4">Operating System</h3>
+          <DemoPie data={osData} />
+        </div>
+      </div>
+
+      {/* ── Visitor Details ── */}
       <VisitorDetailsTable visitors={visitors} />
     </div>
   );

@@ -255,3 +255,125 @@ export async function getVisitors(): Promise<VisitorProfile[]> {
   if (!data) return [];
   return Object.entries(data).map(([key, val]) => ({ ...val, id: key }));
 }
+
+/**
+ * Enrich the current session's visitor profile with form-submitted data.
+ * Called after a user submits any lead/contact form on the site.
+ */
+export async function enrichVisitorFromForm(data: { name?: string; email?: string; phone?: string }) {
+  const sid = typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('talio_sid') : null;
+  if (!sid) return;
+  const existing = await fbGet<VisitorProfile>('visitors');
+  if (!existing) return;
+  const match = Object.entries(existing).find(([, v]) => v.sessionId === sid);
+  if (!match) return;
+  const patch: Record<string, string> = {};
+  if (data.name) patch.autoName = data.name;
+  if (data.email) patch.autoEmail = data.email;
+  if (data.phone) patch.autoPhone = data.phone;
+  if (Object.keys(patch).length > 0) {
+    await fbPatch(`visitors/${match[0]}`, patch);
+  }
+}
+
+// ── Blog System ──
+
+export interface BlogPost {
+  id?: string;
+  title: string;
+  slug: string;
+  metaDescription: string;
+  content: string;
+  featuredImage: string;
+  tags: string[];
+  status: 'draft' | 'published';
+  authorEmail: string;
+  authorName: string;
+  createdAt: string;
+  updatedAt: string;
+  publishedAt?: string;
+  readTimeMinutes?: number;
+}
+
+export interface BlogEditor {
+  id?: string;
+  email: string;
+  name: string;
+  createdAt: string;
+}
+
+function estimateReadTime(html: string): number {
+  const text = html.replace(/<[^>]*>/g, '').trim();
+  const words = text.split(/\s+/).filter(Boolean).length;
+  return Math.max(1, Math.round(words / 200));
+}
+
+export async function createBlogPost(post: Omit<BlogPost, 'id'>): Promise<string> {
+  const toSave = { ...post, readTimeMinutes: estimateReadTime(post.content) };
+  const res = await fbPost('blogPosts', toSave);
+  return res.name;
+}
+
+export async function updateBlogPost(id: string, post: Partial<BlogPost>): Promise<void> {
+  const update = { ...post, updatedAt: new Date().toISOString() };
+  if (post.content) update.readTimeMinutes = estimateReadTime(post.content);
+  await fbPatch(`blogPosts/${id}`, update);
+}
+
+export async function deleteBlogPost(id: string): Promise<void> {
+  await fbDelete(`blogPosts/${id}`);
+}
+
+export async function getBlogPosts(): Promise<BlogPost[]> {
+  const data = await fbGet<BlogPost>('blogPosts');
+  if (!data) return [];
+  return Object.entries(data)
+    .map(([key, val]) => ({ ...val, id: key }))
+    .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+}
+
+export async function getPublishedBlogPosts(): Promise<BlogPost[]> {
+  const posts = await getBlogPosts();
+  return posts
+    .filter(p => p.status === 'published')
+    .sort((a, b) => new Date(b.publishedAt || b.updatedAt).getTime() - new Date(a.publishedAt || a.updatedAt).getTime());
+}
+
+export async function getBlogPostBySlug(slug: string): Promise<BlogPost | null> {
+  const data = await fbGet<BlogPost>('blogPosts');
+  if (!data) return null;
+  const match = Object.entries(data).find(([, v]) => v.slug === slug && v.status === 'published');
+  return match ? { ...match[1], id: match[0] } : null;
+}
+
+export async function addBlogEditor(editor: Omit<BlogEditor, 'id'>): Promise<string> {
+  const existing = await fbGet<BlogEditor>('blogEditors');
+  if (existing) {
+    const dup = Object.entries(existing).find(([, v]) => v.email.toLowerCase() === editor.email.toLowerCase());
+    if (dup) throw new Error('Editor with this email already exists');
+  }
+  const res = await fbPost('blogEditors', editor);
+  return res.name;
+}
+
+export async function removeBlogEditor(id: string): Promise<void> {
+  await fbDelete(`blogEditors/${id}`);
+}
+
+export async function getBlogEditors(): Promise<BlogEditor[]> {
+  const data = await fbGet<BlogEditor>('blogEditors');
+  if (!data) return [];
+  return Object.entries(data)
+    .map(([key, val]) => ({ ...val, id: key }))
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+}
+
+export async function validateBlogEditor(email: string, password: string): Promise<BlogEditor | null> {
+  // Check admin password first
+  const adminPw = import.meta.env.VITE_ADMIN_PASSWORD as string;
+  if (!adminPw || password !== adminPw) return null;
+  const data = await fbGet<BlogEditor>('blogEditors');
+  if (!data) return null;
+  const match = Object.entries(data).find(([, v]) => v.email.toLowerCase() === email.toLowerCase());
+  return match ? { ...match[1], id: match[0] } : null;
+}

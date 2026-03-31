@@ -1,21 +1,34 @@
 /* Global style overrides — loaded last to take priority */
+/* Scoped to public site only — admin panel (.admin-panel) is excluded */
 
-p {
+p:not(.admin-panel p) {
     margin-top: 1em !important;
     margin-bottom: 1em !important;
 }
 
-h1, h2 {
+h1:not(.admin-panel h1),
+h2:not(.admin-panel h2) {
     margin-bottom: 1em !important;
 }
 
 /* Remove extra top margin on subtitle paragraphs that directly follow headings */
-h1 + p,
-h2 + p,
-h3 + p {
+h1 + p:not(.admin-panel p),
+h2 + p:not(.admin-panel p),
+h3 + p:not(.admin-panel p) {
     margin-top: 0em !important;
 }
 
-h4{
+h4:not(.admin-panel h4) {
     margin-bottom: 1.5em !important;
+}
+
+/* Reset all global overrides inside the admin panel */
+.admin-panel p,
+.admin-panel h1,
+.admin-panel h2,
+.admin-panel h3,
+.admin-panel h4,
+.admin-panel h5,
+.admin-panel h6 {
+    margin: 0 !important;
 }

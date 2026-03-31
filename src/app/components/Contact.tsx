@@ -3,7 +3,7 @@ import { motion, useInView } from 'motion/react';
 import { MapPin, Phone, Mail, Clock, FileText, HelpCircle, MessageCircle, Send, CheckCircle2, Twitter, Linkedin, Instagram } from 'lucide-react';
 import { Link } from 'react-router';
 import { usePageMeta } from '@/app/hooks/usePageMeta';
-import { submitContact } from '@/lib/firebase';
+import { submitContact, enrichVisitorFromForm } from '@/lib/firebase';
 
 export function Contact() {
   usePageMeta('Contact', 'Get in touch with the Talio team. Reach out for sales inquiries, support, or partnership opportunities. We\'re here to help.');
@@ -43,6 +43,7 @@ export function Contact() {
         source: 'contact-page',
         submittedAt: new Date().toISOString(),
       });
+      enrichVisitorFromForm({ name: `${form.firstName} ${form.lastName}`.trim(), email: form.email, phone: form.phone });
       setSubmitted(true);
       setForm({ firstName: '', lastName: '', email: '', phone: '', subject: '', message: '' });
     } catch {

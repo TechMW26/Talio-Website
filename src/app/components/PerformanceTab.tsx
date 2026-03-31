@@ -11,7 +11,7 @@ import {
 import { MapContainer, TileLayer, CircleMarker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { getPageVisits, getVisitors, getLeads, getContacts, getSignups, type PageVisit, type VisitorProfile, type LeadEntry } from '@/lib/firebase';
+import { getPageVisits, getVisitors, getLeads, type PageVisit, type VisitorProfile, type LeadEntry } from '@/lib/firebase';
 
 // ── Helpers ──
 

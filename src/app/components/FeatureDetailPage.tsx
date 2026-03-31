@@ -1,9 +1,10 @@
 import { motion, useInView } from 'motion/react';
 import { useRef, useState } from 'react';
-import { Link } from 'react-router';
+import { Link, useLocation } from 'react-router';
 import { ArrowRight, CheckCircle, Loader2, type LucideIcon } from 'lucide-react';
 import { usePageMeta } from '@/app/hooks/usePageMeta';
 import { submitLead } from '@/lib/firebase';
+import { getPageLabelFromPath } from '@/lib/leadAttribution';
 
 interface FeatureCard {
   icon: LucideIcon;
@@ -281,6 +282,7 @@ export function FeatureDetailPage({
 
 /* ─── Lead Form Component ─── */
 function LeadForm({ source, accentColor, titleGradient }: { source: string; accentColor: string; titleGradient: string }) {
+  const location = useLocation();
   const [formState, setFormState] = useState<'idle' | 'submitting' | 'success'>('idle');
   const [formData, setFormData] = useState({
     firstName: '',
@@ -302,6 +304,8 @@ function LeadForm({ source, accentColor, titleGradient }: { source: string; acce
       await submitLead({
         ...formData,
         source: `feature-${source.toLowerCase().replace(/\s+/g, '-')}`,
+        sourcePagePath: location.pathname,
+        sourcePageName: getPageLabelFromPath(location.pathname),
         submittedAt: new Date().toISOString(),
       });
       setFormState('success');

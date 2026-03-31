@@ -1,11 +1,12 @@
 import { useState, type ChangeEvent, type FormEvent } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, CheckCircle2 } from 'lucide-react';
-import { Link } from 'react-router';
+import { Link, useLocation } from 'react-router';
 import { DemoBookingStepper } from '@/app/components/DemoBookingStepper';
 import { createDemoBookingEmailPayload, sendDemoBookingEmail } from '@/app/components/demoBookingEmail';
 import { createEmptyDemoBookingForm, type PlanInfo } from '@/app/components/demoBookingTypes';
 import { submitSignup } from '@/lib/firebase';
+import { getPageLabelFromPath } from '@/lib/leadAttribution';
 
 export type { PlanInfo } from '@/app/components/demoBookingTypes';
 
@@ -16,6 +17,7 @@ interface BookDemoPopupProps {
 }
 
 export function BookDemoPopup({ isOpen, onClose, planInfo }: BookDemoPopupProps) {
+  const location = useLocation();
   const [form, setForm] = useState(createEmptyDemoBookingForm());
 
   const [submitting, setSubmitting] = useState(false);
@@ -29,11 +31,15 @@ export function BookDemoPopup({ isOpen, onClose, planInfo }: BookDemoPopupProps)
     e.preventDefault();
     setSubmitting(true);
     try {
-      const submissionData = createDemoBookingEmailPayload(
-        form,
-        planInfo ? `pricing-${planInfo.name.toLowerCase()}` : 'book-demo-popup',
-        planInfo,
-      );
+      const submissionData = {
+        ...createDemoBookingEmailPayload(
+          form,
+          planInfo ? `pricing-${planInfo.name.toLowerCase()}` : 'book-demo-popup',
+          planInfo,
+        ),
+        sourcePagePath: location.pathname,
+        sourcePageName: getPageLabelFromPath(location.pathname),
+      };
 
       await submitSignup(submissionData);
       await sendDemoBookingEmail(submissionData);

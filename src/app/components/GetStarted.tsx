@@ -1,15 +1,18 @@
 import { useRef, useState, type ChangeEvent, type FormEvent } from 'react';
 import { motion, useInView } from 'motion/react';
 import { Bot, Clock, Shield, Headphones, CheckCircle2 } from 'lucide-react';
-import { Link } from 'react-router';
+import { Link, useLocation } from 'react-router';
 import { usePageMeta } from '@/app/hooks/usePageMeta';
 import { createDemoBookingEmailPayload, sendDemoBookingEmail } from '@/app/components/demoBookingEmail';
 import { DemoBookingStepper } from '@/app/components/DemoBookingStepper';
 import { createEmptyDemoBookingForm } from '@/app/components/demoBookingTypes';
 import { submitSignup } from '@/lib/firebase';
+import { getPageLabelFromPath } from '@/lib/leadAttribution';
 
 export function GetStarted() {
   usePageMeta('Get Started', 'Book a free demo of Talio and see how it can transform your workforce management.');
+
+  const location = useLocation();
 
   const heroRef = useRef(null);
   const contentRef = useRef(null);
@@ -35,7 +38,11 @@ export function GetStarted() {
     e.preventDefault();
     setSubmitting(true);
     try {
-      const submissionData = createDemoBookingEmailPayload(form, 'get-started');
+      const submissionData = {
+        ...createDemoBookingEmailPayload(form, 'get-started'),
+        sourcePagePath: location.pathname,
+        sourcePageName: getPageLabelFromPath(location.pathname),
+      };
 
       await submitSignup(submissionData);
       await sendDemoBookingEmail(submissionData);

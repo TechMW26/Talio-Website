@@ -1,5 +1,7 @@
 const DB_URL = import.meta.env.VITE_FIREBASE_DB_URL as string;
 
+export type EntryCollection = 'leads' | 'contacts' | 'signups';
+
 export interface LeadEntry {
   id?: string;
   firstName: string;
@@ -15,6 +17,14 @@ export interface LeadEntry {
   message?: string;
   source: string;
   submittedAt: string;
+  firstSubmittedAt?: string;
+  preferredDate?: string;
+  preferredTime?: string;
+  selectedPlan?: string;
+  selectedPlanPrice?: string;
+  sourcePagePath?: string;
+  sourcePageName?: string;
+  _collection?: EntryCollection;
 }
 
 export interface PageVisit {
@@ -95,6 +105,22 @@ async function fbDelete(path: string) {
   return res.json();
 }
 
+function mapEntries(data: Record<string, LeadEntry> | null, collection: EntryCollection): LeadEntry[] {
+  if (!data) return [];
+
+  return Object.entries(data).map(([key, value]) => ({
+    ...value,
+    id: key,
+    _collection: collection,
+  }));
+}
+
+function sortEntriesBySubmittedAt<T extends LeadEntry>(entries: T[]): T[] {
+  return [...entries].sort(
+    (left, right) => new Date(right.submittedAt || 0).getTime() - new Date(left.submittedAt || 0).getTime(),
+  );
+}
+
 // ── Dedup helpers ──
 
 async function findExistingEntry(path: string, email?: string, phone?: string): Promise<[string, LeadEntry] | null> {
@@ -136,24 +162,28 @@ export async function submitSignup(signup: LeadEntry) {
 }
 
 export async function getLeads(): Promise<LeadEntry[]> {
-  const data = await fbGet<LeadEntry>('leads');
-  if (!data) return [];
-  return Object.entries(data).map(([key, val]) => ({ ...val, id: key }));
+  const [leadData, signupData] = await Promise.all([
+    fbGet<LeadEntry>('leads'),
+    fbGet<LeadEntry>('signups'),
+  ]);
+
+  return sortEntriesBySubmittedAt([
+    ...mapEntries(leadData, 'leads'),
+    ...mapEntries(signupData, 'signups'),
+  ]);
 }
 
 export async function getContacts(): Promise<LeadEntry[]> {
   const data = await fbGet<LeadEntry>('contacts');
-  if (!data) return [];
-  return Object.entries(data).map(([key, val]) => ({ ...val, id: key }));
+  return sortEntriesBySubmittedAt(mapEntries(data, 'contacts'));
 }
 
 export async function getSignups(): Promise<LeadEntry[]> {
   const data = await fbGet<LeadEntry>('signups');
-  if (!data) return [];
-  return Object.entries(data).map(([key, val]) => ({ ...val, id: key }));
+  return sortEntriesBySubmittedAt(mapEntries(data, 'signups'));
 }
 
-export async function deleteEntry(collection: 'leads' | 'contacts' | 'signups', id: string) {
+export async function deleteEntry(collection: EntryCollection, id: string) {
   return fbDelete(`${collection}/${id}`);
 }
 

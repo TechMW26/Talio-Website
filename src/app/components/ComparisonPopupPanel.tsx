@@ -21,20 +21,20 @@ interface ComparisonPopupPanelProps {
 
 export function ComparisonPopupPanel({ className = '' }: ComparisonPopupPanelProps) {
   return (
-    <div className={`relative w-full rounded-[2rem] border border-white/10 bg-zinc-900/90 p-4 shadow-[0_0_40px_rgba(76,29,149,0.12)] backdrop-blur-xl ${className}`.trim()}>
+    <div className={`site-dark-panel relative w-full rounded-[2rem] border border-white/10 p-4 shadow-[0_0_2.5rem_rgba(76,29,149,0.12)] ${className}`.trim()}>
       <div className="pointer-events-none absolute inset-x-10 top-0 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
 
       <div className="text-center">
-        <span className="block text-[11px] font-semibold uppercase tracking-[0.18em] text-gray-500">Comparison</span>
+        <span className="block text-[0.6875rem] font-semibold uppercase tracking-[0.18em] text-gray-500">Comparison</span>
         <span className="mt-2 block text-2xl font-bold tracking-tighter text-white">1 tool to do it all</span>
         <span className="mt-1 block text-sm text-gray-400">Save time and money. Just get Talio.</span>
       </div>
 
       <div className="mt-5 overflow-x-auto">
-        <table className="w-full min-w-[310px]">
+        <table className="w-full min-w-[19.375rem]">
           <thead>
             <tr>
-              <th className="w-[40%] px-2 py-3 text-left text-[11px] font-normal uppercase tracking-[0.14em] text-gray-500" />
+              <th className="w-[40%] px-2 py-3 text-left text-[0.6875rem] font-normal uppercase tracking-[0.14em] text-gray-500" />
               {comparisonCompetitors.map((competitor) => (
                 <th key={competitor.name} className="px-2 py-3 text-center">
                   <div className="flex items-center justify-center">

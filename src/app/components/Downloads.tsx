@@ -4,17 +4,22 @@ import { Download, Star, CheckCircle2 } from 'lucide-react';
 import { IoLogoMicrosoft } from 'react-icons/io5';
 import { SiAndroid, SiApple } from 'react-icons/si';
 import { usePageMeta } from '@/app/hooks/usePageMeta';
+import { useCompensatedMinWidth } from '@/app/hooks/useZoomCompensatedViewport';
 
 export function Downloads() {
   usePageMeta('Downloads', 'Download Talio for macOS, Windows, and iOS. Android support is coming soon. Get productivity visibility, coordination, and connected HR workflows on every device.');
+  const hasDesktopPlatformGrid = useCompensatedMinWidth(1280);
+  const hasTabletPlatformGrid = useCompensatedMinWidth(768);
+  const hasDesktopRequirementsGrid = useCompensatedMinWidth(1120);
+  const hasTabletRequirementsGrid = useCompensatedMinWidth(768);
 
   const heroRef = useRef(null);
   const platformsRef = useRef(null);
   const requirementsRef = useRef(null);
   
-  const heroInView = useInView(heroRef, { once: true, margin: "-100px" });
-  const platformsInView = useInView(platformsRef, { once: true, margin: "-100px" });
-  const requirementsInView = useInView(requirementsRef, { once: true, margin: "-100px" });
+  const heroInView = useInView(heroRef, { once: true, margin: '-10%' });
+  const platformsInView = useInView(platformsRef, { once: true, margin: '-10%' });
+  const requirementsInView = useInView(requirementsRef, { once: true, margin: '-10%' });
 
   const [detectedPlatform, setDetectedPlatform] = useState<'windows' | 'mac' | 'ios' | 'android'>('windows');
 
@@ -248,7 +253,7 @@ export function Downloads() {
         className="py-20 md:py-32 relative overflow-hidden"
         style={{ position: 'relative' }}
       >
-        <div className="max-w-[1600px] mx-auto px-6 md:px-8 lg:px-16">
+        <div className="mx-auto max-w-7xl px-6 md:px-8 lg:px-12">
           <motion.h2
             initial={{ opacity: 0, y: 30 }}
             animate={platformsInView ? { opacity: 1, y: 0 } : {}}
@@ -258,7 +263,7 @@ export function Downloads() {
             All Platforms
           </motion.h2>
 
-          <div className="grid gap-8 md:grid-cols-2 xl:grid-cols-4">
+          <div className={`grid gap-8 ${hasDesktopPlatformGrid ? 'grid-cols-4' : hasTabletPlatformGrid ? 'grid-cols-2' : 'grid-cols-1'}`}>
             {platforms.map((platform, index) => {
               const Icon = platform.icon;
 
@@ -345,7 +350,7 @@ export function Downloads() {
         className="py-20 md:py-32 bg-gradient-to-b from-gray-950 to-gray-900 relative overflow-hidden"
         style={{ position: 'relative' }}
       >
-        <div className="max-w-[1600px] mx-auto px-6 md:px-8 lg:px-16">
+        <div className="mx-auto max-w-7xl px-6 md:px-8 lg:px-12">
           <motion.h2
             initial={{ opacity: 0, y: 30 }}
             animate={requirementsInView ? { opacity: 1, y: 0 } : {}}
@@ -355,7 +360,7 @@ export function Downloads() {
             System Requirements
           </motion.h2>
 
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className={`grid gap-6 ${hasDesktopRequirementsGrid ? 'grid-cols-3' : hasTabletRequirementsGrid ? 'grid-cols-2' : 'grid-cols-1'}`}>
             {Object.entries(requirements).map(([platform, data], index) => (
               <motion.div
                 key={platform}

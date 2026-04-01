@@ -13,10 +13,10 @@ export function Contact() {
   const infoRef = useRef(null);
   const helpRef = useRef(null);
 
-  const heroInView = useInView(heroRef, { once: true, margin: '-100px' });
-  const formInView = useInView(formRef, { once: true, margin: '-100px' });
-  const infoInView = useInView(infoRef, { once: true, margin: '-100px' });
-  const helpInView = useInView(helpRef, { once: true, margin: '-100px' });
+  const heroInView = useInView(heroRef, { once: true, margin: '-10%' });
+  const formInView = useInView(formRef, { once: true, margin: '-10%' });
+  const infoInView = useInView(infoRef, { once: true, margin: '-10%' });
+  const helpInView = useInView(helpRef, { once: true, margin: '-10%' });
 
   const [form, setForm] = useState({
     firstName: '',
@@ -114,7 +114,7 @@ export function Contact() {
   ];
 
   const inputClass =
-    'w-full rounded-xl border border-gray-800 bg-gray-900 px-4 py-3 text-sm text-white placeholder-gray-500 outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500';
+    'site-dark-input w-full rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 outline-none transition';
 
   return (
     <div className="min-h-screen bg-black text-white">
@@ -152,7 +152,7 @@ export function Contact() {
             initial={{ opacity: 0, x: -40 }}
             animate={formInView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.6 }}
-            className="rounded-3xl border border-gray-800 bg-gray-900 p-8 md:p-10"
+            className="site-dark-panel relative overflow-hidden rounded-3xl border border-gray-800/50 p-8 md:p-10"
           >
             <h2 className="mb-1 text-2xl font-semibold">Send Us a Message</h2>
             <p className="mb-8 text-sm text-gray-400">Fill out the form and we'll respond within 24 hours.</p>
@@ -245,7 +245,7 @@ export function Contact() {
             {contactCards.map((card) => (
               <div
                 key={card.title}
-                className="flex items-start gap-5 rounded-3xl border border-gray-800 bg-gray-900 p-6"
+                className="flex items-start gap-5 rounded-3xl border border-gray-800/50 bg-white/[0.03] p-6"
               >
                 <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500/20 to-purple-500/20">
                   <card.icon className="h-5 w-5 text-blue-400" />
@@ -274,7 +274,7 @@ export function Contact() {
             ))}
 
             {/* Social Links */}
-            <div className="rounded-3xl border border-gray-800 bg-gray-900 p-6">
+            <div className="rounded-3xl border border-gray-800/50 bg-white/[0.03] p-6">
               <span className="mb-4 block font-semibold text-white">Follow Us</span>
               <div className="flex gap-3">
                 {socialLinks.map((social) => (
@@ -284,7 +284,7 @@ export function Contact() {
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label={social.label}
-                    className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-gray-800 bg-gray-800/50 text-gray-300 transition hover:border-blue-500/50 hover:text-white"
+                    className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-gray-800/50 bg-white/[0.04] text-gray-300 transition hover:border-blue-500/50 hover:text-white"
                   >
                     <social.icon className="h-5 w-5" />
                   </a>
@@ -307,7 +307,7 @@ export function Contact() {
             {quickHelp.map((item) => (
               <div
                 key={item.title}
-                className="rounded-3xl border border-gray-800 bg-gray-900 p-8 text-center transition hover:border-gray-700"
+                className="rounded-3xl border border-gray-800/50 bg-white/[0.03] p-8 text-center transition hover:border-gray-700"
               >
                 <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500/20 to-purple-500/20">
                   <item.icon className="h-6 w-6 text-blue-400" />

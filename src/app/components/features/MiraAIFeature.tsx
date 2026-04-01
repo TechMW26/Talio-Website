@@ -1,11 +1,11 @@
 import { FeatureDetailPage } from '@/app/components/FeatureDetailPage';
 import { MessageCircle, FileBarChart, Lightbulb, Cog, HelpCircle, Brain } from 'lucide-react';
 
-export function MiraAIFeature() {
+export function MIRAAIFeature() {
   return (
     <FeatureDetailPage
       badge="MIRA INSIDE WORKFLOWS"
-      title="Mira"
+      title="MIRA"
       titleGradient="from-violet-400 to-purple-400"
       subtitle="Talio's embedded intelligence layer for summaries, drafting, reporting, and faster execution across daily workflows."
       accentColor="text-purple-400"
@@ -57,11 +57,11 @@ export function MiraAIFeature() {
       ]}
       steps={[
         { step: '1', title: 'Ask Anything', description: 'Type your question in natural language.' },
-        { step: '2', title: 'Get Instant Response', description: 'Mira analyzes context and responds in seconds.' },
-        { step: '3', title: 'Take Action', description: 'Act on insights or let Mira accelerate the workflow.' },
+        { step: '2', title: 'Get Instant Response', description: 'MIRA analyzes context and responds in seconds.' },
+        { step: '3', title: 'Take Action', description: 'Act on insights or let MIRA accelerate the workflow.' },
       ]}
       testimonial={{
-        quote: "Mira helps our managers move faster because summaries, reports, and follow-ups happen inside the work itself.",
+        quote: "MIRA helps our managers move faster because summaries, reports, and follow-ups happen inside the work itself.",
         author: 'Priya Sharma',
         role: 'HR Head, TechVentures Ltd',
       }}

@@ -61,7 +61,7 @@ const stats = [
 ];
 
 export function MobileAboutPage() {
-  usePageMeta('About', 'Learn how Talio is building an AI-powered productivity utility with Mira and HRMS add-ons for modern teams.');
+  usePageMeta('About', 'Learn how Talio is building an AI-powered productivity utility with MIRA and HRMS add-ons for modern teams.');
 
   return (
     <div className="min-h-screen bg-black text-white">
@@ -206,7 +206,7 @@ export function MobileAboutPage() {
 
       <section className="pb-28">
         <div className="mx-auto max-w-7xl px-4 md:px-8 lg:px-12">
-          <div className="rounded-[2.5rem] border border-white/10 bg-black p-6 text-center shadow-[0_0_60px_rgba(79,70,229,0.18)]">
+          <div className="rounded-[2.5rem] border border-white/10 bg-black p-6 text-center shadow-[0_0_3.75rem_rgba(79,70,229,0.18)]">
             <h2 className="text-3xl font-bold tracking-tighter leading-[1.02] text-white">Ready to transform your workforce?</h2>
             <p className="mt-4 text-sm font-light leading-relaxed text-white/85">
               Join the teams already using Talio to operate faster, communicate better, and make decisions with more confidence.

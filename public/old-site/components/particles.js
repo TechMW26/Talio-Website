@@ -4,7 +4,7 @@
  */
 
 (function() {
-    const canvas = document.getElementById('mira-canvas');
+    const canvas = document.getElementById('MIRA-canvas');
     if (!canvas) return;
     
     const ctx = canvas.getContext('2d', { alpha: true });

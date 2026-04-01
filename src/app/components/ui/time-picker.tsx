@@ -107,14 +107,14 @@ export function TimePicker({
         type="button"
         onClick={() => setOpen((prev) => !prev)}
         className={cn(
-          "group flex w-full items-center gap-2.5 rounded-2xl border bg-gray-950/80 px-4 py-3 text-left text-[16px] md:text-[13px] outline-none transition-all duration-200",
+          "site-dark-input group flex w-full items-center gap-2.5 rounded-2xl px-4 py-3 text-left text-[1rem] md:text-[0.8125rem] outline-none transition-all duration-200",
           open
-            ? "border-blue-500/60 ring-2 ring-blue-500/20 shadow-lg shadow-blue-500/5"
-            : "border-gray-700/60 hover:border-gray-600",
+            ? "border-white/18 ring-2 ring-white/8 shadow-lg shadow-black/30"
+            : "hover:border-white/16",
           value ? "text-white" : "text-gray-500",
         )}
       >
-        <Clock className={cn("h-4 w-4 shrink-0 transition-colors", open ? "text-blue-400" : "text-gray-500 group-hover:text-blue-400")} />
+        <Clock className={cn("h-4 w-4 shrink-0 transition-colors", open ? "text-violet-300" : "text-gray-500 group-hover:text-white")} />
         <span className="flex-1 truncate">{value || placeholder}</span>
         <ChevronDown className={cn("h-3.5 w-3.5 shrink-0 text-gray-500 transition-transform duration-200", open && "rotate-180")} />
       </button>
@@ -126,10 +126,10 @@ export function TimePicker({
             className="fixed z-[9999]"
             style={{ top: pos.top, left: pos.left, width: pos.width }}
           >
-            <div className="rounded-2xl border border-gray-700/50 bg-gray-900/95 p-4 shadow-2xl shadow-black/60 backdrop-blur-xl animate-in fade-in-0 zoom-in-[0.98] slide-in-from-top-1 duration-200">
+            <div className="site-dark-panel rounded-2xl border border-gray-800/50 p-4 shadow-2xl shadow-black/60 animate-in fade-in-0 zoom-in-[0.98] slide-in-from-top-1 duration-200">
               {amSlots.length > 0 && (
                 <div>
-                  <span className="mb-2 block text-[10px] font-semibold uppercase tracking-[0.18em] text-gray-500">
+                  <span className="mb-2 block text-[0.625rem] font-semibold uppercase tracking-[0.18em] text-gray-500">
                     Morning
                   </span>
                   <div className="grid grid-cols-4 gap-1.5">
@@ -139,10 +139,10 @@ export function TimePicker({
                         type="button"
                         onClick={() => handleSelect(slot)}
                         className={cn(
-                          "rounded-xl px-2 py-2 text-[11px] font-medium transition-all duration-150",
+                          "rounded-xl px-2 py-2 text-[0.6875rem] font-medium transition-all duration-150",
                           value === slot
-                            ? "bg-blue-500 text-white shadow-md shadow-blue-500/25 ring-1 ring-blue-400/30"
-                            : "border border-gray-800/80 bg-gray-950/60 text-gray-400 hover:border-blue-500/30 hover:bg-blue-500/10 hover:text-white",
+                            ? "bg-white text-black shadow-md shadow-white/10 ring-1 ring-white/15"
+                            : "border border-white/8 bg-black/40 text-gray-400 hover:border-white/16 hover:bg-white/[0.06] hover:text-white",
                         )}
                       >
                         {slot}
@@ -153,8 +153,8 @@ export function TimePicker({
               )}
 
               {pmSlots.length > 0 && (
-                <div className={amSlots.length > 0 ? "mt-3 pt-3 border-t border-gray-800/50" : ""}>
-                  <span className="mb-2 block text-[10px] font-semibold uppercase tracking-[0.18em] text-gray-500">
+                <div className={amSlots.length > 0 ? "mt-3 border-t border-white/8 pt-3" : ""}>
+                  <span className="mb-2 block text-[0.625rem] font-semibold uppercase tracking-[0.18em] text-gray-500">
                     Afternoon
                   </span>
                   <div className="grid grid-cols-4 gap-1.5">
@@ -164,10 +164,10 @@ export function TimePicker({
                         type="button"
                         onClick={() => handleSelect(slot)}
                         className={cn(
-                          "rounded-xl px-2 py-2 text-[11px] font-medium transition-all duration-150",
+                          "rounded-xl px-2 py-2 text-[0.6875rem] font-medium transition-all duration-150",
                           value === slot
-                            ? "bg-blue-500 text-white shadow-md shadow-blue-500/25 ring-1 ring-blue-400/30"
-                            : "border border-gray-800/80 bg-gray-950/60 text-gray-400 hover:border-blue-500/30 hover:bg-blue-500/10 hover:text-white",
+                            ? "bg-white text-black shadow-md shadow-white/10 ring-1 ring-white/15"
+                            : "border border-white/8 bg-black/40 text-gray-400 hover:border-white/16 hover:bg-white/[0.06] hover:text-white",
                         )}
                       >
                         {slot}

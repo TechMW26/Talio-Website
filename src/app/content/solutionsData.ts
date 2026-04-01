@@ -73,7 +73,7 @@ export const solutions: SolutionItem[] = [
       'Performance management',
       'Advanced reporting',
       'Document management',
-      'Mira workflow support',
+      'MIRA workflow support',
     ],
     stats: [
       { value: '80%', label: 'time saved' },

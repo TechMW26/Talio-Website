@@ -14,7 +14,7 @@ export function SoundDisclaimer() {
           exit={{ opacity: 0 }}
           transition={{ duration: 0.35 }}
           className="fixed inset-0 z-[9999] flex items-center justify-center px-4"
-          style={{ backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', background: 'rgba(0,0,0,0.6)' }}
+          style={{ backdropFilter: 'blur(1rem)', WebkitBackdropFilter: 'blur(1rem)', background: 'rgba(0,0,0,0.6)' }}
         >
           <motion.div
             initial={{ opacity: 0, scale: 0.85, y: 30 }}
@@ -24,12 +24,12 @@ export function SoundDisclaimer() {
             className="relative w-full max-w-md overflow-hidden rounded-3xl border border-white/[0.06]"
             style={{
               background: 'linear-gradient(145deg, rgba(20,20,28,0.97) 0%, rgba(12,12,18,0.98) 100%)',
-              boxShadow: '0 50px 120px rgba(0,0,0,0.7), 0 0 80px rgba(139,92,246,0.08), inset 0 1px 0 rgba(255,255,255,0.04)',
+              boxShadow: '0 3.125rem 7.5rem rgba(0,0,0,0.7), 0 0 5rem rgba(139,92,246,0.08), inset 0 0.0625rem 0 rgba(255,255,255,0.04)',
             }}
           >
             {/* Glow accents */}
-            <div className="absolute -top-20 -right-20 w-40 h-40 rounded-full bg-violet-500/15 blur-[60px] pointer-events-none" />
-            <div className="absolute -bottom-16 -left-16 w-32 h-32 rounded-full bg-blue-500/10 blur-[50px] pointer-events-none" />
+            <div className="absolute -top-20 -right-20 w-40 h-40 rounded-full bg-violet-500/15 blur-[3.75rem] pointer-events-none" />
+            <div className="absolute -bottom-16 -left-16 w-32 h-32 rounded-full bg-blue-500/10 blur-[3.125rem] pointer-events-none" />
 
             {/* Animated sound wave ring */}
             <div className="flex justify-center pt-10 pb-2">
@@ -38,19 +38,19 @@ export function SoundDisclaimer() {
                   animate={{ scale: [1, 1.4, 1], opacity: [0.3, 0, 0.3] }}
                   transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
                   className="absolute inset-0 rounded-full border border-violet-400/30"
-                  style={{ margin: '-14px' }}
+                  style={{ margin: '-0.875rem' }}
                 />
                 <motion.div
                   animate={{ scale: [1, 1.25, 1], opacity: [0.2, 0, 0.2] }}
                   transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
                   className="absolute inset-0 rounded-full border border-blue-400/20"
-                  style={{ margin: '-8px' }}
+                  style={{ margin: '-0.5rem' }}
                 />
                 <div
                   className="relative w-16 h-16 rounded-full flex items-center justify-center"
                   style={{
                     background: 'linear-gradient(135deg, rgba(139,92,246,0.2), rgba(59,130,246,0.15))',
-                    boxShadow: '0 0 30px rgba(139,92,246,0.15), inset 0 1px 0 rgba(255,255,255,0.06)',
+                    boxShadow: '0 0 1.875rem rgba(139,92,246,0.15), inset 0 0.0625rem 0 rgba(255,255,255,0.06)',
                   }}
                 >
                   <Volume2 className="w-7 h-7 text-violet-300" strokeWidth={1.8} />
@@ -73,13 +73,13 @@ export function SoundDisclaimer() {
             <div className="px-8 pt-6 pb-8 flex flex-col gap-3">
               {/* Primary: Awesome */}
               <motion.button
-                whileHover={{ scale: 1.02, boxShadow: '0 8px 40px rgba(139,92,246,0.3), 0 0 20px rgba(139,92,246,0.15)' }}
+                whileHover={{ scale: 1.02, boxShadow: '0 0.5rem 2.5rem rgba(139,92,246,0.3), 0 0 1.25rem rgba(139,92,246,0.15)' }}
                 whileTap={{ scale: 0.98 }}
                 onClick={accept}
                 className="relative w-full py-3.5 rounded-2xl font-semibold text-sm text-white overflow-hidden cursor-pointer"
                 style={{
                   background: 'linear-gradient(135deg, #7c3aed, #6366f1, #3b82f6)',
-                  boxShadow: '0 4px 24px rgba(139,92,246,0.25), inset 0 1px 0 rgba(255,255,255,0.12)',
+                  boxShadow: '0 0.25rem 1.5rem rgba(139,92,246,0.25), inset 0 0.0625rem 0 rgba(255,255,255,0.12)',
                 }}
               >
                 {/* Shimmer */}

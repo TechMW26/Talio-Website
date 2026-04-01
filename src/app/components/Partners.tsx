@@ -9,6 +9,7 @@ import {
   Megaphone,
   ArrowRight,
 } from "lucide-react";
+import { useCompensatedMinWidth } from '@/app/hooks/useZoomCompensatedViewport';
 
 const benefits = [
   { icon: DollarSign, title: "Competitive Commissions", desc: "Earn up to 30% recurring commissions on every deal" },
@@ -57,6 +58,11 @@ const steps = [
 
 export function Partners() {
   usePageMeta('Partners', 'Partner with Talio and grow your business. Explore referral, reseller, and technology partner programs with competitive benefits.');
+  const hasBenefitsTwoColumnGrid = useCompensatedMinWidth(860);
+  const hasProgramsThreeColumnGrid = useCompensatedMinWidth(1320);
+  const hasProgramsTwoColumnGrid = useCompensatedMinWidth(900);
+  const hasFourStepColumns = useCompensatedMinWidth(1320);
+  const hasTwoStepColumns = useCompensatedMinWidth(860);
 
   const heroRef = useRef(null);
   const benefitsRef = useRef(null);
@@ -64,11 +70,11 @@ export function Partners() {
   const processRef = useRef(null);
   const ctaRef = useRef(null);
 
-  const heroInView = useInView(heroRef, { once: true, margin: "-100px" });
-  const benefitsInView = useInView(benefitsRef, { once: true, margin: "-100px" });
-  const programsInView = useInView(programsRef, { once: true, margin: "-100px" });
-  const processInView = useInView(processRef, { once: true, margin: "-100px" });
-  const ctaInView = useInView(ctaRef, { once: true, margin: "-100px" });
+  const heroInView = useInView(heroRef, { once: true, margin: '-10%' });
+  const benefitsInView = useInView(benefitsRef, { once: true, margin: '-10%' });
+  const programsInView = useInView(programsRef, { once: true, margin: '-10%' });
+  const processInView = useInView(processRef, { once: true, margin: '-10%' });
+  const ctaInView = useInView(ctaRef, { once: true, margin: '-10%' });
 
   return (
     <div className="min-h-screen bg-black text-white">
@@ -96,7 +102,7 @@ export function Partners() {
 
       {/* Benefits */}
       <section ref={benefitsRef} className="pb-20">
-        <div className="max-w-7xl mx-auto px-6 md:px-8 lg:px-12 grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <div className={`max-w-7xl mx-auto px-6 md:px-8 lg:px-12 grid gap-6 ${hasBenefitsTwoColumnGrid ? 'grid-cols-2' : 'grid-cols-1'}`}>
           {benefits.map((b, i) => (
             <motion.div
               key={b.title}
@@ -124,7 +130,7 @@ export function Partners() {
           className="max-w-7xl mx-auto px-6 md:px-8 lg:px-12"
         >
           <h2 className="text-4xl md:text-6xl lg:text-7xl font-bold text-center mb-16 tracking-tighter leading-[1.05]">Partner Programs</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className={`grid gap-6 ${hasProgramsThreeColumnGrid ? 'grid-cols-3' : hasProgramsTwoColumnGrid ? 'grid-cols-2' : 'grid-cols-1'}`}>
             {programs.map((prog, i) => (
               <motion.div
                 key={prog.title}
@@ -167,7 +173,7 @@ export function Partners() {
           className="max-w-7xl mx-auto px-6 md:px-8 lg:px-12"
         >
           <h2 className="text-4xl md:text-6xl lg:text-7xl font-bold text-center mb-16 tracking-tighter leading-[1.05]">How It Works</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          <div className={`grid gap-6 ${hasFourStepColumns ? 'grid-cols-4' : hasTwoStepColumns ? 'grid-cols-2' : 'grid-cols-1'}`}>
             {steps.map((step, i) => (
               <motion.div
                 key={step.title}

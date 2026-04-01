@@ -183,7 +183,7 @@ const posts = [
   },
   {
     title: 'Meet MIRA: How Talio\'s AI Assistant Is Redefining HR Operations',
-    slug: 'meet-mira-talio-ai-assistant-redefining-hr-operations',
+    slug: 'meet-MIRA-talio-ai-assistant-redefining-hr-operations',
     metaDescription: 'Explore MIRA, Talio\'s AI-powered HR assistant that answers workforce queries instantly, generates smart reports, predicts trends, and automates repetitive HR tasks — available 24/7 in 50+ languages.',
     featuredImage: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=1200&q=80&auto=format',
     tags: ['MIRA AI', 'Artificial Intelligence', 'HR Automation', 'Innovation'],

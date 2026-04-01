@@ -22,7 +22,7 @@ export function Footer() {
         { label: 'Pricing', href: '/pricing' },
         { label: 'Downloads', href: '/downloads' },
         { label: 'Solutions', href: '/solutions' },
-        { label: 'Mira', href: '/old-site/index.html', reloadDocument: true },
+        { label: 'MIRA', href: '/MIRA-ai' },
       ]
     },
     {
@@ -65,8 +65,8 @@ export function Footer() {
 
       {/* Ambient background glows */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute -top-40 left-1/4 w-[500px] h-[500px] bg-purple-600/8 rounded-full blur-[150px]" />
-        <div className="absolute -bottom-40 right-1/4 w-[400px] h-[400px] bg-blue-600/8 rounded-full blur-[150px]" />
+        <div className="absolute -top-40 left-1/4 w-[31.25rem] h-[31.25rem] bg-purple-600/8 rounded-full blur-[9.375rem]" />
+        <div className="absolute -bottom-40 right-1/4 w-[25rem] h-[25rem] bg-blue-600/8 rounded-full blur-[9.375rem]" />
         
         {/* Subtle Fox Watermark */}
         <motion.div
@@ -79,7 +79,7 @@ export function Footer() {
           <motion.img
             src={foxMascot}
             alt=""
-            className="w-[500px] h-[500px] object-contain"
+            className="w-[31.25rem] h-[31.25rem] object-contain"
             animate={{ rotate: [0, 3, -3, 0] }}
             transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
           />
@@ -149,7 +149,7 @@ export function Footer() {
               </div>
               
               <p className="text-sm text-gray-500 leading-relaxed mb-8 max-w-xs">
-                Talio is an AI-powered productivity utility for modern teams, with Mira and built-in HRMS add-ons in one operating layer.
+                Talio is an AI-powered productivity utility for modern teams, with MIRA and built-in HRMS add-ons in one operating layer.
               </p>
 
               {/* Contact Info */}

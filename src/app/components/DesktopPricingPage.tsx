@@ -1,10 +1,20 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { motion, useInView, useScroll, useTransform, AnimatePresence } from 'motion/react';
 import { Check, X, ChevronDown, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router';
 import * as SwitchPrimitive from '@radix-ui/react-switch';
 import { BookDemoPopup, type PlanInfo } from './BookDemoPopup';
+import { PricingChangeConfetti } from './PricingChangeConfetti';
+import { ElfsightReviewsSection } from './ElfsightReviewsSection';
 import { pricingFaqs, pricingPlans } from './pricingData';
+import { useCompensatedMinWidth } from '@/app/hooks/useZoomCompensatedViewport';
+
+const PLAN_CONFETTI_COLORS: Record<string, string[]> = {
+  Budget: ['bg-emerald-300', 'bg-teal-300', 'bg-cyan-300', 'bg-white'],
+  Starter: ['bg-sky-300', 'bg-blue-300', 'bg-cyan-200', 'bg-white'],
+  Professional: ['bg-violet-300', 'bg-fuchsia-300', 'bg-pink-300', 'bg-white'],
+  Enterprise: ['bg-orange-300', 'bg-amber-300', 'bg-red-300', 'bg-white'],
+};
 
 export function DesktopPricingPage() {
   const [billing, setBilling] = useState<'monthly' | 'annual'>('monthly');
@@ -12,6 +22,9 @@ export function DesktopPricingPage() {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [showDemoPopup, setShowDemoPopup] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<PlanInfo | null>(null);
+  const [priceCelebrationKey, setPriceCelebrationKey] = useState(0);
+  const hasWidePlansGrid = useCompensatedMinWidth(1500);
+  const hasMediumPlansGrid = useCompensatedMinWidth(980);
 
   const openDemoForPlan = (plan: typeof pricingPlans[number]) => {
     const priceDisplay = plan.priceLabel ?? `₹${billing === 'monthly' ? plan.price.monthly : plan.price.annual}${plan.period}`;
@@ -23,16 +36,53 @@ export function DesktopPricingPage() {
     setShowDemoPopup(true);
   };
 
-  const containerRef = useRef(null);
-  const heroRef = useRef(null);
-  const plansRef = useRef(null);
-  const faqRef = useRef(null);
-  const ctaRef = useRef(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const heroRef = useRef<HTMLElement | null>(null);
+  const plansRef = useRef<HTMLElement | null>(null);
+  const faqRef = useRef<HTMLElement | null>(null);
+  const ctaRef = useRef<HTMLElement | null>(null);
+  const hasMountedBillingRef = useRef(false);
 
-  const heroInView = useInView(heroRef, { once: true, margin: '-100px' });
-  const plansInView = useInView(plansRef, { once: true, margin: '-100px' });
-  const faqInView = useInView(faqRef, { once: true, margin: '-100px' });
-  const ctaInView = useInView(ctaRef, { once: true, margin: '-100px' });
+  const scrollPlansIntoView = () => {
+    if (!plansRef.current) {
+      return;
+    }
+
+    const targetTop = plansRef.current.getBoundingClientRect().top + window.scrollY - 7.5 * 16;
+
+    window.scrollTo({
+      top: Math.max(0, targetTop),
+      behavior: 'smooth',
+    });
+  };
+
+  const handleBillingChange = (nextBilling: 'monthly' | 'annual') => {
+    if (nextBilling === billing) {
+      return;
+    }
+
+    setBilling(nextBilling);
+
+    if (nextBilling === 'annual') {
+      window.requestAnimationFrame(() => {
+        window.requestAnimationFrame(scrollPlansIntoView);
+      });
+    }
+  };
+
+  useEffect(() => {
+    if (!hasMountedBillingRef.current) {
+      hasMountedBillingRef.current = true;
+      return;
+    }
+
+    setPriceCelebrationKey((current) => current + 1);
+  }, [billing]);
+
+  const heroInView = useInView(heroRef, { once: true, margin: '-10%' });
+  const plansInView = useInView(plansRef, { once: true, margin: '-10%' });
+  const faqInView = useInView(faqRef, { once: true, margin: '-10%' });
+  const ctaInView = useInView(ctaRef, { once: true, margin: '-10%' });
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -47,14 +97,14 @@ export function DesktopPricingPage() {
             y: useTransform(scrollYProgress, [0, 1], [100, -100]),
             opacity: useTransform(scrollYProgress, [0, 0.5, 1], [0.15, 0.25, 0.15]),
           }}
-          className="absolute top-1/4 -left-1/4 w-[600px] h-[600px] bg-gradient-to-br from-purple-500/20 via-blue-500/10 to-transparent rounded-full blur-3xl"
+          className="absolute top-1/4 -left-1/4 w-[37.5rem] h-[37.5rem] bg-gradient-to-br from-purple-500/20 via-blue-500/10 to-transparent rounded-full blur-3xl"
         />
         <motion.div
           style={{
             y: useTransform(scrollYProgress, [0, 1], [-100, 100]),
             opacity: useTransform(scrollYProgress, [0, 0.5, 1], [0.15, 0.25, 0.15]),
           }}
-          className="absolute bottom-1/4 -right-1/4 w-[500px] h-[500px] bg-gradient-to-br from-pink-500/20 via-purple-500/10 to-transparent rounded-full blur-3xl"
+          className="absolute bottom-1/4 -right-1/4 w-[31.25rem] h-[31.25rem] bg-gradient-to-br from-pink-500/20 via-purple-500/10 to-transparent rounded-full blur-3xl"
         />
       </div>
 
@@ -84,45 +134,41 @@ export function DesktopPricingPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.3 }}
-        className="flex items-center justify-center gap-3 mb-16 mt-6"
+        className="mb-16 mt-6 flex flex-col items-center gap-3 px-6"
       >
-        <span className={`text-sm font-medium transition-colors duration-300 ${billing === 'monthly' ? 'text-white' : 'text-gray-500'}`}>
-          Monthly
-        </span>
-        <SwitchPrimitive.Root
-          checked={billing === 'annual'}
-          onCheckedChange={(checked) => setBilling(checked ? 'annual' : 'monthly')}
-          className="relative w-14 h-8 rounded-full bg-gray-800 border border-gray-700/80 transition-colors duration-300 data-[state=checked]:bg-gray-800 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50"
+        <div className="inline-flex items-center gap-4 rounded-full border border-white/10 bg-white/[0.03] px-4 py-3 shadow-[0_1rem_2.5rem_-1.75rem_rgba(0,0,0,0.85)]">
+          <span className={`text-sm font-medium transition-colors duration-300 ${billing === 'monthly' ? 'text-white' : 'text-gray-500'}`}>
+            Monthly
+          </span>
+          <SwitchPrimitive.Root
+            checked={billing === 'annual'}
+            onCheckedChange={(checked) => handleBillingChange(checked ? 'annual' : 'monthly')}
+            aria-label="Billing frequency"
+            className="relative flex h-9 w-[4.125rem] cursor-pointer items-center rounded-full border border-white/10 bg-[#182132] p-1 outline-none transition-colors duration-300 data-[state=checked]:bg-[#1c2538] focus-visible:ring-2 focus-visible:ring-purple-500/50"
+          >
+            <SwitchPrimitive.Thumb asChild>
+              <motion.span
+                className="block h-7 w-7 rounded-full bg-gradient-to-r from-violet-500 via-fuchsia-500 to-pink-500 shadow-[0_0.625rem_1.875rem_rgba(192,38,211,0.45)]"
+                animate={{ x: billing === 'annual' ? 33 : 0 }}
+                transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+              />
+            </SwitchPrimitive.Thumb>
+          </SwitchPrimitive.Root>
+          <span className={`text-sm font-medium transition-colors duration-300 ${billing === 'annual' ? 'text-white' : 'text-gray-500'}`}>
+            Annual
+          </span>
+        </div>
+
+        <motion.div
+          animate={{
+            opacity: billing === 'annual' ? 1 : 0.72,
+            scale: billing === 'annual' ? 1 : 0.98,
+          }}
+          transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+          className={`rounded-full border px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.16em] ${billing === 'annual' ? 'border-green-500/30 bg-green-500/12 text-green-400' : 'border-white/10 bg-white/[0.03] text-gray-500'}`}
         >
-          <SwitchPrimitive.Thumb asChild>
-            <motion.span
-              className="block w-6 h-6 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 shadow-lg shadow-purple-500/30"
-              layout
-              transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-              style={{
-                position: 'absolute',
-                top: 3,
-                left: billing === 'annual' ? 29 : 3,
-              }}
-            />
-          </SwitchPrimitive.Thumb>
-        </SwitchPrimitive.Root>
-        <span className={`text-sm font-medium transition-colors duration-300 ${billing === 'annual' ? 'text-white' : 'text-gray-500'}`}>
-          Annual
-        </span>
-        <AnimatePresence>
-          {billing === 'annual' && (
-            <motion.span
-              initial={{ opacity: 0, scale: 0.8, x: -10 }}
-              animate={{ opacity: 1, scale: 1, x: 0 }}
-              exit={{ opacity: 0, scale: 0.8, x: -10 }}
-              transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-              className="ml-1 px-2.5 py-0.5 rounded-full bg-green-500/10 border border-green-500/20 text-green-400 text-xs font-medium"
-            >
-              Save 20%
-            </motion.span>
-          )}
-        </AnimatePresence>
+          20% off with annual billing
+        </motion.div>
       </motion.div>
 
       <motion.section
@@ -130,13 +176,17 @@ export function DesktopPricingPage() {
         initial={{ opacity: 0, y: 30 }}
         animate={plansInView ? { opacity: 1, y: 0 } : {}}
         transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-        className="relative max-w-[1600px] mx-auto px-6 md:px-8 lg:px-12 pb-28"
+        className="relative mx-auto max-w-[96rem] px-4 pb-28 md:px-6 lg:px-8"
       >
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 items-start pt-5">
+        <div className={`grid items-stretch gap-5 pt-6 xl:gap-6 ${hasWidePlansGrid ? 'grid-cols-4' : hasMediumPlansGrid ? 'grid-cols-2' : 'grid-cols-1'}`}>
           {pricingPlans.map((plan, index) => {
             const Icon = plan.icon;
             const isHovered = hoveredIndex === index;
             const priceDisplay = plan.priceLabel ?? `₹${billing === 'monthly' ? plan.price.monthly : plan.price.annual}`;
+            const priceClassName = plan.priceLabel
+              ? 'text-[2.5rem] md:text-[2.875rem]'
+              : 'text-[2.875rem] md:text-[3.375rem]';
+            const confettiColors = PLAN_CONFETTI_COLORS[plan.name] ?? PLAN_CONFETTI_COLORS.Professional;
 
             return (
               <motion.div
@@ -150,21 +200,21 @@ export function DesktopPricingPage() {
                 }}
                 onMouseEnter={() => setHoveredIndex(index)}
                 onMouseLeave={() => setHoveredIndex(null)}
-                className={`relative group ${plan.featured ? 'pt-5 md:-mt-4 md:mb-4' : 'pt-6'}`}
+                className="relative group flex h-full flex-col pt-8"
               >
                 {plan.badge && (
                   <motion.div
                     initial={{ opacity: 0, scale: 0.8, y: -20 }}
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     transition={{ duration: 0.6, delay: 0.8, type: 'spring' }}
-                    className="absolute -top-3 left-1/2 -translate-x-1/2 z-30"
+                    className="absolute top-0 left-1/2 -translate-x-1/2 z-30"
                   >
                     <motion.div
                       animate={{
                         boxShadow: [
-                          '0 0 20px rgba(168, 85, 247, 0.4)',
-                          '0 0 40px rgba(236, 72, 153, 0.6)',
-                          '0 0 20px rgba(168, 85, 247, 0.4)',
+                          '0 0 1.25rem rgba(168, 85, 247, 0.4)',
+                          '0 0 2.5rem rgba(236, 72, 153, 0.6)',
+                          '0 0 1.25rem rgba(168, 85, 247, 0.4)',
                         ],
                       }}
                       transition={{ duration: 2, repeat: Infinity, repeatType: 'reverse' }}
@@ -186,18 +236,18 @@ export function DesktopPricingPage() {
                   animate={{
                     boxShadow: isHovered
                       ? plan.featured
-                        ? '0 24px 80px rgba(168, 85, 247, 0.24)'
-                        : '0 24px 72px rgba(59, 130, 246, 0.18)'
+                        ? '0 1.5rem 5rem rgba(168, 85, 247, 0.24)'
+                        : '0 1.5rem 4.5rem rgba(59, 130, 246, 0.18)'
                       : plan.featured
-                        ? '0 10px 32px rgba(0, 0, 0, 0.28)'
-                        : '0 8px 28px rgba(0, 0, 0, 0.24)',
+                        ? '0 0.625rem 2rem rgba(0, 0, 0, 0.28)'
+                        : '0 0.5rem 1.75rem rgba(0, 0, 0, 0.24)',
                   }}
                   transition={{ duration: 0.3, type: 'spring', stiffness: 300 }}
                   className={`
-                    relative h-full rounded-[2.5rem] overflow-hidden
+                    relative flex h-full flex-col rounded-[2.5rem] overflow-hidden
                     ${plan.featured
-                      ? 'bg-gray-900/60 border-2 border-purple-500/30 backdrop-blur-sm p-10'
-                      : 'bg-gray-900/60 border border-gray-800/60 backdrop-blur-sm p-10'
+                      ? 'bg-gray-900/60 border-2 border-purple-500/30 backdrop-blur-sm p-7 xl:p-8'
+                      : 'bg-gray-900/60 border border-gray-800/60 backdrop-blur-sm p-7 xl:p-8'
                     }
                     transition-shadow duration-500
                   `}
@@ -208,94 +258,121 @@ export function DesktopPricingPage() {
                     transition={{ duration: 3, repeat: Infinity, repeatType: 'reverse' }}
                   />
 
-                  <div className="flex justify-center mb-7 relative">
-                    <motion.div
-                      animate={isHovered ? { y: [0, -8, 0] } : {}}
-                      transition={{ duration: 2, repeat: Infinity, repeatType: 'reverse' }}
-                      className="relative z-10"
-                    >
-                      <div className={`w-16 h-16 rounded-2xl flex items-center justify-center relative shadow-xl bg-gradient-to-br ${plan.gradient}`}>
-                        <Icon className="w-8 h-8 relative z-10 text-white" />
-                      </div>
-                    </motion.div>
-                  </div>
-
-                  <h3 className="text-2xl font-bold mb-2 tracking-tight relative z-10 text-white text-center">
-                    {plan.name}
-                  </h3>
-
-                  <p className="text-sm mb-8 font-light relative z-10 text-gray-400 text-center">
-                    {plan.subtitle}
-                  </p>
-
-                  <div className="mb-8 relative z-10 text-center">
-                    <span className="text-5xl md:text-6xl font-bold tracking-tighter text-white">
-                      {priceDisplay}
-                    </span>
-                    {plan.period && (
-                      <span className="text-base text-gray-500 ml-1">
-                        {plan.period}
-                      </span>
-                    )}
-                  </div>
-
-                  <button onClick={() => openDemoForPlan(plan)} className="block mb-10 relative z-10 w-full">
-                    <motion.div
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      className={`relative w-full py-4 text-sm font-semibold rounded-full overflow-hidden text-center shadow-lg group ${
-                        plan.featured
-                          ? 'bg-white text-black'
-                          : 'bg-white/10 text-white border border-white/10 hover:bg-white/15'
-                      } transition-colors`}
-                    >
+                  <div className="relative z-10 flex flex-1 flex-col">
+                    <div className="relative mb-6 flex justify-center">
                       <motion.div
-                        className={`absolute inset-0 bg-gradient-to-r ${plan.gradient}`}
-                        initial={{ x: '-100%' }}
-                        whileHover={{ x: 0 }}
-                        transition={{ duration: 0.3 }}
-                      />
-                      <span className="relative z-10 flex items-center justify-center gap-2">
-                        <span className="flex overflow-hidden">
-                          {plan.cta.split('').map((char: string, i: number) => (
-                            <span key={i} className="relative inline-flex flex-col h-[1.5em] overflow-hidden">
-                              <span className="group-hover:-translate-y-full transition-transform duration-500 ease-[0.22,1,0.36,1]" style={{ transitionDelay: `${i * 0.025}s` }}>
-                                {char === ' ' ? '\u00A0' : char}
-                              </span>
-                              <span className="absolute top-0 left-0 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-[0.22,1,0.36,1]" style={{ transitionDelay: `${i * 0.025}s` }}>
-                                {char === ' ' ? '\u00A0' : char}
-                              </span>
-                            </span>
-                          ))}
-                        </span>
-                        <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                      </span>
-                    </motion.div>
-                  </button>
-
-                  <div className="space-y-4 relative z-10">
-                    {plan.features.map((feature, featureIndex) => (
-                      <motion.div
-                        key={feature.name}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={plansInView ? { opacity: 1, x: 0 } : {}}
-                        transition={{ duration: 0.5, delay: 0.4 + index * 0.1 + featureIndex * 0.05 }}
-                        className="flex items-center gap-3"
+                        animate={isHovered ? { y: [0, -8, 0] } : {}}
+                        transition={{ duration: 2, repeat: Infinity, repeatType: 'reverse' }}
+                        className="relative z-10"
                       >
-                        {feature.included ? (
-                          <div className={`flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center bg-gradient-to-br ${plan.gradient}`}>
-                            <Check className="w-3 h-3 text-white" strokeWidth={3} />
-                          </div>
-                        ) : (
-                          <div className="flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center bg-gray-800/80">
-                            <X className="w-3 h-3 text-gray-600" strokeWidth={3} />
-                          </div>
-                        )}
-                        <span className={`text-sm ${feature.included ? 'text-gray-300' : 'text-gray-600 line-through'}`}>
-                          {feature.name}
+                        <div className={`flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br shadow-xl ${plan.gradient}`}>
+                          <Icon className="h-8 w-8 text-white" />
+                        </div>
+                      </motion.div>
+                    </div>
+
+                    <div className="min-h-[6.75rem] text-center">
+                      <h3 className="relative z-10 mb-2 text-2xl font-bold tracking-tight text-white">
+                        {plan.name}
+                      </h3>
+
+                      <p className="relative z-10 text-sm font-light text-gray-400">
+                        {plan.subtitle}
+                      </p>
+                    </div>
+
+                    <div className="relative z-10 mb-7 min-h-[5.75rem] overflow-visible text-center">
+                      <PricingChangeConfetti triggerKey={priceCelebrationKey} colors={confettiColors} className="inset-x-0 top-0 h-24" />
+
+                      <div className="flex min-h-[3.75rem] items-end justify-center overflow-hidden">
+                        <AnimatePresence mode="wait">
+                          <motion.span
+                            key={`${plan.name}-${billing}`}
+                            initial={{ opacity: 0, y: 14, scale: 0.92, filter: 'blur(0.25rem)' }}
+                            animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0rem)' }}
+                            exit={{ opacity: 0, y: -14, scale: 0.92, filter: 'blur(0.25rem)' }}
+                            transition={{ duration: 0.36, ease: [0.16, 1, 0.3, 1] }}
+                            className={`font-bold tracking-tighter leading-none text-white ${priceClassName}`}
+                          >
+                            {priceDisplay}
+                          </motion.span>
+                        </AnimatePresence>
+                      </div>
+
+                      <div className="mt-1 min-h-[1.25rem] overflow-hidden text-sm text-gray-500">
+                        <AnimatePresence mode="wait">
+                          <motion.span
+                            key={`${plan.name}-${billing}-period`}
+                            initial={{ opacity: 0, y: 8 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -8 }}
+                            transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
+                            className="block"
+                          >
+                            {plan.period || '\u00A0'}
+                          </motion.span>
+                        </AnimatePresence>
+                      </div>
+                    </div>
+
+                    <button onClick={() => openDemoForPlan(plan)} className="relative z-10 mb-8 block w-full">
+                      <motion.div
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        className={`relative w-full overflow-hidden rounded-full py-4 text-center text-sm font-semibold shadow-lg group ${
+                          plan.featured
+                            ? 'bg-white text-black'
+                            : 'border border-white/10 bg-white/10 text-white hover:bg-white/15'
+                        } transition-colors`}
+                      >
+                        <motion.div
+                          className={`absolute inset-0 bg-gradient-to-r ${plan.gradient}`}
+                          initial={{ x: '-100%' }}
+                          whileHover={{ x: 0 }}
+                          transition={{ duration: 0.3 }}
+                        />
+                        <span className="relative z-10 flex items-center justify-center gap-2">
+                          <span className="flex overflow-hidden">
+                            {plan.cta.split('').map((char: string, i: number) => (
+                              <span key={i} className="relative inline-flex h-[1.5em] flex-col overflow-hidden">
+                                <span className="group-hover:-translate-y-full transition-transform duration-500 ease-[0.22,1,0.36,1]" style={{ transitionDelay: `${i * 0.025}s` }}>
+                                  {char === ' ' ? '\u00A0' : char}
+                                </span>
+                                <span className="absolute top-0 left-0 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-[0.22,1,0.36,1]" style={{ transitionDelay: `${i * 0.025}s` }}>
+                                  {char === ' ' ? '\u00A0' : char}
+                                </span>
+                              </span>
+                            ))}
+                          </span>
+                          <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                         </span>
                       </motion.div>
-                    ))}
+                    </button>
+
+                    <div className="relative z-10 mt-auto space-y-4">
+                      {plan.features.map((feature, featureIndex) => (
+                        <motion.div
+                          key={feature.name}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={plansInView ? { opacity: 1, x: 0 } : {}}
+                          transition={{ duration: 0.5, delay: 0.4 + index * 0.1 + featureIndex * 0.05 }}
+                          className="flex items-center gap-3"
+                        >
+                          {feature.included ? (
+                            <div className={`flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br ${plan.gradient}`}>
+                              <Check className="h-3 w-3 text-white" strokeWidth={3} />
+                            </div>
+                          ) : (
+                            <div className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-gray-800/80">
+                              <X className="h-3 w-3 text-gray-600" strokeWidth={3} />
+                            </div>
+                          )}
+                          <span className={`text-sm ${feature.included ? 'text-gray-300' : 'text-gray-600 line-through'}`}>
+                            {feature.name}
+                          </span>
+                        </motion.div>
+                      ))}
+                    </div>
                   </div>
 
                   <motion.div
@@ -316,6 +393,13 @@ export function DesktopPricingPage() {
           })}
         </div>
       </motion.section>
+
+      <ElfsightReviewsSection
+        sectionClassName="relative bg-black pb-16 md:pb-20 overflow-hidden"
+        eyebrow="✦ Google Reviews"
+        title="What Teams Are Saying"
+        subtitle="Live Google reviews from teams already running Talio in daily operations."
+      />
 
       <motion.section
         ref={faqRef}

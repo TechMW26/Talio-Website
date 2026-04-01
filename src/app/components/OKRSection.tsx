@@ -1,9 +1,12 @@
 import { motion } from 'motion/react';
 import { useRef } from 'react';
 import { ScrollRevealText, ScrollRevealHeading } from '@/app/components/ScrollRevealText';
+import { useCompensatedMinWidth } from '@/app/hooks/useZoomCompensatedViewport';
 
 export function OKRSection() {
   const containerRef = useRef(null);
+  const hasTabletCardGrid = useCompensatedMinWidth(768);
+  const hasDesktopCardGrid = useCompensatedMinWidth(1024);
 
   const cards = [
     {
@@ -81,7 +84,7 @@ export function OKRSection() {
         </div>
 
         {/* Dynamic Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className={`grid gap-8 ${hasDesktopCardGrid ? 'grid-cols-3' : hasTabletCardGrid ? 'grid-cols-2' : 'grid-cols-1'}`}>
           {cards.map((card, index) => (
             <ScrollRevealCard key={index} data={card} index={index} />
           ))}
@@ -108,7 +111,7 @@ function ScrollRevealCard({ data, index }: { data: any, index: number }) {
         rotateX: 0,
         scale: 1
       }}
-      viewport={{ once: true, margin: "-100px" }}
+      viewport={{ once: true, margin: '-10%' }}
       transition={{
         type: "spring",
         stiffness: 50,
@@ -118,7 +121,7 @@ function ScrollRevealCard({ data, index }: { data: any, index: number }) {
       className="h-full"
     >
       {data.type === 'stat' ? (
-        <div className={`h-full rounded-3xl p-10 flex flex-col justify-between shadow-xl ${data.color} min-h-[300px] group hover:scale-[1.02] transition-transform duration-500`}>
+        <div className={`h-full rounded-3xl p-10 flex flex-col justify-between shadow-xl ${data.color} min-h-[18.75rem] group hover:scale-[1.02] transition-transform duration-500`}>
           <div className="flex justify-between items-start">
             <span className="text-sm font-medium uppercase tracking-widest opacity-80">{data.label}</span>
             <span className="text-xs font-bold px-3 py-1 rounded-full bg-white/20 backdrop-blur-md">
@@ -130,7 +133,7 @@ function ScrollRevealCard({ data, index }: { data: any, index: number }) {
           </div>
         </div>
       ) : (
-        <div className="h-full bg-white dark:bg-gray-900 rounded-3xl p-10 border border-gray-100 dark:border-gray-800 shadow-xl min-h-[300px] flex flex-col justify-between group hover:border-purple-500/30 transition-colors duration-500">
+        <div className="h-full bg-white dark:bg-gray-900 rounded-3xl p-10 border border-gray-100 dark:border-gray-800 shadow-xl min-h-[18.75rem] flex flex-col justify-between group hover:border-purple-500/30 transition-colors duration-500">
           <div>
             <div className="flex justify-between items-start mb-8">
               <span className={`text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider ${

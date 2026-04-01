@@ -241,16 +241,16 @@ function Key({
             ? { duration: 0.9, delay: collapseDelay, type: 'spring', stiffness: 60, damping: 12, mass: 1.2 }
             : { duration: 0.8, delay: entranceDelay, ease: [0.16, 1, 0.3, 1] }
       }
-      className="rounded-[14px] flex items-center justify-center relative"
+      className="rounded-[0.875rem] flex items-center justify-center relative"
       style={{
         background: glowBorder || (!social ? '#1A1A1A' : undefined),
-        padding: glowBorder ? '1.5px' : undefined,
+        padding: glowBorder ? '0.0938rem' : undefined,
         boxShadow: !social
           ? (showGlow
               ? `0 ${shadowDepth}px ${shadowBlur}px rgba(0,0,0,.35), 0 0 ${glow * 24}px rgba(127,179,167,${glow * 0.5})`
-              : `0 4px 0 rgba(0,0,0,0.2), 0 ${shadowDepth}px ${shadowBlur}px rgba(0,0,0,.25)`)
+              : `0 0.25rem 0 rgba(0,0,0,0.2), 0 ${shadowDepth}px ${shadowBlur}px rgba(0,0,0,.25)`)
           : undefined, // social keys' boxShadow is written directly by applyPop
-        border: !social && !glowBorder ? '1px solid rgba(255,255,255,0.06)' : social ? '1px solid rgba(255,255,255,0.25)' : undefined,
+        border: !social && !glowBorder ? '0.0625rem solid rgba(255,255,255,0.06)' : social ? '0.0625rem solid rgba(255,255,255,0.25)' : undefined,
         transformStyle: 'preserve-3d',
         animation: isIdleIcon && entered && !collapsed ? 'iconFloat 4s ease-in-out infinite' : undefined,
         animationDelay: isIdleIcon ? `${waveDelay * 3}s` : undefined,
@@ -259,7 +259,7 @@ function Key({
     >
       {glowBorder && (
         <div
-          className="absolute inset-[1.5px] rounded-[12.5px] z-0"
+          className="absolute inset-[0.0938rem] rounded-[0.7813rem] z-0"
           style={{ background: 'rgba(18,18,18,0.95)' }}
         />
       )}
@@ -267,7 +267,7 @@ function Key({
         <img
           src={social.icon}
           alt={social.name}
-          className="w-[36px] h-[36px] object-contain relative z-10"
+          className="w-[2.25rem] h-[2.25rem] object-contain relative z-10"
           loading="lazy"
         />
       )}
@@ -327,16 +327,16 @@ export function KeyboardSection() {
           100% { opacity: 0.7; background-position: 200% 0; }
         }
         @keyframes talioFloat {
-          0%, 100% { transform: translateZ(80px) scale(1.12); }
-          50% { transform: translateZ(95px) scale(1.15); }
+          0%, 100% { transform: translateZ(5rem) scale(1.12); }
+          50% { transform: translateZ(5.9375rem) scale(1.15); }
         }
         @keyframes iconFloat {
-          0%, 100% { transform: translateZ(50px) scale(1.08); }
-          50% { transform: translateZ(58px) scale(1.10); }
+          0%, 100% { transform: translateZ(3.125rem) scale(1.08); }
+          50% { transform: translateZ(3.625rem) scale(1.10); }
         }
         @keyframes tooltipBounce {
           0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-6px); }
+          50% { transform: translateY(-0.375rem); }
         }
       `}</style>
 
@@ -374,14 +374,14 @@ export function KeyboardSection() {
       {/* Keyboard + scattered keys (always rendered, animate between states) */}
       <div
         className="relative flex items-center justify-center px-4"
-        style={{ transform: 'translate(40px, -30px)' }}
+        style={{ transform: 'translate(2.5rem, -1.875rem)' }}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
       >
         <div
           className="relative"
           style={{
-            perspective: '900px',
+            perspective: '56.25rem',
             perspectiveOrigin: '50% 70%',
           }}
         >
@@ -396,13 +396,13 @@ export function KeyboardSection() {
                 className="absolute z-40 pointer-events-none"
                 style={{ top: '5%', left: '42%', transform: 'translateX(-50%)' }}
               >
-                <div style={{ animation: 'tooltipBounce 2s ease-in-out infinite', perspective: '600px' }}>
+                <div style={{ animation: 'tooltipBounce 2s ease-in-out infinite', perspective: '37.5rem' }}>
                   <div
                     className="px-6 py-3 rounded-xl text-base font-extrabold tracking-wide"
                     style={{
                       background: '#ffffff',
-                      boxShadow: '0 8px 24px rgba(0,0,0,0.15), 0 4px 0 rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,1), 0 0 20px rgba(127,179,167,0.15)',
-                      border: '1px solid rgba(0,0,0,0.06)',
+                      boxShadow: '0 0.5rem 1.5rem rgba(0,0,0,0.15), 0 0.25rem 0 rgba(0,0,0,0.08), inset 0 0.0625rem 0 rgba(255,255,255,1), 0 0 1.25rem rgba(127,179,167,0.15)',
+                      border: '0.0625rem solid rgba(0,0,0,0.06)',
                       transform: 'rotateX(8deg)',
                       transformStyle: 'preserve-3d',
                     }}
@@ -424,7 +424,7 @@ export function KeyboardSection() {
                     className="w-3 h-3 mx-auto -mt-1.5 rotate-45"
                     style={{
                       background: '#ffffff',
-                      boxShadow: '4px 4px 8px rgba(0,0,0,0.1)',
+                      boxShadow: '0.25rem 0.25rem 0.5rem rgba(0,0,0,0.1)',
                     }}
                   />
                 </div>
@@ -435,7 +435,7 @@ export function KeyboardSection() {
           <motion.div
             animate={{ opacity: showComparison ? 0 : 1 }}
             transition={{ duration: 0.5 }}
-            className="absolute -inset-[14px] rounded-[28px] pointer-events-none z-20"
+            className="absolute -inset-[0.875rem] rounded-[1.75rem] pointer-events-none z-20"
             style={{
               background: 'linear-gradient(90deg, transparent 0%, rgba(127,179,167,0) 15%, rgba(127,179,167,0.5) 35%, rgba(167,150,235,0.4) 50%, rgba(127,179,167,0.5) 65%, rgba(127,179,167,0) 85%, transparent 100%)',
               backgroundSize: '200% 100%',
@@ -443,17 +443,17 @@ export function KeyboardSection() {
               mask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
               maskComposite: 'exclude',
               WebkitMaskComposite: 'xor',
-              padding: '2.5px',
+              padding: '0.1563rem',
               transform: 'rotateX(48deg) rotateZ(-8deg)',
               transformStyle: 'preserve-3d',
             }}
           />
           <div
             ref={gridRef}
-            className="relative grid gap-[7px]"
+            className="relative grid gap-[0.4375rem]"
             style={{
-              gridTemplateColumns: 'repeat(12, minmax(56px, 96px))',
-              gridAutoRows: 'minmax(56px, 96px)',
+              gridTemplateColumns: 'repeat(12, minmax(3.5rem, 6rem))',
+              gridAutoRows: 'minmax(3.5rem, 6rem)',
               transform: 'rotateX(48deg) rotateZ(-8deg)',
               transformStyle: 'preserve-3d',
             }}
@@ -491,24 +491,24 @@ export function KeyboardSection() {
               }
               whileHover={{
                 backgroundColor: '#000000',
-                boxShadow: '0 0 60px rgba(127,179,167,0.7), 0 0 120px rgba(127,179,167,0.35), 0 16px 48px rgba(0,0,0,0.5)',
-                border: '1px solid rgba(127,179,167,0.5)',
+                boxShadow: '0 0 3.75rem rgba(127,179,167,0.7), 0 0 7.5rem rgba(127,179,167,0.35), 0 1rem 3rem rgba(0,0,0,0.5)',
+                border: '0.0625rem solid rgba(127,179,167,0.5)',
               }}
               transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
               onClick={handleTalioClick}
-              className="flex items-center justify-center rounded-[20px] z-10 cursor-pointer relative group"
+              className="flex items-center justify-center rounded-[1.25rem] z-10 cursor-pointer relative group"
               style={{
                 gridColumn: '6 / span 2',
                 gridRow: '2 / span 2',
                 backgroundColor: '#ffffff',
-                border: '1px solid rgba(255,255,255,0.25)',
-                boxShadow: '0 16px 48px rgba(127,179,167,0.5), 0 0 100px rgba(127,179,167,0.25), 0 8px 20px rgba(0,0,0,0.4)',
-                transform: 'translateZ(80px) scale(1.12)',
+                border: '0.0625rem solid rgba(255,255,255,0.25)',
+                boxShadow: '0 1rem 3rem rgba(127,179,167,0.5), 0 0 6.25rem rgba(127,179,167,0.25), 0 0.5rem 1.25rem rgba(0,0,0,0.4)',
+                transform: 'translateZ(5rem) scale(1.12)',
                 transformStyle: 'preserve-3d',
                 animation: showComparison ? undefined : 'talioFloat 3s ease-in-out infinite',
               }}
             >
-              <img src={logoImage} alt="Talio" className="w-[60px] md:w-[80px]" />
+              <img src={logoImage} alt="Talio" className="w-[3.75rem] md:w-[5rem]" />
             </motion.div>
 
             {/* Spacebar */}
@@ -518,13 +518,13 @@ export function KeyboardSection() {
                 : { opacity: 1, y: 0 }
               }
               transition={{ duration: 0.6, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-              className="rounded-[14px] h-[78px]"
+              className="rounded-[0.875rem] h-[4.875rem]"
               style={{
                 gridColumn: '4 / span 6',
                 background: '#1A1A1A',
-                boxShadow: '0 4px 0 rgba(0,0,0,0.2), 0 6px 12px rgba(0,0,0,.25)',
-                border: '1px solid rgba(255,255,255,0.06)',
-                transform: 'translateZ(6px)',
+                boxShadow: '0 0.25rem 0 rgba(0,0,0,0.2), 0 0.375rem 0.75rem rgba(0,0,0,.25)',
+                border: '0.0625rem solid rgba(255,255,255,0.06)',
+                transform: 'translateZ(0.375rem)',
                 transformStyle: 'preserve-3d',
               }}
             />

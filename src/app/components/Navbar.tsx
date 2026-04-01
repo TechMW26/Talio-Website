@@ -1,19 +1,140 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Menu, X, ArrowRight, Clock, Calendar, DollarSign, LayoutGrid, Target, Sparkles, Bot, MessageSquare, Bell, ChevronRight, Zap } from 'lucide-react';
+import { Menu, X, ArrowRight, Clock, Calendar, DollarSign, LayoutGrid, Target, Sparkles, Bot, MessageSquare, Bell, ChevronRight, ChevronLeft, Zap, Download, Info, Newspaper, Phone, type LucideIcon } from 'lucide-react';
 import { Button } from '@/app/components/ui/button';
 import { Link, useNavigate, useLocation } from 'react-router';
 import React from 'react';
 import logoImage from '@/assets/2090cd551224404a5a02329a4590597a32d19a1f.png';
 import { BookDemoPopup } from './BookDemoPopup';
+import { useIsMobileViewport } from '@/app/hooks/useIsMobileViewport';
+import { useCompensatedMinWidth } from '@/app/hooks/useZoomCompensatedViewport';
+
+type NavItem = {
+  name: string;
+  href: string;
+  reloadDocument?: boolean;
+  gradient?: boolean;
+  mobileIcon: LucideIcon;
+  mobileDescription: string;
+};
+
+type FeatureLink = {
+  icon: React.FC<{ className: string }>;
+  title: string;
+  description: string;
+  accentColor: string;
+  href: string;
+  badge?: string;
+};
+
+type FeatureGroup = {
+  title: string;
+  labelClassName: string;
+  dotClassName: string;
+  mobileBorderClassName: string;
+  mobileAuraClassName: string;
+  items: FeatureLink[];
+};
+
+const NAV_ITEMS: NavItem[] = [
+  {
+    name: 'MIRA',
+    href: '/MIRA-ai',
+    gradient: true,
+    mobileIcon: Bot,
+    mobileDescription: 'Open the dedicated MIRA experience without leaving the site route.',
+  },
+  {
+    name: 'Features',
+    href: '/features',
+    mobileIcon: LayoutGrid,
+    mobileDescription: 'Browse every Talio module in a dedicated drawer.',
+  },
+  {
+    name: 'Pricing',
+    href: '/pricing',
+    mobileIcon: DollarSign,
+    mobileDescription: 'Compare plans and deployment options.',
+  },
+  {
+    name: 'Downloads',
+    href: '/downloads',
+    mobileIcon: Download,
+    mobileDescription: 'Get Talio for desktop and Android.',
+  },
+  {
+    name: 'About',
+    href: '/about',
+    mobileIcon: Info,
+    mobileDescription: 'See how Talio is positioned and built.',
+  },
+  {
+    name: 'Blog',
+    href: '/blog',
+    mobileIcon: Newspaper,
+    mobileDescription: 'Read product, team, and operations updates.',
+  },
+  {
+    name: 'Contact',
+    href: '/contact',
+    mobileIcon: Phone,
+    mobileDescription: 'Talk to sales or request a working session.',
+  },
+];
+
+const FEATURE_GROUPS: FeatureGroup[] = [
+  {
+    title: 'Productivity',
+    labelClassName: 'text-blue-400/80',
+    dotClassName: 'bg-blue-400 shadow-[0_0_0.5rem_rgba(96,165,250,0.45)]',
+    mobileBorderClassName: 'border-blue-500/20',
+    mobileAuraClassName: 'from-blue-500/18 via-blue-400/6 to-transparent',
+    items: [
+      { icon: LayoutGrid, title: 'Talio Projects', description: 'Kanban-style project management', accentColor: 'indigo', href: '/features/projects' },
+      { icon: Target, title: 'Goals & OKRs', description: 'Set and track company objectives', accentColor: 'cyan', href: '/features/goals' },
+      { icon: Sparkles, title: 'AI Workflows', description: 'Automate repetitive tasks', accentColor: 'amber', href: '/features/workflows' },
+    ],
+  },
+  {
+    title: 'Communication',
+    labelClassName: 'text-pink-400/80',
+    dotClassName: 'bg-pink-400 shadow-[0_0_0.5rem_rgba(244,114,182,0.45)]',
+    mobileBorderClassName: 'border-pink-500/20',
+    mobileAuraClassName: 'from-pink-500/18 via-fuchsia-400/6 to-transparent',
+    items: [
+      { icon: Bot, title: 'MIRA', description: 'Embedded intelligence for daily workflows', accentColor: 'violet', href: '/features/MIRA-ai', badge: 'New' },
+      { icon: MessageSquare, title: 'Team Chat', description: 'Real-time messaging and channels', accentColor: 'pink', href: '/features/team-chat' },
+      { icon: Bell, title: 'Notifications', description: 'Stay updated with real-time alerts', accentColor: 'orange', href: '/features/notifications' },
+    ],
+  },
+  {
+    title: 'HRMS Add-Ons',
+    labelClassName: 'text-purple-400/80',
+    dotClassName: 'bg-purple-400 shadow-[0_0_0.5rem_rgba(168,85,247,0.45)]',
+    mobileBorderClassName: 'border-purple-500/20',
+    mobileAuraClassName: 'from-purple-500/18 via-violet-400/6 to-transparent',
+    items: [
+      { icon: Clock, title: 'Smart Attendance', description: 'GPS-enabled check-ins with geofencing', accentColor: 'purple', href: '/features/attendance' },
+      { icon: DollarSign, title: 'Automated Payroll', description: 'Calculate salaries and generate payslips', accentColor: 'blue', href: '/features/payroll' },
+      { icon: Calendar, title: 'Leave Management', description: 'Smart leave tracking and approvals', accentColor: 'emerald', href: '/features/leaves' },
+    ],
+  },
+];
+
+const FEATURE_COUNT = FEATURE_GROUPS.reduce((count, group) => count + group.items.length, 0);
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isMobileFeaturesMenuOpen, setIsMobileFeaturesMenuOpen] = useState(false);
   const [showFeaturesDropdown, setShowFeaturesDropdown] = useState(false);
   const [showDemoPopup, setShowDemoPopup] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const isMobileViewport = useIsMobileViewport();
+  const hasDesktopNavRoom = useCompensatedMinWidth(1024);
+  const hasWideMegaMenu = useCompensatedMinWidth(1440);
+  const shouldUseMobileNav = isMobileViewport || !hasDesktopNavRoom;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -23,8 +144,13 @@ export function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const handleNavigation = (href: string) => {
+  const closeMobilePanels = () => {
+    setIsMobileFeaturesMenuOpen(false);
     setIsMobileMenuOpen(false);
+  };
+
+  const handleNavigation = (href: string) => {
+    closeMobilePanels();
     
     if (href.startsWith('#')) {
       // It's a section scroll
@@ -50,383 +176,517 @@ export function Navbar() {
     }
   };
 
-  const navItems = [
-    { name: 'Mira', href: '/old-site/index.html', isRoute: true, reloadDocument: true, gradient: true },
-    { name: 'Features', href: '/features', isRoute: true },
-    { name: 'Pricing', href: '/pricing', isRoute: true },
-    { name: 'Downloads', href: '/downloads', isRoute: true },
-    { name: 'About', href: '/about', isRoute: true },
-    { name: 'Blog', href: '/blog', isRoute: true },
-    { name: 'Contact', href: '/contact', isRoute: true }
-  ];
+  useEffect(() => {
+    closeMobilePanels();
+    setShowFeaturesDropdown(false);
+  }, [location.pathname]);
+
+  const isAnyMobilePanelOpen = isMobileMenuOpen || isMobileFeaturesMenuOpen;
+
+  useEffect(() => {
+    if (!isAnyMobilePanelOpen) {
+      return undefined;
+    }
+
+    const previousOverflow = document.body.style.overflow;
+
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [isAnyMobilePanelOpen]);
+
+  useEffect(() => {
+    if (!isAnyMobilePanelOpen) {
+      return undefined;
+    }
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        closeMobilePanels();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isAnyMobilePanelOpen]);
+
+  const toggleMobileMenu = () => {
+    if (isAnyMobilePanelOpen) {
+      closeMobilePanels();
+      return;
+    }
+
+    setIsMobileMenuOpen(true);
+  };
+
+  const openMobileFeaturesMenu = () => {
+    setIsMobileMenuOpen(true);
+    setIsMobileFeaturesMenuOpen(true);
+  };
+
+  const mobileHeaderElevated = isScrolled || isAnyMobilePanelOpen;
 
   return (
     <motion.nav
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-        isScrolled
-          ? 'py-3 md:py-4'
-          : 'py-4 md:py-6'
-      }`}
+      className="fixed top-0 left-0 right-0 z-50"
     >
-      <div className="max-w-[1600px] mx-auto px-6 md:px-8 lg:px-16">
-        <motion.div 
-          className={`
-            relative rounded-full transition-all duration-500
-            ${isScrolled 
-              ? 'bg-black/80 backdrop-blur-2xl shadow-lg shadow-black/5 border border-gray-800/50' 
-              : 'bg-transparent'
-            }
-          `}
-        >
-          <div className="px-8 py-4 flex items-center justify-between">
-            {/* Logo */}
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => navigate('/')}
-              className="flex items-center gap-2.5 cursor-pointer relative z-10"
-            >
-              <motion.img
-                src={logoImage}
-                alt="Talio Logo"
-                whileHover={{ rotate: 15, scale: 1.1 }}
-                transition={{ duration: 0.4 }}
-                className="h-7 w-7 object-contain"
-              />
-              <span className="text-2xl font-normal text-white tracking-tight">
-                Talio
-              </span>
-            </motion.div>
+      {shouldUseMobileNav ? (
+        <>
+          <motion.div
+            className={`relative z-[60] w-full transition-all duration-500 ${
+              mobileHeaderElevated
+                ? 'border-b border-white/10 bg-black/70 backdrop-blur-2xl shadow-[0_1.125rem_2.75rem_-2.125rem_rgba(0,0,0,0.92)]'
+                : 'border-b border-white/[0.04] bg-gradient-to-b from-black/45 via-black/20 to-transparent backdrop-blur-xl'
+            }`}
+          >
+            <div className="flex items-center justify-between px-4 py-3.5">
+              <motion.div
+                whileTap={{ scale: 0.97 }}
+                onClick={() => navigate('/')}
+                className="flex items-center gap-3 cursor-pointer"
+              >
+                <motion.img
+                  src={logoImage}
+                  alt="Talio Logo"
+                  whileHover={{ rotate: 12, scale: 1.05 }}
+                  transition={{ duration: 0.35 }}
+                  className="h-8 w-8 object-contain"
+                />
+                <span className="text-xl font-normal tracking-tight text-white">
+                  Talio
+                </span>
+              </motion.div>
 
-            {/* Desktop Menu */}
-            <div className="hidden lg:flex items-center gap-2 relative">
-              {navItems.map((item, index) => {
-                // Special handling for Features with dropdown
-                if (item.name === 'Features') {
-                  return (
-                    <div
-                      key={item.name}
-                      className="relative"
-                      onMouseEnter={() => setShowFeaturesDropdown(true)}
-                      onMouseLeave={() => setShowFeaturesDropdown(false)}
+              <motion.button
+                whileTap={{ scale: 0.9 }}
+                onClick={toggleMobileMenu}
+                className={`flex h-11 w-11 items-center justify-center rounded-full border text-white transition-all duration-300 ${
+                  isAnyMobilePanelOpen
+                    ? 'border-white/18 bg-white/[0.08]'
+                    : 'border-white/10 bg-white/[0.04] hover:bg-white/[0.08]'
+                }`}
+                aria-label={isAnyMobilePanelOpen ? 'Close menu' : 'Open menu'}
+              >
+                <AnimatePresence mode="wait">
+                  {isAnyMobilePanelOpen ? (
+                    <motion.div
+                      key="close"
+                      initial={{ rotate: -90, opacity: 0 }}
+                      animate={{ rotate: 0, opacity: 1 }}
+                      exit={{ rotate: 90, opacity: 0 }}
+                      transition={{ duration: 0.2 }}
                     >
+                      <X className="h-5 w-5" />
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key="menu"
+                      initial={{ rotate: 90, opacity: 0 }}
+                      animate={{ rotate: 0, opacity: 1 }}
+                      exit={{ rotate: -90, opacity: 0 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <Menu className="h-5 w-5" />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.button>
+            </div>
+          </motion.div>
+
+          <AnimatePresence>
+            {isMobileMenuOpen && (
+              <>
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.25 }}
+                  onClick={closeMobilePanels}
+                  className="fixed inset-0 z-40 bg-black/45 backdrop-blur-sm"
+                />
+
+                <motion.aside
+                  initial={{ x: '100%' }}
+                  animate={{ x: 0 }}
+                  exit={{ x: '100%' }}
+                  transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                  className="fixed inset-y-0 right-0 z-50 w-[78vw] max-w-xs overflow-hidden border-l border-white/8 bg-[#0a0a0f]"
+                >
+                  <div className="flex h-full flex-col pb-6 pt-[5.5rem]">
+                    <div className="flex-1 overflow-y-auto px-4">
+                      <div className="space-y-1">
+                        {NAV_ITEMS.map((item, index) => {
+                          const Icon = item.mobileIcon;
+
+                          if (item.name === 'Features') {
+                            return (
+                              <motion.button
+                                key={item.name}
+                                initial={{ opacity: 0, x: 24 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, x: 12 }}
+                                transition={{ duration: 0.28, delay: index * 0.04 }}
+                                type="button"
+                                onClick={openMobileFeaturesMenu}
+                                className="group flex w-full items-center gap-3 rounded-2xl px-3 py-3 text-left transition-colors duration-200 hover:bg-white/[0.06]"
+                              >
+                                <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-white/[0.06] text-white">
+                                  <Icon className="h-[1.125rem] w-[1.125rem]" />
+                                </div>
+                                <span className="flex-1 text-[0.9375rem] font-medium text-white">{item.name}</span>
+                                <ChevronRight className="h-4 w-4 text-gray-600 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:text-gray-400" />
+                              </motion.button>
+                            );
+                          }
+
+                          return (
+                            <motion.div
+                              key={item.name}
+                              initial={{ opacity: 0, x: 24 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              exit={{ opacity: 0, x: 12 }}
+                              transition={{ duration: 0.28, delay: index * 0.04 }}
+                            >
+                              <Link
+                                to={item.href}
+                                reloadDocument={Boolean(item.reloadDocument)}
+                                onClick={closeMobilePanels}
+                                className="group flex items-center gap-3 rounded-2xl px-3 py-3 transition-colors duration-200 hover:bg-white/[0.06]"
+                              >
+                                <div className={`flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl text-white ${
+                                  item.gradient
+                                    ? 'bg-gradient-to-br from-purple-500/20 via-fuchsia-500/10 to-blue-500/12'
+                                    : 'bg-white/[0.06]'
+                                }`}>
+                                  <Icon className="h-[1.125rem] w-[1.125rem]" />
+                                </div>
+                                <span className={`text-[0.9375rem] font-medium ${item.gradient ? 'bg-gradient-to-r from-purple-300 via-pink-300 to-blue-300 bg-clip-text text-transparent' : 'text-white'}`}>
+                                  {item.name}
+                                </span>
+                              </Link>
+                            </motion.div>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    <div className="px-4 pt-4 space-y-2.5">
+                      <button
+                        onClick={() => {
+                          closeMobilePanels();
+                          setShowDemoPopup(true);
+                        }}
+                        className="w-full rounded-xl border border-white/10 px-4 py-3 text-sm font-semibold text-gray-300 transition-colors duration-200 hover:border-white/16 hover:text-white"
+                      >
+                        Book Free Demo
+                      </button>
+                      <Link to="/get-started" onClick={closeMobilePanels}>
+                        <Button className="mt-0 h-auto w-full rounded-xl bg-white px-4 py-3 text-sm font-semibold text-black transition-colors duration-200 hover:bg-gray-100">
+                          <span className="flex items-center gap-2">
+                            <span>Start Today</span>
+                            <ArrowRight className="h-4 w-4" />
+                          </span>
+                        </Button>
+                      </Link>
+                    </div>
+                  </div>
+                </motion.aside>
+
+                <AnimatePresence>
+                  {isMobileFeaturesMenuOpen && (
+                    <motion.aside
+                      initial={{ x: '100%' }}
+                      animate={{ x: 0 }}
+                      exit={{ x: '100%' }}
+                      transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                      className="fixed inset-y-0 right-0 z-[55] w-[84vw] max-w-xs overflow-hidden border-l border-white/8 bg-[#0a0a0f]"
+                    >
+                      <div className="flex h-full flex-col pb-6 pt-[5.5rem]">
+                        <div className="px-4">
+                          <button
+                            type="button"
+                            onClick={() => setIsMobileFeaturesMenuOpen(false)}
+                            className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-400 transition-colors duration-200 hover:text-white"
+                          >
+                            <ChevronLeft className="h-4 w-4" />
+                            Back
+                          </button>
+                        </div>
+
+                        <div className="mt-4 flex-1 overflow-y-auto px-4">
+                          <div className="space-y-5">
+                            {FEATURE_GROUPS.map((group, groupIndex) => (
+                              <motion.div
+                                key={group.title}
+                                initial={{ opacity: 0, x: 24 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, x: 12 }}
+                                transition={{ duration: 0.28, delay: groupIndex * 0.04 }}
+                              >
+                                <div className="mb-2 flex items-center gap-2 px-1">
+                                  <div className={`h-1.5 w-1.5 rounded-full ${group.dotClassName}`} />
+                                  <span className={`text-[0.625rem] font-semibold uppercase tracking-[0.2em] ${group.labelClassName}`}>
+                                    {group.title}
+                                  </span>
+                                </div>
+
+                                <div className="space-y-0.5">
+                                  {group.items.map((item) => {
+                                    const Icon = item.icon;
+
+                                    return (
+                                      <Link
+                                        key={item.href}
+                                        to={item.href}
+                                        onClick={closeMobilePanels}
+                                        className="group flex items-center gap-3 rounded-2xl px-3 py-2.5 transition-colors duration-200 hover:bg-white/[0.06]"
+                                      >
+                                        <div className={`flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl ${ACCENT_COLORS[item.accentColor]?.bg ?? ACCENT_COLORS.purple.bg} ring-1 ${ACCENT_COLORS[item.accentColor]?.ring ?? ACCENT_COLORS.purple.ring}`}>
+                                          <Icon className={`h-4 w-4 ${ACCENT_COLORS[item.accentColor]?.icon ?? ACCENT_COLORS.purple.icon}`} />
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                          <span className="text-sm font-medium text-white">
+                                            {item.title}
+                                          </span>
+                                          {item.badge && (
+                                            <span className="rounded-full bg-gradient-to-r from-violet-500 to-fuchsia-500 px-1.5 py-[0.0625rem] text-[0.5625rem] font-bold uppercase tracking-[0.16em] text-white">
+                                              {item.badge}
+                                            </span>
+                                          )}
+                                        </div>
+                                      </Link>
+                                    );
+                                  })}
+                                </div>
+                              </motion.div>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div className="px-4 pt-4">
+                          <Link
+                            to="/features"
+                            onClick={closeMobilePanels}
+                            className="flex items-center justify-between gap-4 rounded-xl bg-white px-4 py-3 text-black transition-colors duration-200 hover:bg-gray-100"
+                          >
+                            <span className="text-sm font-semibold">View all features</span>
+                            <div className="flex items-center gap-2 text-sm text-black/55">
+                              <span>{FEATURE_COUNT}</span>
+                              <ArrowRight className="h-4 w-4" />
+                            </div>
+                          </Link>
+                        </div>
+                      </div>
+                    </motion.aside>
+                  )}
+                </AnimatePresence>
+              </>
+            )}
+          </AnimatePresence>
+        </>
+      ) : (
+        <div className={`mx-auto max-w-[88rem] px-6 transition-all duration-500 md:px-8 lg:px-12 ${
+          isScrolled ? 'pt-3 md:pt-4' : 'pt-4 md:pt-6'
+        }`}>
+          <motion.div
+            className={`relative rounded-full transition-all duration-500 ${
+              isScrolled
+                ? 'bg-black/80 backdrop-blur-2xl shadow-lg shadow-black/5 border border-gray-800/50'
+                : 'bg-transparent'
+            }`}
+          >
+            <div className="px-8 py-4 flex items-center justify-between">
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => navigate('/')}
+                className="flex items-center gap-2.5 cursor-pointer relative z-10"
+              >
+                <motion.img
+                  src={logoImage}
+                  alt="Talio Logo"
+                  whileHover={{ rotate: 15, scale: 1.1 }}
+                  transition={{ duration: 0.4 }}
+                  className="h-7 w-7 object-contain"
+                />
+                <span className="text-2xl font-normal text-white tracking-tight">
+                  Talio
+                </span>
+              </motion.div>
+
+              <div className="flex items-center gap-2 relative">
+                {NAV_ITEMS.map((item, index) => {
+                  if (item.name === 'Features') {
+                    return (
+                      <div
+                        key={item.name}
+                        className="relative"
+                        onMouseEnter={() => setShowFeaturesDropdown(true)}
+                        onMouseLeave={() => setShowFeaturesDropdown(false)}
+                      >
+                        <motion.div
+                          initial={{ opacity: 0, y: -20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.5, delay: 0.1 + index * 0.05 }}
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={() => handleNavigation(item.href)}
+                          className="px-6 py-2.5 text-base text-gray-300 hover:text-white transition-colors duration-300 rounded-full hover:bg-gray-800 relative group cursor-pointer"
+                        >
+                          {item.name}
+                          <motion.div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-white rounded-full group-hover:w-1/2 transition-all duration-300" />
+                        </motion.div>
+
+                        <AnimatePresence>
+                          {showFeaturesDropdown && (
+                            <motion.div
+                              initial={{ opacity: 0, y: 10, scale: 0.96 }}
+                              animate={{ opacity: 1, y: 0, scale: 1 }}
+                              exit={{ opacity: 0, y: 10, scale: 0.96 }}
+                              transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                              className={`absolute top-full mt-4 ${hasWideMegaMenu ? 'left-1/2 -translate-x-1/2 w-[min(57.5rem,calc(100vw-4rem))]' : 'left-0 w-[min(48.75rem,calc(100vw-4rem))]'}`}
+                            >
+                              <div className="absolute -top-4 left-0 right-0 h-4" />
+
+                              <div className="relative rounded-[1.25rem] p-[0.0625rem] bg-gradient-to-b from-gray-700/60 via-gray-800/30 to-gray-900/20">
+                                <div className="absolute -top-20 left-1/4 w-60 h-60 bg-purple-600/8 rounded-full blur-3xl pointer-events-none" />
+                                <div className="absolute -top-16 right-1/4 w-48 h-48 bg-blue-600/8 rounded-full blur-3xl pointer-events-none" />
+                                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-72 h-32 bg-cyan-600/5 rounded-full blur-3xl pointer-events-none" />
+
+                                <div className="bg-[#0c0e14]/95 backdrop-blur-2xl rounded-[1.25rem] overflow-hidden shadow-[0_1.5625rem_3.75rem_-0.75rem_rgba(0,0,0,0.7)]">
+                                  <div className={`grid ${hasWideMegaMenu ? 'grid-cols-3' : 'grid-cols-2'}`}>
+                                    {FEATURE_GROUPS.map((group, groupIndex) => (
+                                      <div
+                                        key={group.title}
+                                        className={`relative p-5 ${hasWideMegaMenu && groupIndex === 1 ? 'border-x border-white/[0.04]' : ''} ${!hasWideMegaMenu && groupIndex === 2 ? 'col-span-2 border-t border-white/[0.04]' : ''}`}
+                                      >
+                                        <div className="flex items-center gap-2 mb-4 px-2">
+                                          <div className={`w-1.5 h-1.5 rounded-full ${group.dotClassName}`} />
+                                          <h3 className={`text-[0.625rem] font-bold uppercase tracking-[0.2em] ${group.labelClassName}`}>
+                                            {group.title}
+                                          </h3>
+                                        </div>
+                                        <div className="space-y-0.5">
+                                          {group.items.map((feature, featureIndex) => (
+                                            <FeatureItem
+                                              key={feature.href}
+                                              icon={feature.icon}
+                                              title={feature.title}
+                                              description={feature.description}
+                                              accentColor={feature.accentColor}
+                                              href={feature.href}
+                                              badge={feature.badge}
+                                              delay={groupIndex * 0.04 + featureIndex * 0.03}
+                                            />
+                                          ))}
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
+
+                                  <div className="border-t border-white/[0.05] px-6 py-3 flex items-center justify-between bg-white/[0.02]">
+                                    <Link to="/features" className="group/cta flex items-center gap-2 text-[0.8125rem] text-gray-400 hover:text-white transition-all duration-300 font-medium">
+                                      <Zap className="w-3.5 h-3.5 text-purple-400 group-hover/cta:text-purple-300 transition-colors" />
+                                      Explore all features
+                                      <ArrowRight className="w-3.5 h-3.5 group-hover/cta:translate-x-1 transition-transform duration-300" />
+                                    </Link>
+                                    <div className="flex items-center gap-1.5 text-[0.6875rem] text-gray-600">
+                                      <div className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" />
+                                      {FEATURE_COUNT} features available
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </div>
+                    );
+                  }
+
+                  return (
+                    <Link key={item.name} to={item.href} reloadDocument={Boolean(item.reloadDocument)}>
                       <motion.div
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5, delay: 0.1 + index * 0.05 }}
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
-                        onClick={() => handleNavigation(item.href)}
-                        className="px-6 py-2.5 text-base text-gray-300 hover:text-white transition-colors duration-300 rounded-full hover:bg-gray-800 relative group cursor-pointer"
+                        className={`px-6 py-2.5 text-base transition-colors duration-300 rounded-full hover:bg-gray-800 relative group cursor-pointer ${
+                          item.gradient ? '' : 'text-gray-300 hover:text-white'
+                        }`}
                       >
-                        {item.name}
+                        {item.gradient ? (
+                          <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent font-semibold">
+                            {item.name}
+                          </span>
+                        ) : (
+                          item.name
+                        )}
                         <motion.div
-                          className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-white rounded-full group-hover:w-1/2 transition-all duration-300"
+                          className={`absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 rounded-full group-hover:w-1/2 transition-all duration-300 ${
+                            item.gradient ? 'bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400' : 'bg-white'
+                          }`}
                         />
                       </motion.div>
-
-                      {/* Features Mega Menu */}
-                      <AnimatePresence>
-                        {showFeaturesDropdown && (
-                          <motion.div
-                            initial={{ opacity: 0, y: 10, scale: 0.96 }}
-                            animate={{ opacity: 1, y: 0, scale: 1 }}
-                            exit={{ opacity: 0, y: 10, scale: 0.96 }}
-                            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                            className="absolute top-full left-1/2 -translate-x-1/2 mt-4 w-[920px]"
-                          >
-                            {/* Invisible bridge */}
-                            <div className="absolute -top-4 left-0 right-0 h-4" />
-
-                            {/* Outer glow ring */}
-                            <div className="relative rounded-[20px] p-[1px] bg-gradient-to-b from-gray-700/60 via-gray-800/30 to-gray-900/20">
-                              {/* Background ambient glows */}
-                              <div className="absolute -top-20 left-1/4 w-60 h-60 bg-purple-600/8 rounded-full blur-3xl pointer-events-none" />
-                              <div className="absolute -top-16 right-1/4 w-48 h-48 bg-blue-600/8 rounded-full blur-3xl pointer-events-none" />
-                              <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-72 h-32 bg-cyan-600/5 rounded-full blur-3xl pointer-events-none" />
-
-                              <div className="bg-[#0c0e14]/95 backdrop-blur-2xl rounded-[20px] overflow-hidden shadow-[0_25px_60px_-12px_rgba(0,0,0,0.7)]">
-                                <div className="grid grid-cols-3">
-
-                                  {/* PRODUCTIVITY */}
-                                  <div className="p-5 relative">
-                                    <div className="flex items-center gap-2 mb-4 px-2">
-                                      <div className="w-1.5 h-1.5 rounded-full bg-blue-400 shadow-[0_0_6px_2px_rgba(96,165,250,0.4)]" />
-                                      <h3 className="text-[10px] font-bold text-blue-400/80 uppercase tracking-[0.2em]">
-                                        Productivity
-                                      </h3>
-                                    </div>
-                                    <div className="space-y-0.5">
-                                      <FeatureItem icon={LayoutGrid} title="Talio Projects" description="Kanban-style project management" accentColor="indigo" href="/features/projects" delay={0} />
-                                      <FeatureItem icon={Target} title="Goals & OKRs" description="Set and track company objectives" accentColor="cyan" href="/features/goals" delay={0.03} />
-                                      <FeatureItem icon={Sparkles} title="AI Workflows" description="Automate repetitive tasks" accentColor="amber" href="/features/workflows" delay={0.06} />
-                                    </div>
-                                  </div>
-
-                                  {/* COMMUNICATION */}
-                                  <div className="p-5 relative border-x border-white/[0.04]">
-                                    <div className="flex items-center gap-2 mb-4 px-2">
-                                      <div className="w-1.5 h-1.5 rounded-full bg-pink-400 shadow-[0_0_6px_2px_rgba(244,114,182,0.4)]" />
-                                      <h3 className="text-[10px] font-bold text-pink-400/80 uppercase tracking-[0.2em]">
-                                        Communication
-                                      </h3>
-                                    </div>
-                                    <div className="space-y-0.5">
-                                      <FeatureItem icon={Bot} title="Mira" description="Embedded intelligence for daily workflows" accentColor="violet" href="/features/mira-ai" delay={0.04} badge="New" />
-                                      <FeatureItem icon={MessageSquare} title="Team Chat" description="Real-time messaging and channels" accentColor="pink" href="/features/team-chat" delay={0.07} />
-                                      <FeatureItem icon={Bell} title="Notifications" description="Stay updated with real-time alerts" accentColor="orange" href="/features/notifications" delay={0.1} />
-                                    </div>
-                                  </div>
-
-                                  {/* HRMS ADD-ONS */}
-                                  <div className="p-5 relative">
-                                    <div className="flex items-center gap-2 mb-4 px-2">
-                                      <div className="w-1.5 h-1.5 rounded-full bg-purple-400 shadow-[0_0_6px_2px_rgba(168,85,247,0.4)]" />
-                                      <h3 className="text-[10px] font-bold text-purple-400/80 uppercase tracking-[0.2em]">
-                                        HRMS Add-Ons
-                                      </h3>
-                                    </div>
-                                    <div className="space-y-0.5">
-                                      <FeatureItem icon={Clock} title="Smart Attendance" description="GPS-enabled check-ins with geofencing" accentColor="purple" href="/features/attendance" delay={0.05} />
-                                      <FeatureItem icon={DollarSign} title="Automated Payroll" description="Calculate salaries and generate payslips" accentColor="blue" href="/features/payroll" delay={0.08} />
-                                      <FeatureItem icon={Calendar} title="Leave Management" description="Smart leave tracking and approvals" accentColor="emerald" href="/features/leaves" delay={0.11} />
-                                    </div>
-                                  </div>
-                                </div>
-
-                                {/* Bottom CTA bar */}
-                                <div className="border-t border-white/[0.05] px-6 py-3 flex items-center justify-between bg-white/[0.02]">
-                                  <Link to="/features" className="group/cta flex items-center gap-2 text-[13px] text-gray-400 hover:text-white transition-all duration-300 font-medium">
-                                    <Zap className="w-3.5 h-3.5 text-purple-400 group-hover/cta:text-purple-300 transition-colors" />
-                                    Explore all features
-                                    <ArrowRight className="w-3.5 h-3.5 group-hover/cta:translate-x-1 transition-transform duration-300" />
-                                  </Link>
-                                  <div className="flex items-center gap-1.5 text-[11px] text-gray-600">
-                                    <div className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" />
-                                    9 features available
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-                    </div>
+                    </Link>
                   );
-                }
+                })}
+              </div>
 
-                // Regular menu items
-                return item.isRoute ? (
-                  <Link key={item.name} to={item.href} reloadDocument={Boolean((item as any).reloadDocument)}>
-                    <motion.div
-                      initial={{ opacity: 0, y: -20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.5, delay: 0.1 + index * 0.05 }}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      className={`px-6 py-2.5 text-base transition-colors duration-300 rounded-full hover:bg-gray-800 relative group cursor-pointer ${
-                        (item as any).gradient ? '' : 'text-gray-300 hover:text-white'
-                      }`}
-                    >
-                      {(item as any).gradient ? (
-                        <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent font-semibold">
-                          {item.name}
-                        </span>
-                      ) : (
-                        item.name
-                      )}
-                      <motion.div
-                        className={`absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 rounded-full group-hover:w-1/2 transition-all duration-300 ${
-                          (item as any).gradient ? 'bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400' : 'bg-white'
-                        }`}
-                      />
-                    </motion.div>
-                  </Link>
-                ) : (
-                  <motion.div
-                    key={item.name}
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.1 + index * 0.05 }}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => handleNavigation(item.href)}
-                    className="px-6 py-2.5 text-base text-gray-300 hover:text-white transition-colors duration-300 rounded-full hover:bg-gray-800 relative group cursor-pointer"
-                  >
-                    {item.name}
-                    <motion.div
-                      className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-white rounded-full group-hover:w-1/2 transition-all duration-300"
-                    />
-                  </motion.div>
-                );
-              })}
-            </div>
-
-            {/* CTA Button - Desktop */}
-            <div className="hidden lg:flex items-center gap-3">
-              <motion.button
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.4 }}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setShowDemoPopup(true)}
-                className="px-6 py-2.5 text-sm font-medium text-gray-300 hover:text-white transition-colors duration-300 rounded-full border border-gray-700 hover:border-gray-500 hover:bg-gray-800/50"
-              >
-                Book Free Demo
-              </motion.button>
-              <MagneticButton>
-                <Link to="/get-started">
-                <Button className="bg-white hover:bg-gray-100 text-black px-6 py-2.5 rounded-full text-sm font-semibold shadow-xl shadow-white/10 hover:shadow-2xl hover:shadow-white/20 transition-all duration-500 group relative overflow-hidden">
-                  <span className="relative z-10 flex items-center gap-2">
-                    <span className="flex overflow-hidden">
-                      {"Start Today".split('').map((char, i) => (
-                        <span key={i} className="relative inline-flex flex-col h-[1.5em] overflow-hidden">
-                          <span className="group-hover:-translate-y-full transition-transform duration-500 ease-[0.22,1,0.36,1]" style={{ transitionDelay: `${i * 0.025}s` }}>
-                            {char === ' ' ? '\u00A0' : char}
-                          </span>
-                          <span className="absolute top-0 left-0 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-[0.22,1,0.36,1]" style={{ transitionDelay: `${i * 0.025}s` }}>
-                            {char === ' ' ? '\u00A0' : char}
-                          </span>
-                        </span>
-                      ))}
-                    </span>
-                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                  </span>
-                  <motion.div
-                    className="absolute inset-0 bg-gradient-to-r from-purple-600 to-blue-600"
-                    initial={{ x: '-100%' }}
-                    whileHover={{ x: 0 }}
-                    transition={{ duration: 0.5 }}
-                  />
-                </Button>
-                </Link>
-              </MagneticButton>
-            </div>
-
-            {/* Mobile Menu Button */}
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="lg:hidden w-11 h-11 flex items-center justify-center rounded-full hover:bg-gray-800 transition-colors text-white"
-            >
-              <AnimatePresence mode="wait">
-                {isMobileMenuOpen ? (
-                  <motion.div
-                    key="close"
-                    initial={{ rotate: -90, opacity: 0 }}
-                    animate={{ rotate: 0, opacity: 1 }}
-                    exit={{ rotate: 90, opacity: 0 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <X className="w-6 h-6" />
-                  </motion.div>
-                ) : (
-                  <motion.div
-                    key="menu"
-                    initial={{ rotate: 90, opacity: 0 }}
-                    animate={{ rotate: 0, opacity: 1 }}
-                    exit={{ rotate: -90, opacity: 0 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <Menu className="w-6 h-6" />
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </motion.button>
-          </div>
-        </motion.div>
-      </div>
-
-      {/* Mobile Menu */}
-      <AnimatePresence>
-        {isMobileMenuOpen && (
-          <>
-            {/* Backdrop */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="lg:hidden fixed inset-0 bg-black/20 backdrop-blur-sm -z-10"
-            />
-            
-            {/* Menu Panel */}
-            <motion.div
-              initial={{ opacity: 0, y: -20, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -20, scale: 0.95 }}
-              transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-              className="lg:hidden absolute top-full left-8 right-8 mt-4"
-            >
-              <div className="bg-gray-900/90 backdrop-blur-2xl rounded-3xl border border-gray-800 shadow-2xl p-8 overflow-hidden">
-                {/* Decorative Gradient */}
-                <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-purple-200/30 to-blue-200/30 rounded-full blur-3xl -z-10" />
-                
-                <div className="space-y-2 mb-8">
-                  {navItems.map((item, index) => (
-                    <motion.div
-                      key={item.name}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.3, delay: index * 0.05 }}
-                    >
-                      {item.isRoute ? (
-                        <Link
-                          to={item.href}
-                          reloadDocument={Boolean((item as any).reloadDocument)}
-                          onClick={() => setIsMobileMenuOpen(false)}
-                          className={`block px-6 py-4 text-lg font-medium hover:bg-gray-800 rounded-2xl transition-all duration-300 ${
-                            (item as any).gradient ? '' : 'text-gray-300 hover:text-white'
-                          }`}
-                        >
-                          {(item as any).gradient ? (
-                            <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent font-semibold">
-                              {item.name}
-                            </span>
-                          ) : item.name}
-                        </Link>
-                      ) : (
-                        <a
-                          href={item.href}
-                          onClick={() => handleNavigation(item.href)}
-                          className="block px-6 py-4 text-lg font-medium text-gray-300 hover:text-white hover:bg-gray-800 rounded-2xl transition-all duration-300"
-                        >
-                          {item.name}
-                        </a>
-                      )}
-                    </motion.div>
-                  ))}
-                </div>
-                
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
+              <div className="flex items-center gap-3">
+                <motion.button
+                  initial={{ opacity: 0, y: -20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3, delay: 0.2 }}
-                  className="space-y-3"
+                  transition={{ duration: 0.5, delay: 0.4 }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setShowDemoPopup(true)}
+                  className="px-6 py-2.5 text-sm font-medium text-gray-300 hover:text-white transition-colors duration-300 rounded-full border border-gray-700 hover:border-gray-500 hover:bg-gray-800/50"
                 >
-                  <button
-                    onClick={() => { setIsMobileMenuOpen(false); setShowDemoPopup(true); }}
-                    className="w-full py-4 rounded-2xl text-base font-semibold border border-gray-700 text-gray-300 hover:text-white hover:border-gray-500 transition-all duration-300"
-                  >
-                    Book Free Demo
-                  </button>
-                  <Link to="/get-started" onClick={() => setIsMobileMenuOpen(false)}>
-                    <Button className="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white py-7 rounded-2xl text-base font-semibold shadow-xl shadow-purple-500/30 hover:shadow-2xl hover:shadow-purple-500/40 transition-all duration-300">
-                      Start Today
+                  Book Free Demo
+                </motion.button>
+                <MagneticButton>
+                  <Link to="/get-started">
+                    <Button className="bg-white hover:bg-gray-100 text-black px-6 py-2.5 rounded-full text-sm font-semibold shadow-xl shadow-white/10 hover:shadow-2xl hover:shadow-white/20 transition-all duration-500 group relative overflow-hidden">
+                      <span className="relative z-10 flex items-center gap-2">
+                        <span className="flex overflow-hidden">
+                          {'Start Today'.split('').map((char, i) => (
+                            <span key={i} className="relative inline-flex flex-col h-[1.5em] overflow-hidden">
+                              <span className="group-hover:-translate-y-full transition-transform duration-500 ease-[0.22,1,0.36,1]" style={{ transitionDelay: `${i * 0.025}s` }}>
+                                {char === ' ' ? '\u00A0' : char}
+                              </span>
+                              <span className="absolute top-0 left-0 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-[0.22,1,0.36,1]" style={{ transitionDelay: `${i * 0.025}s` }}>
+                                {char === ' ' ? '\u00A0' : char}
+                              </span>
+                            </span>
+                          ))}
+                        </span>
+                        <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                      </span>
+                      <motion.div
+                        className="absolute inset-0 bg-gradient-to-r from-purple-600 to-blue-600"
+                        initial={{ x: '-100%' }}
+                        whileHover={{ x: 0 }}
+                        transition={{ duration: 0.5 }}
+                      />
                     </Button>
                   </Link>
-                </motion.div>
+                </MagneticButton>
               </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+            </div>
+          </motion.div>
+        </div>
+      )}
 
       {/* Book Demo Popup */}
       <BookDemoPopup isOpen={showDemoPopup} onClose={() => setShowDemoPopup(false)} />
@@ -506,23 +766,23 @@ function FeatureItem({ icon: Icon, title, description, accentColor, href, delay 
       <div className={`absolute left-2.5 top-1/2 -translate-y-1/2 w-10 h-10 rounded-xl ${colors.bg} opacity-0 group-hover/item:opacity-100 blur-lg transition-opacity duration-500 pointer-events-none`} />
 
       {/* Icon container */}
-      <div className={`relative z-10 w-9 h-9 flex-shrink-0 rounded-[10px] ${colors.bg} ring-1 ${colors.ring} flex items-center justify-center group-hover/item:shadow-lg ${colors.glow} transition-all duration-300 group-hover/item:scale-110`}>
-        <Icon className={`w-[18px] h-[18px] ${colors.icon} transition-transform duration-300 group-hover/item:scale-110`} />
+      <div className={`relative z-10 w-9 h-9 flex-shrink-0 rounded-[0.625rem] ${colors.bg} ring-1 ${colors.ring} flex items-center justify-center group-hover/item:shadow-lg ${colors.glow} transition-all duration-300 group-hover/item:scale-110`}>
+        <Icon className={`w-[1.125rem] h-[1.125rem] ${colors.icon} transition-transform duration-300 group-hover/item:scale-110`} />
       </div>
 
       {/* Text */}
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-1.5">
-          <span className="text-[13px] font-semibold text-gray-300 group-hover/item:text-white transition-colors duration-200 leading-tight">
+          <span className="text-[0.8125rem] font-semibold text-gray-300 group-hover/item:text-white transition-colors duration-200 leading-tight">
             {title}
           </span>
           {badge && (
-            <span className="px-1.5 py-[1px] text-[9px] font-bold uppercase tracking-wider bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white rounded-full leading-none">
+            <span className="px-1.5 py-[0.0625rem] text-[0.5625rem] font-bold uppercase tracking-wider bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white rounded-full leading-none">
               {badge}
             </span>
           )}
         </div>
-        <span className="block text-[11px] text-gray-500 group-hover/item:text-gray-400 leading-snug truncate transition-colors duration-200">
+        <span className="block text-[0.6875rem] text-gray-500 group-hover/item:text-gray-400 leading-snug truncate transition-colors duration-200">
           {description}
         </span>
       </div>

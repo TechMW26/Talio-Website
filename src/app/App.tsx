@@ -8,7 +8,9 @@ import { MouseFollower } from '@/app/components/MouseFollower';
 import { AnalyticsTracker } from '@/app/components/AnalyticsTracker';
 import { SoundProvider } from '@/app/components/SoundContext';
 import { SoundDisclaimer } from '@/app/components/SoundDisclaimer';
+import { ElfsightReviewsSection } from '@/app/components/ElfsightReviewsSection';
 import { useIsMobileViewport } from '@/app/hooks/useIsMobileViewport';
+import { useDesktopScaleCompensation } from '@/app/hooks/useDesktopScaleCompensation';
 
 const HomePage = lazy(() => import('@/pages/HomePage').then((module) => ({ default: module.HomePage })));
 const AboutPage = lazy(() => import('@/pages/AboutPage').then((module) => ({ default: module.AboutPage })));
@@ -29,7 +31,7 @@ const LeavesFeature = lazy(() => import('@/app/components/features/LeavesFeature
 const ProjectsFeature = lazy(() => import('@/app/components/features/ProjectsFeature').then((module) => ({ default: module.ProjectsFeature })));
 const GoalsFeature = lazy(() => import('@/app/components/features/GoalsFeature').then((module) => ({ default: module.GoalsFeature })));
 const WorkflowsFeature = lazy(() => import('@/app/components/features/WorkflowsFeature').then((module) => ({ default: module.WorkflowsFeature })));
-const MiraAIFeature = lazy(() => import('@/app/components/features/MiraAIFeature').then((module) => ({ default: module.MiraAIFeature })));
+const MIRAAIFeature = lazy(() => import('@/app/components/features/MIRAAIFeature').then((module) => ({ default: module.MIRAAIFeature })));
 const TeamChatFeature = lazy(() => import('@/app/components/features/TeamChatFeature').then((module) => ({ default: module.TeamChatFeature })));
 const NotificationsFeature = lazy(() => import('@/app/components/features/NotificationsFeature').then((module) => ({ default: module.NotificationsFeature })));
 const AdminDashboard = lazy(() => import('@/app/components/AdminDashboard').then((module) => ({ default: module.AdminDashboard })));
@@ -38,14 +40,6 @@ const BlogPostPage = lazy(() => import('@/app/components/BlogPostPage').then((mo
 
 function RouteFallback() {
   return <div className="min-h-[60vh] bg-black" />;
-}
-
-function HtmlDocumentRedirect({ to }: { to: string }) {
-  useEffect(() => {
-    window.location.replace(to);
-  }, [to]);
-
-  return <div className="min-h-screen bg-black" />;
 }
 
 function ScrollToTop({ lenisRef }: { lenisRef?: React.RefObject<Lenis | null> }) {
@@ -74,9 +68,11 @@ function ScrollToTop({ lenisRef }: { lenisRef?: React.RefObject<Lenis | null> })
 function AppLayout() {
   const { pathname } = useLocation();
   const isAdmin = pathname === '/admin';
-  const isStandaloneHtmlRoute = pathname === '/mira-ai';
+  const shouldRenderInlineReviews = pathname === '/pricing' || pathname === '/help';
   const isMobileViewport = useIsMobileViewport();
   const lenisRef = useRef<Lenis | null>(null);
+
+  useDesktopScaleCompensation(isMobileViewport || isAdmin);
 
   useEffect(() => {
     if (isMobileViewport) {
@@ -113,19 +109,19 @@ function AppLayout() {
   }, [isMobileViewport]);
 
   return (
-    <div className={`${!isAdmin && !isStandaloneHtmlRoute ? 'app-site-shell ' : ''}min-h-screen bg-black transition-colors duration-300 relative ${isMobileViewport || isStandaloneHtmlRoute ? '' : 'cursor-none'}`} style={{ position: 'relative' }}>
+    <div className={`${!isAdmin ? 'app-site-shell ' : ''}min-h-screen bg-black transition-colors duration-300 relative ${isMobileViewport ? '' : 'cursor-none'}`} style={{ position: 'relative' }}>
       <ScrollToTop lenisRef={lenisRef} />
-      {!isMobileViewport && !isStandaloneHtmlRoute && <CustomCursor />}
-      {!isMobileViewport && !isStandaloneHtmlRoute && <MouseFollower />}
-      {!isAdmin && !isStandaloneHtmlRoute && <AnalyticsTracker />}
-      {!isAdmin && !isStandaloneHtmlRoute && <Navbar />}
+      {!isMobileViewport && <CustomCursor />}
+      {!isMobileViewport && <MouseFollower />}
+      {!isAdmin && <AnalyticsTracker />}
+      {!isAdmin && <Navbar />}
       <Suspense fallback={<RouteFallback />}>
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/downloads" element={<Downloads />} />
           <Route path="/documents" element={<Documents />} />
-          <Route path="/mira-ai" element={<HtmlDocumentRedirect to="/old-site/index.html" />} />
+          <Route path="/MIRA-ai" element={<MIRAAIFeature />} />
           <Route path="/features" element={<FeaturesPage />} />
           <Route path="/features/attendance" element={<AttendanceFeature />} />
           <Route path="/features/payroll" element={<PayrollFeature />} />
@@ -133,7 +129,7 @@ function AppLayout() {
           <Route path="/features/projects" element={<ProjectsFeature />} />
           <Route path="/features/goals" element={<GoalsFeature />} />
           <Route path="/features/workflows" element={<WorkflowsFeature />} />
-          <Route path="/features/mira-ai" element={<MiraAIFeature />} />
+          <Route path="/features/MIRA-ai" element={<MIRAAIFeature />} />
           <Route path="/features/team-chat" element={<TeamChatFeature />} />
           <Route path="/features/notifications" element={<NotificationsFeature />} />
           <Route path="/pricing" element={<PricingPage />} />
@@ -149,19 +145,21 @@ function AppLayout() {
           <Route path="/admin" element={<AdminDashboard />} />
         </Routes>
       </Suspense>
-      {!isAdmin && !isStandaloneHtmlRoute && <Footer />}
+      {!isAdmin && !shouldRenderInlineReviews && (
+        <ElfsightReviewsSection />
+      )}
+      {!isAdmin && <Footer />}
     </div>
   );
 }
 
 export default function App() {
   const isMobileViewport = useIsMobileViewport();
-  const isStandaloneHtmlRoute = typeof window !== 'undefined' && window.location.pathname === '/mira-ai';
 
   return (
     <SoundProvider>
       <BrowserRouter>
-        {!isMobileViewport && !isStandaloneHtmlRoute && <SoundDisclaimer />}
+        {!isMobileViewport && <SoundDisclaimer />}
         <AppLayout />
       </BrowserRouter>
     </SoundProvider>

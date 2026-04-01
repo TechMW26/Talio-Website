@@ -84,7 +84,7 @@ export function BookDemoPopup({ isOpen, onClose, planInfo }: BookDemoPopupProps)
           onClick={handleClose}
         >
           {/* Backdrop */}
-          <div className="absolute inset-0 bg-black/70 backdrop-blur-md" />
+          <div className="absolute inset-0 bg-black/78" />
 
           {/* Modal */}
           <motion.div
@@ -93,17 +93,17 @@ export function BookDemoPopup({ isOpen, onClose, planInfo }: BookDemoPopupProps)
             exit={{ opacity: 0, scale: 0.95, y: 24 }}
             transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
             onClick={(e) => e.stopPropagation()}
-            className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl border border-gray-700/40 bg-gray-900 shadow-2xl shadow-black/40"
+            className="site-dark-panel relative w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl border border-gray-800/50 shadow-2xl shadow-black/60"
           >
             {/* Close button */}
             <button
               onClick={handleClose}
-              className="absolute top-4 right-4 z-10 flex h-8 w-8 items-center justify-center rounded-lg border border-gray-700/50 bg-gray-800/80 text-gray-400 transition-all hover:bg-gray-700 hover:text-white"
+              className="absolute top-4 right-4 z-10 flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-black/65 text-gray-400 transition-all hover:border-white/16 hover:bg-white/[0.06] hover:text-white"
             >
               <X className="h-4 w-4" />
             </button>
 
-            <div className="p-5 sm:p-6">
+            <div className="relative p-5 sm:p-6">
               {submitted ? (
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
@@ -128,24 +128,19 @@ export function BookDemoPopup({ isOpen, onClose, planInfo }: BookDemoPopupProps)
                 <>
                   {/* Header */}
                   <div className="mb-5 pr-8">
-                    <div className="mb-3 flex items-center gap-2">
-                      <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-500/15">
-                        <Sparkles className="h-3.5 w-3.5 text-blue-400" />
-                      </div>
-                      <span className="text-xs font-semibold uppercase tracking-widest text-blue-400">Free Demo</span>
-                    </div>
-                    <span className="block text-xl sm:text-2xl font-bold text-white leading-tight">Book a free demo.</span>
-                    <span className="mt-2 block text-[13px] sm:text-sm text-gray-400 leading-relaxed">
+                    <span className="block text-xs font-semibold uppercase tracking-widest text-gray-300">Free Demo</span>
+                    <span className="mt-3 block text-xl sm:text-2xl font-bold text-white leading-tight">Book a free demo.</span>
+                    <span className="mt-2 block text-[0.8125rem] sm:text-sm text-gray-400 leading-relaxed">
                       See Talio in action — tailored to your team and workflow.
                     </span>
                   </div>
 
                   {/* Trust badges */}
                   <div className="mb-5 flex flex-wrap gap-x-4 gap-y-1.5">
-                    <span className="inline-flex items-center gap-1.5 text-[11px] text-gray-500">
+                    <span className="inline-flex items-center gap-1.5 text-[0.6875rem] text-gray-500">
                       <Clock className="h-3 w-3 text-gray-600" /> 30 min session
                     </span>
-                    <span className="inline-flex items-center gap-1.5 text-[11px] text-gray-500">
+                    <span className="inline-flex items-center gap-1.5 text-[0.6875rem] text-gray-500">
                       <Shield className="h-3 w-3 text-gray-600" /> No commitment
                     </span>
                   </div>
@@ -162,7 +157,7 @@ export function BookDemoPopup({ isOpen, onClose, planInfo }: BookDemoPopupProps)
                     planInfo={planInfo}
                     resetKey={`${isOpen}-${planInfo?.name ?? 'default'}`}
                     legalNotice={
-                      <p className="text-center text-[11px] leading-relaxed text-gray-500">
+                      <p className="text-center text-[0.6875rem] leading-relaxed text-gray-500">
                         By booking a demo you agree to our{' '}
                         <Link to="/terms" className="text-gray-400 underline hover:text-white transition-colors">Terms</Link>{' '}
                         and{' '}

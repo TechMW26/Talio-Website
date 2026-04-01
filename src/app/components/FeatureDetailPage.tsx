@@ -3,6 +3,7 @@ import { useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router';
 import { ArrowRight, CheckCircle, Loader2, type LucideIcon } from 'lucide-react';
 import { usePageMeta } from '@/app/hooks/usePageMeta';
+import { useCompensatedMinWidth } from '@/app/hooks/useZoomCompensatedViewport';
 import { submitLead } from '@/lib/firebase';
 import { getPageLabelFromPath } from '@/lib/leadAttribution';
 
@@ -50,8 +51,8 @@ export function FeatureDetailPage({
   stats,
   features,
   steps,
-  testimonial,
-  gradientFrom = 'to-blue-950/30',
+  testimonial: _testimonial,
+  gradientFrom = 'to-black',
   accentColor = 'text-blue-400',
   heroImage
 }: FeatureDetailPageProps) {
@@ -61,20 +62,24 @@ export function FeatureDetailPage({
   const statsRef = useRef(null);
   const featuresRef = useRef(null);
   const stepsRef = useRef(null);
-  const testimonialRef = useRef(null);
   const ctaRef = useRef(null);
 
-  const heroInView = useInView(heroRef, { once: true, margin: '-100px' });
-  const statsInView = useInView(statsRef, { once: true, margin: '-100px' });
-  const featuresInView = useInView(featuresRef, { once: true, margin: '-100px' });
-  const stepsInView = useInView(stepsRef, { once: true, margin: '-100px' });
-  const testimonialInView = useInView(testimonialRef, { once: true, margin: '-100px' });
-  const ctaInView = useInView(ctaRef, { once: true, margin: '-100px' });
+  const heroInView = useInView(heroRef, { once: true, margin: '-10%' });
+  const statsInView = useInView(statsRef, { once: true, margin: '-10%' });
+  const featuresInView = useInView(featuresRef, { once: true, margin: '-10%' });
+  const stepsInView = useInView(stepsRef, { once: true, margin: '-10%' });
+  const ctaInView = useInView(ctaRef, { once: true, margin: '-10%' });
+  const hasFourStatColumns = useCompensatedMinWidth(1200);
+  const hasThreeFeatureColumns = useCompensatedMinWidth(1320);
+  const hasTwoFeatureColumns = useCompensatedMinWidth(920);
+  const hasThreeStepColumns = useCompensatedMinWidth(1180);
+  const hasTwoStepColumns = useCompensatedMinWidth(860);
+  const hasLeadSplitLayout = useCompensatedMinWidth(1140);
 
   return (
     <div className="bg-black relative transition-colors duration-300">
       {/* Hero */}
-      <section ref={heroRef} className={`relative min-h-[60vh] flex items-center justify-center py-20 md:py-32 overflow-hidden ${!heroImage ? `bg-gradient-to-br from-gray-900 via-gray-950 ${gradientFrom}` : ''}`}>
+      <section ref={heroRef} className={`relative min-h-[60vh] flex items-center justify-center py-20 md:py-32 overflow-hidden ${!heroImage ? 'bg-black' : ''}`}>
         {heroImage && (
           <div className="absolute inset-0">
             <img
@@ -82,16 +87,12 @@ export function FeatureDetailPage({
               alt=""
               className="absolute inset-0 w-full h-full object-cover"
             />
-            <div className="absolute inset-0 bg-gradient-to-b from-gray-950 via-gray-950/80 to-gray-950" />
+            <div className="absolute inset-0 bg-black/55" />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/75 via-black/85 to-black" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.08),transparent_42%)]" />
           </div>
         )}
-        <div className="absolute inset-0">
-          <motion.div
-            animate={{ scale: [1, 1.2, 1], opacity: [0.2, 0.4, 0.2] }}
-            transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
-            className="absolute top-1/4 -left-1/4 w-[500px] h-[500px] bg-gradient-to-br from-blue-900/15 to-transparent rounded-full blur-3xl"
-          />
-        </div>
+
         <div className="relative max-w-5xl mx-auto px-6 md:px-8 lg:px-12 text-center z-10">
           <motion.span
             initial={{ opacity: 0, y: 20 }}
@@ -107,7 +108,7 @@ export function FeatureDetailPage({
             transition={{ duration: 1, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
             className="text-4xl md:text-6xl lg:text-7xl font-bold mb-10 leading-[1.05] tracking-tighter text-center"
           >
-            <span className={`text-transparent bg-clip-text bg-gradient-to-r ${titleGradient}`}>{title}</span>
+            <span className="text-white [text-shadow:0_1.125rem_3rem_rgba(0,0,0,0.55)]">{title}</span>
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -123,7 +124,7 @@ export function FeatureDetailPage({
       {/* Stats */}
       <section ref={statsRef} className="py-16 border-b border-gray-800/50">
         <div className="max-w-6xl mx-auto px-6 md:px-8 lg:px-12">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+          <div className={`grid gap-8 ${hasFourStatColumns ? 'grid-cols-4' : 'grid-cols-2'}`}>
             {stats.map((stat, i) => (
               <motion.div
                 key={stat.label}
@@ -159,7 +160,7 @@ export function FeatureDetailPage({
             </p>
           </motion.div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className={`grid gap-6 ${hasThreeFeatureColumns ? 'grid-cols-3' : hasTwoFeatureColumns ? 'grid-cols-2' : 'grid-cols-1'}`}>
             {features.map((feature, i) => (
               <motion.div
                 key={feature.title}
@@ -201,7 +202,7 @@ export function FeatureDetailPage({
             </h2>
           </motion.div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className={`grid gap-8 ${hasThreeStepColumns ? 'grid-cols-3' : hasTwoStepColumns ? 'grid-cols-2' : 'grid-cols-1'}`}>
             {steps.map((step, i) => (
               <motion.div
                 key={step.title}
@@ -221,29 +222,6 @@ export function FeatureDetailPage({
         </div>
       </section>
 
-      {/* Testimonial */}
-      {testimonial && (
-        <section ref={testimonialRef} className="py-20 md:py-32">
-          <div className="max-w-4xl mx-auto px-6 md:px-8 lg:px-12">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={testimonialInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.8 }}
-              className="bg-gray-900/60 border border-gray-800/60 rounded-3xl p-10 md:p-14 text-center"
-            >
-              <div className="text-4xl mb-6">❝</div>
-              <p className="text-xl md:text-2xl text-gray-300 leading-relaxed mb-8 font-light italic">
-                {testimonial.quote}
-              </p>
-              <div>
-                <div className="font-semibold text-white">{testimonial.author}</div>
-                <div className="text-sm text-gray-500">{testimonial.role}</div>
-              </div>
-            </motion.div>
-          </div>
-        </section>
-      )}
-
       {/* Lead Form */}
       <section ref={ctaRef} className="py-20 md:py-32 bg-gradient-to-b from-gray-900 to-gray-950">
         <div className="max-w-7xl mx-auto px-6 md:px-8 lg:px-12">
@@ -251,7 +229,7 @@ export function FeatureDetailPage({
             initial={{ opacity: 0, y: 30 }}
             animate={ctaInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center"
+            className={`grid items-center gap-12 ${hasLeadSplitLayout ? 'grid-cols-2 lg:gap-20' : 'grid-cols-1'}`}
           >
             {/* Left - Info */}
             <div>
@@ -284,6 +262,7 @@ export function FeatureDetailPage({
 function LeadForm({ source, accentColor, titleGradient }: { source: string; accentColor: string; titleGradient: string }) {
   const location = useLocation();
   const [formState, setFormState] = useState<'idle' | 'submitting' | 'success'>('idle');
+  const hasTwoColumnFormFields = useCompensatedMinWidth(900);
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -319,7 +298,7 @@ function LeadForm({ source, accentColor, titleGradient }: { source: string; acce
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="bg-gray-900/60 border border-gray-800/60 rounded-3xl p-10 text-center"
+        className="site-dark-panel rounded-3xl border p-10 text-center"
       >
         <div className={`w-16 h-16 mx-auto rounded-full bg-gradient-to-br ${titleGradient} flex items-center justify-center mb-6`}>
           <CheckCircle className="w-8 h-8 text-white" />
@@ -331,8 +310,8 @@ function LeadForm({ source, accentColor, titleGradient }: { source: string; acce
   }
 
   return (
-    <form onSubmit={handleSubmit} className="bg-gray-900/60 border border-gray-800/60 rounded-3xl p-8 md:p-10 space-y-5">
-      <div className="grid grid-cols-2 gap-4">
+    <form onSubmit={handleSubmit} className="site-dark-panel rounded-3xl border p-8 md:p-10 space-y-5">
+      <div className={`grid gap-4 ${hasTwoColumnFormFields ? 'grid-cols-2' : 'grid-cols-1'}`}>
         <input
           type="text"
           name="firstName"
@@ -340,7 +319,7 @@ function LeadForm({ source, accentColor, titleGradient }: { source: string; acce
           required
           value={formData.firstName}
           onChange={handleChange}
-          className="w-full px-4 py-3.5 bg-gray-800/80 border border-gray-700/60 rounded-xl text-white placeholder-gray-500 text-sm focus:outline-none focus:border-gray-600 transition-colors"
+          className="site-dark-input w-full px-4 py-3.5 rounded-xl text-white placeholder-gray-500 text-sm focus:outline-none transition-colors"
         />
         <input
           type="text"
@@ -349,7 +328,7 @@ function LeadForm({ source, accentColor, titleGradient }: { source: string; acce
           required
           value={formData.lastName}
           onChange={handleChange}
-          className="w-full px-4 py-3.5 bg-gray-800/80 border border-gray-700/60 rounded-xl text-white placeholder-gray-500 text-sm focus:outline-none focus:border-gray-600 transition-colors"
+          className="site-dark-input w-full px-4 py-3.5 rounded-xl text-white placeholder-gray-500 text-sm focus:outline-none transition-colors"
         />
       </div>
       <input
@@ -359,9 +338,9 @@ function LeadForm({ source, accentColor, titleGradient }: { source: string; acce
         required
         value={formData.email}
         onChange={handleChange}
-        className="w-full px-4 py-3.5 bg-gray-800/80 border border-gray-700/60 rounded-xl text-white placeholder-gray-500 text-sm focus:outline-none focus:border-gray-600 transition-colors"
+        className="site-dark-input w-full px-4 py-3.5 rounded-xl text-white placeholder-gray-500 text-sm focus:outline-none transition-colors"
       />
-      <div className="grid grid-cols-2 gap-4">
+      <div className={`grid gap-4 ${hasTwoColumnFormFields ? 'grid-cols-2' : 'grid-cols-1'}`}>
         <input
           type="text"
           name="companyName"
@@ -369,14 +348,14 @@ function LeadForm({ source, accentColor, titleGradient }: { source: string; acce
           required
           value={formData.companyName}
           onChange={handleChange}
-          className="w-full px-4 py-3.5 bg-gray-800/80 border border-gray-700/60 rounded-xl text-white placeholder-gray-500 text-sm focus:outline-none focus:border-gray-600 transition-colors"
+          className="site-dark-input w-full px-4 py-3.5 rounded-xl text-white placeholder-gray-500 text-sm focus:outline-none transition-colors"
         />
         <select
           name="companySize"
           required
           value={formData.companySize}
           onChange={handleChange}
-          className="w-full px-4 py-3.5 bg-gray-800/80 border border-gray-700/60 rounded-xl text-sm focus:outline-none focus:border-gray-600 transition-colors appearance-none"
+          className="site-dark-input w-full px-4 py-3.5 rounded-xl text-sm focus:outline-none transition-colors appearance-none"
           style={{ color: formData.companySize ? 'white' : '#6b7280' }}
         >
           <option value="" disabled>Company Size</option>

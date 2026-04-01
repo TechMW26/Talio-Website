@@ -6,13 +6,13 @@ import { ArrowRight, Check } from "lucide-react";
 import { solutions } from '@/app/content/solutionsData';
 
 export function Solutions() {
-  usePageMeta('Solutions', 'Explore how Talio fits modern teams that need productivity visibility, coordination, Mira, and HRMS add-ons in one operating system.');
+  usePageMeta('Solutions', 'Explore how Talio fits modern teams that need productivity visibility, coordination, MIRA, and HRMS add-ons in one operating system.');
 
   const heroRef = useRef(null);
   const ctaRef = useRef(null);
 
-  const heroInView = useInView(heroRef, { once: true, margin: "-100px" });
-  const ctaInView = useInView(ctaRef, { once: true, margin: "-100px" });
+  const heroInView = useInView(heroRef, { once: true, margin: '-10%' });
+  const ctaInView = useInView(ctaRef, { once: true, margin: '-10%' });
 
   return (
     <div className="min-h-screen bg-black text-white">
@@ -33,7 +33,7 @@ export function Solutions() {
             </span>
           </h1>
           <p className="text-lg md:text-xl text-gray-400 font-light leading-relaxed max-w-2xl text-center">
-            Talio fits teams that need daily visibility, coordination, Mira, and HRMS add-ons in one practical operating utility.
+            Talio fits teams that need daily visibility, coordination, MIRA, and HRMS add-ons in one practical operating utility.
           </p>
         </motion.div>
       </section>
@@ -81,7 +81,7 @@ function SolutionCard({
   index: number;
 }) {
   const ref = useRef(null);
-  const inView = useInView(ref, { once: true, margin: "-100px" });
+  const inView = useInView(ref, { once: true, margin: '-10%' });
 
   return (
     <motion.div
@@ -112,7 +112,7 @@ function SolutionCard({
         </div>
 
         {/* Right — Stats */}
-        <div className="flex md:flex-col gap-6 md:gap-4 md:min-w-[160px]">
+        <div className="flex md:flex-col gap-6 md:gap-4 md:min-w-[10rem]">
           {solution.stats.map((stat) => (
             <div
               key={stat.label}

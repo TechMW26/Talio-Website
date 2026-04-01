@@ -32,7 +32,7 @@ export function WorkflowsFeature() {
         },
         {
           icon: Bot,
-          title: 'Mira Workflow Actions',
+          title: 'MIRA Workflow Actions',
           description: 'AI-powered text generation, data analysis, and smart routing.',
           details: ['Text generation', 'Data analysis', 'Smart routing'],
         },

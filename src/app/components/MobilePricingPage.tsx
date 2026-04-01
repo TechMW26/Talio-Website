@@ -1,10 +1,19 @@
 import { useEffect, useRef, useState } from 'react';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import { Check, ChevronDown, X, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router';
 import * as SwitchPrimitive from '@radix-ui/react-switch';
 import { BookDemoPopup, type PlanInfo } from './BookDemoPopup';
+import { ElfsightReviewsSection } from './ElfsightReviewsSection';
+import { PricingChangeConfetti } from './PricingChangeConfetti';
 import { pricingFaqs, pricingPlans } from './pricingData';
+
+const PLAN_CONFETTI_COLORS: Record<string, string[]> = {
+  Budget: ['bg-emerald-300', 'bg-teal-300', 'bg-cyan-300', 'bg-white'],
+  Starter: ['bg-sky-300', 'bg-blue-300', 'bg-cyan-200', 'bg-white'],
+  Professional: ['bg-violet-300', 'bg-fuchsia-300', 'bg-pink-300', 'bg-white'],
+  Enterprise: ['bg-orange-300', 'bg-amber-300', 'bg-red-300', 'bg-white'],
+};
 
 export function MobilePricingPage() {
   const [billing, setBilling] = useState<'monthly' | 'annual'>('monthly');
@@ -12,7 +21,37 @@ export function MobilePricingPage() {
   const [showDemoPopup, setShowDemoPopup] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<PlanInfo | null>(null);
   const [activePlanIndex, setActivePlanIndex] = useState(0);
+  const [priceCelebrationKey, setPriceCelebrationKey] = useState(0);
   const sliderRef = useRef<HTMLDivElement | null>(null);
+  const plansSectionRef = useRef<HTMLElement | null>(null);
+  const hasMountedBillingRef = useRef(false);
+
+  const scrollPlansIntoView = () => {
+    if (!plansSectionRef.current) {
+      return;
+    }
+
+    const targetTop = plansSectionRef.current.getBoundingClientRect().top + window.scrollY - 6.5 * 16;
+
+    window.scrollTo({
+      top: Math.max(0, targetTop),
+      behavior: 'smooth',
+    });
+  };
+
+  const handleBillingChange = (nextBilling: 'monthly' | 'annual') => {
+    if (nextBilling === billing) {
+      return;
+    }
+
+    setBilling(nextBilling);
+
+    if (nextBilling === 'annual') {
+      window.requestAnimationFrame(() => {
+        window.requestAnimationFrame(scrollPlansIntoView);
+      });
+    }
+  };
 
   const openDemoForPlan = (plan: typeof pricingPlans[number]) => {
     const priceDisplay = plan.priceLabel ?? `₹${billing === 'monthly' ? plan.price.monthly : plan.price.annual}${plan.period}`;
@@ -70,6 +109,15 @@ export function MobilePricingPage() {
       window.removeEventListener('resize', updateActivePlan);
     };
   }, []);
+
+  useEffect(() => {
+    if (!hasMountedBillingRef.current) {
+      hasMountedBillingRef.current = true;
+      return;
+    }
+
+    setPriceCelebrationKey((current) => current + 1);
+  }, [billing]);
 
   const jumpToPlan = (index: number) => {
     const slider = sliderRef.current;
@@ -131,38 +179,44 @@ export function MobilePricingPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.25 }}
-        className="mb-10 flex items-center justify-center gap-3 px-4"
+        className="mb-10 flex flex-col items-center gap-3 px-4"
       >
-        <span className={`text-sm font-medium ${billing === 'monthly' ? 'text-white' : 'text-gray-500'}`}>
-          Monthly
-        </span>
-        <SwitchPrimitive.Root
-          checked={billing === 'annual'}
-          onCheckedChange={(checked) => setBilling(checked ? 'annual' : 'monthly')}
-          className="relative h-8 w-14 rounded-full border border-gray-700/80 bg-gray-800 outline-none"
-        >
-          <SwitchPrimitive.Thumb asChild>
-            <motion.span
-              className="absolute top-[3px] block h-6 w-6 rounded-full bg-gradient-to-r from-purple-500 to-pink-500"
-              animate={{ left: billing === 'annual' ? 29 : 3 }}
-              transition={{ type: 'spring', stiffness: 500, damping: 32 }}
-            />
-          </SwitchPrimitive.Thumb>
-        </SwitchPrimitive.Root>
-        <span className={`text-sm font-medium ${billing === 'annual' ? 'text-white' : 'text-gray-500'}`}>
-          Annual
-        </span>
-      </motion.div>
-
-      {billing === 'annual' && (
-        <div className="mb-8 flex justify-center px-4">
-          <span className="rounded-full border border-green-500/20 bg-green-500/10 px-4 py-1.5 text-xs font-medium text-green-400">
-            Save 20% annually
+        <div className="inline-flex items-center gap-4 rounded-full border border-white/10 bg-white/[0.03] px-4 py-3 shadow-[0_1rem_2.5rem_-1.75rem_rgba(0,0,0,0.85)]">
+          <span className={`text-sm font-medium ${billing === 'monthly' ? 'text-white' : 'text-gray-500'}`}>
+            Monthly
+          </span>
+          <SwitchPrimitive.Root
+            checked={billing === 'annual'}
+            onCheckedChange={(checked) => handleBillingChange(checked ? 'annual' : 'monthly')}
+            aria-label="Billing frequency"
+            className="relative flex h-9 w-[4.125rem] items-center rounded-full border border-white/10 bg-[#182132] p-1 outline-none transition-colors duration-300 data-[state=checked]:bg-[#1c2538] focus-visible:ring-2 focus-visible:ring-purple-500/50"
+          >
+            <SwitchPrimitive.Thumb asChild>
+              <motion.span
+                className="block h-7 w-7 rounded-full bg-gradient-to-r from-violet-500 via-fuchsia-500 to-pink-500 shadow-[0_0.625rem_1.875rem_rgba(192,38,211,0.45)]"
+                animate={{ x: billing === 'annual' ? 33 : 0 }}
+                transition={{ type: 'spring', stiffness: 500, damping: 32 }}
+              />
+            </SwitchPrimitive.Thumb>
+          </SwitchPrimitive.Root>
+          <span className={`text-sm font-medium ${billing === 'annual' ? 'text-white' : 'text-gray-500'}`}>
+            Annual
           </span>
         </div>
-      )}
 
-      <section className="pt-2 pb-20">
+        <motion.div
+          animate={{
+            opacity: billing === 'annual' ? 1 : 0.72,
+            scale: billing === 'annual' ? 1 : 0.98,
+          }}
+          transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+          className={`rounded-full border px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.16em] ${billing === 'annual' ? 'border-green-500/30 bg-green-500/12 text-green-400' : 'border-white/10 bg-white/[0.03] text-gray-500'}`}
+        >
+          20% off with annual billing
+        </motion.div>
+      </motion.div>
+
+      <section ref={plansSectionRef} className="pt-2 pb-20">
         <div className="mb-4 px-4 text-center">
           <span className="text-xs font-semibold uppercase tracking-[0.18em] text-gray-500">
             Swipe to compare plans
@@ -175,6 +229,7 @@ export function MobilePricingPage() {
               const Icon = plan.icon;
               const priceDisplay = plan.priceLabel ?? `₹${billing === 'monthly' ? plan.price.monthly : plan.price.annual}`;
               const isActive = activePlanIndex === index;
+              const confettiColors = PLAN_CONFETTI_COLORS[plan.name] ?? PLAN_CONFETTI_COLORS.Professional;
 
               return (
                 <motion.div
@@ -185,9 +240,9 @@ export function MobilePricingPage() {
                   transition={{ duration: 0.6, delay: index * 0.08 }}
                   className={`w-[calc(100vw-2rem)] min-w-[calc(100vw-2rem)] snap-center ${plan.badge ? 'pt-5' : ''}`}
                 >
-                  <div className={`relative h-full rounded-[2.25rem] border ${isActive ? 'border-white/20 shadow-[0_0_40px_rgba(255,255,255,0.06)]' : plan.featured ? 'border-purple-500/30' : 'border-white/10'} bg-gray-950/85 p-6`}> 
+                  <div className={`relative h-full rounded-[2.25rem] border ${isActive ? 'border-white/20 shadow-[0_0_2.5rem_rgba(255,255,255,0.06)]' : plan.featured ? 'border-purple-500/30' : 'border-white/10'} bg-gray-950/85 p-6`}> 
                     {plan.badge && (
-                      <span className={`absolute -top-3 left-5 rounded-full bg-gradient-to-r ${plan.gradient} px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.18em] text-white`}>
+                      <span className={`absolute -top-3 left-5 rounded-full bg-gradient-to-r ${plan.gradient} px-4 py-1.5 text-[0.6875rem] font-bold uppercase tracking-[0.18em] text-white`}>
                         {plan.badge}
                       </span>
                     )}
@@ -199,9 +254,38 @@ export function MobilePricingPage() {
                     <span className="mt-6 block text-2xl font-bold tracking-tight text-white">{plan.name}</span>
                     <span className="mt-2 block text-sm text-gray-400">{plan.subtitle}</span>
 
-                    <div className="mt-6">
-                      <span className="text-5xl font-bold tracking-tighter text-white">{priceDisplay}</span>
-                      {plan.period && <span className="ml-1 text-sm text-gray-500">{plan.period}</span>}
+                    <div className="relative mt-6 min-h-[4.75rem] overflow-visible">
+                      <PricingChangeConfetti triggerKey={priceCelebrationKey} colors={confettiColors} className="inset-x-0 top-0 h-24" />
+
+                      <div className="overflow-hidden">
+                        <AnimatePresence mode="wait">
+                          <motion.span
+                            key={`${plan.name}-${billing}`}
+                            initial={{ opacity: 0, y: 14, scale: 0.92, filter: 'blur(0.25rem)' }}
+                            animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0rem)' }}
+                            exit={{ opacity: 0, y: -14, scale: 0.92, filter: 'blur(0.25rem)' }}
+                            transition={{ duration: 0.36, ease: [0.16, 1, 0.3, 1] }}
+                            className="block text-5xl font-bold tracking-tighter text-white"
+                          >
+                            {priceDisplay}
+                          </motion.span>
+                        </AnimatePresence>
+                      </div>
+
+                      <div className="mt-1 overflow-hidden text-sm text-gray-500">
+                        <AnimatePresence mode="wait">
+                          <motion.span
+                            key={`${plan.name}-${billing}-period`}
+                            initial={{ opacity: 0, y: 8 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -8 }}
+                            transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
+                            className="block"
+                          >
+                            {plan.period || '\u00A0'}
+                          </motion.span>
+                        </AnimatePresence>
+                      </div>
                     </div>
 
                     <button
@@ -258,6 +342,14 @@ export function MobilePricingPage() {
           })}
         </div>
       </section>
+
+      <ElfsightReviewsSection
+        sectionClassName="relative bg-black pb-10 overflow-hidden"
+        containerClassName="mx-auto max-w-7xl px-4 md:px-8 lg:px-12"
+        eyebrow="✦ Google Reviews"
+        title="What Teams Are Saying"
+        subtitle="Live Google reviews from teams already running Talio in daily operations."
+      />
 
       <section className="px-4 pb-20">
         <div className="rounded-[2.5rem] border border-white/10 bg-gray-950/80 p-6">

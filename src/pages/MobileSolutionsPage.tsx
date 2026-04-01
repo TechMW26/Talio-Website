@@ -5,7 +5,7 @@ import { usePageMeta } from '@/app/hooks/usePageMeta';
 import { solutions } from '@/app/content/solutionsData';
 
 export function MobileSolutionsPage() {
-  usePageMeta('Solutions', 'Explore how Talio fits modern teams that need productivity visibility, coordination, Mira, and HRMS add-ons in one operating system.');
+  usePageMeta('Solutions', 'Explore how Talio fits modern teams that need productivity visibility, coordination, MIRA, and HRMS add-ons in one operating system.');
 
   return (
     <div className="min-h-screen bg-black text-white">
@@ -54,7 +54,7 @@ export function MobileSolutionsPage() {
                     <span className={`block text-xl font-bold bg-gradient-to-r ${solution.gradient} bg-clip-text text-transparent`}>
                       {stat.value}
                     </span>
-                    <span className="mt-1 block text-[11px] uppercase tracking-[0.14em] text-gray-500">{stat.label}</span>
+                    <span className="mt-1 block text-[0.6875rem] uppercase tracking-[0.14em] text-gray-500">{stat.label}</span>
                   </div>
                 ))}
               </div>

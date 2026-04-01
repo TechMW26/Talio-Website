@@ -32,7 +32,7 @@ const workflowColumns = [
   {
     title: 'Review',
     accent: 'text-violet-300',
-    tasks: ['Manager approvals', 'Mira recommendations'],
+    tasks: ['Manager approvals', 'MIRA recommendations'],
   },
   {
     title: 'Done',
@@ -67,7 +67,7 @@ const goalCards = [
 ];
 
 const aiCapabilities = [
-  { icon: Bot, title: 'Mira inside workflows', description: 'Get summaries, follow-ups, and operational help without leaving the flow of work.' },
+  { icon: Bot, title: 'MIRA inside workflows', description: 'Get summaries, follow-ups, and operational help without leaving the flow of work.' },
   { icon: Sparkles, title: 'Smart nudges', description: 'Flag delays, risks, and follow-ups before they become blockers.' },
   { icon: Clock, title: 'Weekly time savings', description: 'Automate repetitive HR operations that eat into the day.' },
   { icon: MessageCircle, title: 'Contextual support', description: 'Bring help, updates, and approvals into one conversation layer.' },
@@ -109,7 +109,7 @@ function SectionHeading({
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.6 }}
-        className={`inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] mb-5 ${accentClassName}`}
+        className={`inline-flex items-center gap-2 text-[0.6875rem] font-semibold uppercase tracking-[0.18em] mb-5 ${accentClassName}`}
       >
         {label}
       </motion.div>
@@ -118,7 +118,7 @@ function SectionHeading({
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-        className="max-w-[330px] text-[clamp(2rem,8vw,2.8rem)] font-bold text-white mb-4 leading-[1.02] tracking-tighter text-center"
+        className="max-w-[20.625rem] text-[clamp(2rem,8vw,2.8rem)] font-bold text-white mb-4 leading-[1.02] tracking-tighter text-center"
       >
         {title}
       </motion.h2>
@@ -127,7 +127,7 @@ function SectionHeading({
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.6, delay: 0.2 }}
-        className="max-w-[330px] text-sm text-gray-400 font-light leading-relaxed text-center"
+        className="max-w-[20.625rem] text-sm text-gray-400 font-light leading-relaxed text-center"
       >
         {subtitle}
       </motion.p>
@@ -161,20 +161,20 @@ function SecondaryButtonLink({ to, children }: { to: string; children: string })
 export function MobileHomePage() {
   return (
     <div className="bg-black text-white">
-      <section className="relative flex min-h-[100svh] items-center overflow-hidden bg-black pt-[92px] pb-8">
+      <section className="relative flex min-h-[100svh] items-center overflow-hidden bg-black pt-[5.75rem] pb-8">
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute left-1/2 top-0 h-72 w-72 -translate-x-1/2 rounded-full bg-purple-600/16 blur-3xl" />
           <div className="absolute right-0 top-1/3 h-52 w-52 rounded-full bg-blue-600/10 blur-3xl" />
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(125,91,255,0.10),transparent_35%)]" />
         </div>
 
-        <div className="relative mx-auto flex min-h-[calc(100svh-108px)] w-full items-center px-4">
+        <div className="relative mx-auto flex min-h-[calc(100svh-6.75rem)] w-full items-center px-4">
           <div className="mobile-hero-stack flex w-full flex-col items-center text-center">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
-              className="mobile-hero-eyebrow inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-blue-300"
+              className="mobile-hero-eyebrow inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-[0.6875rem] font-semibold uppercase tracking-[0.18em] text-blue-300"
             >
               ✦ AI-Powered Productivity Utility
             </motion.div>
@@ -188,7 +188,7 @@ export function MobileHomePage() {
               <span className="block text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-200 to-white">
                 Less Chasing.
               </span>
-              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-400">
+              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-400 pb-2">
                 More Doing.
               </span>
             </motion.h1>
@@ -197,9 +197,9 @@ export function MobileHomePage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="mobile-hero-copy max-w-[320px] text-sm font-light leading-relaxed text-gray-400"
+              className="mobile-hero-copy max-w-[20rem] text-sm font-light leading-relaxed text-gray-400"
             >
-              Talio gives teams daily visibility, real-time coordination, Mira inside workflows, and HRMS add-ons that keep attendance, leave, payroll, and employee management connected.
+              Talio gives teams daily visibility, real-time coordination, MIRA inside workflows, and HRMS add-ons that keep attendance, leave, payroll, and employee management connected.
             </motion.p>
 
             <motion.div
@@ -216,12 +216,12 @@ export function MobileHomePage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.4 }}
-              className="mobile-hero-meta flex max-w-[320px] flex-wrap items-center justify-center gap-2"
+              className="mobile-hero-meta flex max-w-[20rem] flex-wrap items-center justify-center gap-2"
             >
               {trustBadges.map((badge) => (
                 <span
                   key={badge}
-                  className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-[11px] font-medium text-gray-300"
+                  className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-[0.6875rem] font-medium text-gray-300"
                 >
                   {badge}
                 </span>
@@ -304,7 +304,7 @@ export function MobileHomePage() {
             transition={{ duration: 0.7 }}
             className="mt-10 grid gap-4"
           >
-            <div className="w-full rounded-[2.25rem] border border-white/10 bg-gradient-to-b from-gray-900 to-black p-4 shadow-[0_0_40px_rgba(76,29,149,0.18)]">
+            <div className="w-full rounded-[2.25rem] border border-white/10 bg-gradient-to-b from-gray-900 to-black p-4 shadow-[0_0_2.5rem_rgba(76,29,149,0.18)]">
               <div className="rounded-[1.75rem] border border-white/10 bg-[#090d16] p-5">
                 <span className="block text-xs uppercase tracking-[0.18em] text-gray-500">Today</span>
                 <span className="mt-3 block text-2xl font-semibold text-white">Checked In</span>
@@ -496,7 +496,7 @@ export function MobileHomePage() {
                     transition={{ duration: 0.35, delay: index * 0.02 }}
                     className="rounded-xl border border-white/10 bg-white/5 p-2"
                   >
-                    <FlagIcon className="h-auto w-full rounded-[3px]" />
+                    <FlagIcon className="h-auto w-full rounded-[0.1875rem]" />
                   </motion.div>
                 );
               })}
@@ -507,7 +507,7 @@ export function MobileHomePage() {
 
       <section className="relative py-16 overflow-hidden bg-black">
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
-          <div className="rounded-[2.5rem] border border-white/10 bg-gradient-to-br from-gray-950 to-[#0c1324] p-6 shadow-[0_0_60px_rgba(59,130,246,0.08)]">
+          <div className="rounded-[2.5rem] border border-white/10 bg-gradient-to-br from-gray-950 to-[#0c1324] p-6 shadow-[0_0_3.75rem_rgba(59,130,246,0.08)]">
             <SectionHeading
               label="Pricing"
               title="Ready to transform your workforce?"

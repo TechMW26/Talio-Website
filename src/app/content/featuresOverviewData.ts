@@ -58,7 +58,7 @@ export const coreFeatures: FeatureOverviewItem[] = [
   {
     icon: Sparkles,
     title: 'AI Workflows',
-    description: 'Use Mira-driven automation to reduce manual follow-up, drafting, and repetitive operational work.',
+    description: 'Use MIRA-driven automation to reduce manual follow-up, drafting, and repetitive operational work.',
     gradient: 'from-indigo-500 to-violet-500',
     href: '/features/workflows',
   },
@@ -67,10 +67,10 @@ export const coreFeatures: FeatureOverviewItem[] = [
 export const communicationFeatures: FeatureOverviewItem[] = [
   {
     icon: Bot,
-    title: 'Mira',
+    title: 'MIRA',
     description: 'Embedded workflow intelligence that helps teams answer questions, generate output, and act faster inside daily work.',
     gradient: 'from-violet-500 to-purple-500',
-    href: '/features/mira-ai',
+    href: '/features/MIRA-ai',
   },
   {
     icon: MessageSquare,

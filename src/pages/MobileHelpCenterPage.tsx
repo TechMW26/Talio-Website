@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { motion } from 'motion/react';
 import { Link } from 'react-router';
 import { ArrowRight, ChevronDown } from 'lucide-react';
+import { ElfsightReviewsSection } from '@/app/components/ElfsightReviewsSection';
 import { usePageMeta } from '@/app/hooks/usePageMeta';
 import { categories, faqs, resources } from '@/app/content/helpCenterData';
 
@@ -35,6 +36,14 @@ export function MobileHelpCenterPage() {
           </div>
         </div>
       </section>
+
+      <ElfsightReviewsSection
+        sectionClassName="relative bg-black pb-10 overflow-hidden"
+        containerClassName="mx-auto max-w-7xl px-4 md:px-8 lg:px-12"
+        eyebrow="✦ Google Reviews"
+        title="Trusted by Real Teams"
+        subtitle="Live Google reviews from teams using Talio across operations and HR workflows."
+      />
 
       <section className="pb-20">
         <div className="mx-auto max-w-7xl px-4 md:px-8 lg:px-12">

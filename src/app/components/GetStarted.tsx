@@ -10,15 +10,15 @@ import { submitSignup, enrichVisitorFromForm } from '@/lib/firebase';
 import { getPageLabelFromPath } from '@/lib/leadAttribution';
 
 export function GetStarted() {
-  usePageMeta('Get Started', 'Book a free demo of Talio and see how it brings productivity visibility, coordination, Mira, and HRMS add-ons into one daily-use system.');
+  usePageMeta('Get Started', 'Book a free demo of Talio and see how it brings productivity visibility, coordination, MIRA, and HRMS add-ons into one daily-use system.');
 
   const location = useLocation();
 
   const heroRef = useRef(null);
   const contentRef = useRef(null);
 
-  const heroInView = useInView(heroRef, { once: true, margin: '-100px' });
-  const contentInView = useInView(contentRef, { once: true, margin: '-100px' });
+  const heroInView = useInView(heroRef, { once: true, margin: '-10%' });
+  const contentInView = useInView(contentRef, { once: true, margin: '-10%' });
 
   const [form, setForm] = useState(createEmptyDemoBookingForm());
 
@@ -65,7 +65,7 @@ export function GetStarted() {
   const benefits = [
     {
       icon: Bot,
-      title: 'Mira inside workflows',
+      title: 'MIRA inside workflows',
       description: 'Use embedded intelligence for summaries, drafting, follow-ups, and faster operational decisions.',
     },
     {
@@ -108,7 +108,7 @@ export function GetStarted() {
               </span>
             </h1>
             <p className="text-lg md:text-xl text-gray-400 font-light leading-relaxed max-w-2xl text-center">
-              Book a guided demo to explore productivity visibility, coordination, Mira, and HRMS add-ons in one system.
+              Book a guided demo to explore productivity visibility, coordination, MIRA, and HRMS add-ons in one system.
             </p>
           </motion.div>
         </div>
@@ -131,14 +131,14 @@ export function GetStarted() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={contentInView ? { opacity: 1, y: 0 } : {}}
                   transition={{ duration: 0.5, delay: i * 0.1 }}
-                  className="flex items-start gap-4 rounded-2xl border border-gray-800/60 bg-gray-900/60 p-5 transition-all hover:border-gray-700/60 hover:bg-gray-900/80"
+                  className="flex items-start gap-4 rounded-2xl border border-gray-800/60 bg-white/[0.03] p-5 transition-all hover:border-gray-700/60 hover:bg-white/[0.06]"
                 >
                   <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500/15 to-purple-500/15">
                     <item.icon className="h-5 w-5 text-blue-400" />
                   </div>
                   <div>
-                    <span className="mb-1 block text-[15px] font-semibold text-white">{item.title}</span>
-                    <span className="block text-[13px] leading-relaxed text-gray-400">{item.description}</span>
+                    <span className="mb-1 block text-[0.9375rem] font-semibold text-white">{item.title}</span>
+                    <span className="block text-[0.8125rem] leading-relaxed text-gray-400">{item.description}</span>
                   </div>
                 </motion.div>
               ))}
@@ -162,7 +162,7 @@ export function GetStarted() {
             transition={{ duration: 0.6 }}
             className="order-1 lg:order-2 lg:sticky lg:top-28 min-w-0"
           >
-            <div className="rounded-2xl border border-gray-700/40 bg-gray-900/80 shadow-2xl shadow-black/20 backdrop-blur-sm">
+            <div className="site-dark-panel relative overflow-hidden rounded-2xl border border-gray-800/50 shadow-2xl shadow-black/40">
               <div className="p-5 sm:p-7">
                 {submitted ? (
                   <motion.div
@@ -189,14 +189,9 @@ export function GetStarted() {
                   <>
                     {/* Form header */}
                     <div className="mb-5">
-                      <div className="mb-3 flex items-center gap-2">
-                        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-500/15">
-                          <Sparkles className="h-3.5 w-3.5 text-blue-400" />
-                        </div>
-                        <span className="text-xs font-semibold uppercase tracking-widest text-blue-400">Free Demo</span>
-                      </div>
-                      <span className="block text-xl sm:text-2xl font-bold text-white leading-tight">Book a free demo.</span>
-                      <span className="mt-2 block text-[13px] sm:text-sm text-gray-400 leading-relaxed">
+                      <span className="block text-xs font-semibold uppercase tracking-widest text-gray-300">Free Demo</span>
+                      <span className="mt-3 block text-xl sm:text-2xl font-bold text-white leading-tight">Book a free demo.</span>
+                      <span className="mt-2 block text-[0.8125rem] sm:text-sm text-gray-400 leading-relaxed">
                         See Talio in action — tailored to your workforce setup.
                       </span>
                     </div>
@@ -212,7 +207,7 @@ export function GetStarted() {
                       submittingLabel="Booking..."
                       resetKey="get-started"
                       legalNotice={
-                        <p className="text-center text-[11px] leading-relaxed text-gray-500">
+                        <p className="text-center text-[0.6875rem] leading-relaxed text-gray-500">
                           By booking a demo you agree to our{' '}
                           <Link to="/terms" className="text-gray-400 underline hover:text-white transition-colors">
                             Terms of Service

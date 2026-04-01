@@ -37,30 +37,30 @@ export function Hero() {
             x: mousePosition.x * 30,
             y: mousePosition.y * 30,
           }}
-          className="absolute top-1/4 -left-1/4 w-[800px] h-[800px] bg-gradient-to-br from-purple-500/20 via-blue-500/10 to-transparent rounded-full blur-3xl"
+          className="absolute top-1/4 -left-1/4 w-[50rem] h-[50rem] bg-gradient-to-br from-purple-500/20 via-blue-500/10 to-transparent rounded-full blur-3xl"
         />
         <motion.div
           style={{
             x: mousePosition.x * -40,
             y: mousePosition.y * -40,
           }}
-          className="absolute bottom-1/4 -right-1/4 w-[600px] h-[600px] bg-gradient-to-br from-pink-500/15 via-purple-500/15 to-transparent rounded-full blur-3xl"
+          className="absolute bottom-1/4 -right-1/4 w-[37.5rem] h-[37.5rem] bg-gradient-to-br from-pink-500/15 via-purple-500/15 to-transparent rounded-full blur-3xl"
         />
         
         {/* Grid Pattern */}
         <div className="absolute inset-0 opacity-[0.1] invert">
           <div className="absolute inset-0" style={{
-            backgroundImage: `linear-gradient(to right, #000 1px, transparent 1px), linear-gradient(to bottom, #000 1px, transparent 1px)`,
-            backgroundSize: '80px 80px'
+            backgroundImage: `linear-gradient(to right, #000 0.0625rem, transparent 0.0625rem), linear-gradient(to bottom, #000 0.0625rem, transparent 0.0625rem)`,
+            backgroundSize: '5rem 5rem'
           }} />
         </div>
       </div>
 
       <motion.div 
         style={{ y, scale }}
-        className="relative max-w-[1600px] mx-auto px-6 md:px-8 lg:px-12 py-20 md:py-28 lg:py-36 z-10 w-full"
+        className="relative mx-auto w-full max-w-7xl px-6 py-20 md:px-8 md:py-28 lg:px-12 lg:py-36 z-10"
       >
-        <div className="max-w-[95%] md:max-w-[90%] mx-auto text-center">
+        <div className="mx-auto w-full max-w-6xl text-center">
           {/* Floating Badge */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -72,7 +72,7 @@ export function Hero() {
               whileHover={{ scale: 1.05 }}
               className="inline-flex items-center gap-2 md:gap-3 px-4 md:px-6 py-2 md:py-3 bg-gradient-to-r from-gray-900 to-gray-800 rounded-full border border-gray-700 shadow-lg shadow-purple-500/20 relative"
               style={{
-                boxShadow: '0 0 20px rgba(168, 85, 247, 0.15), 0 0 40px rgba(59, 130, 246, 0.1)'
+                boxShadow: '0 0 1.25rem rgba(168, 85, 247, 0.15), 0 0 2.5rem rgba(59, 130, 246, 0.1)'
               }}
             >
               <motion.div
@@ -107,14 +107,14 @@ export function Hero() {
             className="max-w-4xl mx-auto text-center mb-16 px-4 flex justify-center"
           >
             <div className="text-base md:text-lg lg:text-xl xl:text-2xl font-light leading-relaxed tracking-tight text-gray-400">
-              {"Talio helps companies manage day-to-day work with better visibility, real-time coordination, Mira inside workflows, and built-in HRMS add-ons for attendance, leave, payroll, and employee management.".split(" ").map((word, i) => (
+              {"Talio helps companies manage day-to-day work with better visibility, real-time coordination, MIRA inside workflows, and built-in HRMS add-ons for attendance, leave, payroll, and employee management.".split(" ").map((word, i) => (
                 <motion.span
                   key={i}
                   className="inline-block cursor-default mr-[0.25em]"
                   animate={{ color: "#9ca3af" }}
                   whileHover={{
                     color: "#ffffff",
-                    textShadow: "0 0 1px #ffffff, 0 0 16px rgba(168, 85, 247, 0.5)"
+                    textShadow: "0 0 0.0625rem #ffffff, 0 0 1rem rgba(168, 85, 247, 0.5)"
                   }}
                   transition={{ duration: 0.15 }}
                 >

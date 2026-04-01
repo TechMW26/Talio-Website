@@ -37,8 +37,8 @@ export function Documents() {
 
   const heroRef = useRef(null);
   const docsRef = useRef(null);
-  const heroInView = useInView(heroRef, { once: true, margin: "-100px" });
-  const docsInView = useInView(docsRef, { once: true, margin: "-100px" });
+  const heroInView = useInView(heroRef, { once: true, margin: '-10%' });
+  const docsInView = useInView(docsRef, { once: true, margin: '-10%' });
 
   const endpoints = [
     { method: 'GET', path: '/employees', desc: 'Retrieve a list of all employees in your organization.' },

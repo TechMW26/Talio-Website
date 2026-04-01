@@ -5,7 +5,7 @@ import { ArrowRight, Sparkles } from 'lucide-react';
 
 export function PricingCTA() {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: '-80px' });
+  const isInView = useInView(ref, { once: true, margin: '-10%' });
 
   return (
     <section className="relative py-24 md:py-32 bg-black overflow-hidden">
@@ -15,14 +15,14 @@ export function PricingCTA() {
           className="absolute inset-0 opacity-[0.02]"
           style={{
             backgroundImage:
-              'radial-gradient(circle, rgba(255,255,255,0.15) 1px, transparent 1px)',
-            backgroundSize: '32px 32px',
+              'radial-gradient(circle, rgba(255,255,255,0.15) 0.0625rem, transparent 0.0625rem)',
+            backgroundSize: '2rem 2rem',
           }}
         />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[500px] bg-gradient-to-br from-violet-600/10 via-blue-500/8 to-cyan-400/5 rounded-full blur-[140px]" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[43.75rem] h-[31.25rem] bg-gradient-to-br from-violet-600/10 via-blue-500/8 to-cyan-400/5 rounded-full blur-[8.75rem]" />
       </div>
 
-      <div ref={ref} className="relative max-w-[900px] mx-auto px-6 md:px-8 lg:px-12">
+      <div ref={ref} className="relative mx-auto max-w-7xl px-6 md:px-8 lg:px-12">
         <div className="flex flex-col items-center text-center">
           {/* Label */}
           <motion.div
@@ -73,7 +73,7 @@ export function PricingCTA() {
                 className="group relative inline-flex items-center gap-3 px-8 py-4 rounded-2xl font-semibold text-white text-base overflow-hidden"
                 style={{
                   background: 'linear-gradient(135deg, #8b5cf6 0%, #6366f1 50%, #3b82f6 100%)',
-                  boxShadow: '0 0 30px rgba(139,92,246,0.3), 0 0 60px rgba(99,102,241,0.15)',
+                  boxShadow: '0 0 1.875rem rgba(139,92,246,0.3), 0 0 3.75rem rgba(99,102,241,0.15)',
                 }}
               >
                 {/* Shimmer */}

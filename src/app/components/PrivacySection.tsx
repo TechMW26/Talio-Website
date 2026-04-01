@@ -2,6 +2,7 @@ import { motion, useInView, useScroll, useTransform, useMotionValue, useSpring, 
 import { useRef, useState, useEffect, useCallback, useMemo } from 'react';
 import { ShieldCheck, Lock, Eye, EyeOff, Database, Server, Fingerprint } from 'lucide-react';
 import Lottie from 'lottie-react';
+import { useCompensatedMinWidth } from '@/app/hooks/useZoomCompensatedViewport';
 
 const PRIVACY_GRADIENT =
   'linear-gradient(90deg, #3E86C6 0%, #A666AA 24.78%, #EC4492 49.45%, #EE4454 74.21%, #F05427 100%)';
@@ -44,7 +45,9 @@ const PRIVACY_FEATURES = [
 export function PrivacySection() {
   const ref = useRef(null);
   const sectionRef = useRef<HTMLElement>(null);
-  const isInView = useInView(ref, { once: true, margin: '-80px' });
+  const isInView = useInView(ref, { once: true, margin: '-10%' });
+  const hasTabletPrivacyGrid = useCompensatedMinWidth(768);
+  const hasDesktopPrivacySplit = useCompensatedMinWidth(1024);
   const [lottieData, setLottieData] = useState<object | null>(null);
   const [hoveredCard, setHoveredCard] = useState<number | null>(null);
   const [hasRevealed, setHasRevealed] = useState(false);
@@ -188,7 +191,7 @@ export function PrivacySection() {
     <section
       ref={sectionRef}
       className="relative bg-black"
-      style={{ marginTop: '-350px', paddingTop: '100px' }}
+      style={{ marginTop: '-21.875rem', paddingTop: '6.25rem' }}
       onMouseMove={handleMouseMove}
     >
       {/* Neon flicker CSS */}
@@ -216,20 +219,20 @@ export function PrivacySection() {
           className="absolute inset-0 opacity-[0.02]"
           style={{
             backgroundImage:
-              'radial-gradient(circle, rgba(255,255,255,0.15) 1px, transparent 1px)',
-            backgroundSize: '32px 32px',
+              'radial-gradient(circle, rgba(255,255,255,0.15) 0.0625rem, transparent 0.0625rem)',
+            backgroundSize: '2rem 2rem',
           }}
         />
-        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-gradient-to-r from-blue-600/5 via-purple-600/5 to-pink-600/5 blur-3xl" />
+        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[37.5rem] h-[37.5rem] rounded-full bg-gradient-to-r from-blue-600/5 via-purple-600/5 to-pink-600/5 blur-3xl" />
       </div>
 
       {/* ─── SVG PATH SCROLL REVEAL ─── */}
-      <div ref={svgContainerRef} className="relative" style={{ minHeight: '580px' }}>
+      <div ref={svgContainerRef} className="relative" style={{ minHeight: '36.25rem' }}>
         {/* Centered SVG with path animation */}
         <div className="absolute inset-0 pointer-events-none z-10 px-4">
           <div
             className="absolute top-0 left-1/2"
-            style={{ transform: 'translateX(-50%)', width: 'min(900px, 100%)', height: '580px' }}
+            style={{ transform: 'translateX(-50%)', width: 'min(56.25rem, 100%)', height: '36.25rem' }}
           >
             <svg viewBox="-20 -70 900 630" width="100%" height="100%" preserveAspectRatio="xMidYMin meet" style={{ overflow: 'visible' }}>
               <defs>
@@ -330,11 +333,11 @@ export function PrivacySection() {
       <div
         ref={ref}
         className={`relative ${hasRevealed ? 'neon-flicker-in' : 'neon-hidden'}`}
-        style={{ marginTop: '-60px' }}
+        style={{ marginTop: '-3.75rem' }}
       >
         <div className="max-w-7xl mx-auto px-6 md:px-8 lg:px-12 pt-8 pb-24 md:pb-32">
           {/* Top section: Lottie + Heading side by side */}
-          <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-16 mb-20">
+          <div className={`flex mb-20 ${hasDesktopPrivacySplit ? 'flex-row items-center gap-16' : 'flex-col items-center gap-12'}`}>
             {/* Left - Lottie Animation */}
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}
@@ -359,7 +362,7 @@ export function PrivacySection() {
             </motion.div>
 
             {/* Right - Heading */}
-            <div className="flex flex-col items-center lg:items-start text-center lg:text-left">
+            <div className={`flex flex-col ${hasDesktopPrivacySplit ? 'items-start text-left' : 'items-center text-center'}`}>
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={isInView ? { opacity: 1, y: 0 } : {}}
@@ -400,7 +403,7 @@ export function PrivacySection() {
           </div>
 
           {/* Feature Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div className={`grid gap-5 ${hasTabletPrivacyGrid ? 'grid-cols-2' : 'grid-cols-1'}`}>
           {PRIVACY_FEATURES.map((feature, i) => (
             <motion.div
               key={feature.title}

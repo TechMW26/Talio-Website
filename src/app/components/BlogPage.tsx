@@ -6,7 +6,7 @@ import { getPublishedBlogPosts, type BlogPost } from '@/lib/firebase';
 import { usePageMeta } from '@/app/hooks/usePageMeta';
 
 export function BlogPage() {
-  usePageMeta('Blog', 'Insights, guides, and updates from the Talio team on productivity visibility, operational control, Mira, and connected HR workflows.');
+  usePageMeta('Blog', 'Insights, guides, and updates from the Talio team on productivity visibility, operational control, MIRA, and connected HR workflows.');
 
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
@@ -79,7 +79,7 @@ export function BlogPage() {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="text-lg md:text-xl text-gray-400 font-light leading-relaxed max-w-2xl text-center"
             >
-              Deep dives into productivity visibility, operational control, Mira, product updates, and the future of work.
+              Deep dives into productivity visibility, operational control, MIRA, product updates, and the future of work.
             </motion.p>
           </div>
 
@@ -301,7 +301,7 @@ export function BlogPage() {
             <div className="flex flex-col items-center text-center">
               <h2 className="text-3xl md:text-4xl font-bold text-white tracking-tight">Stay ahead of the curve</h2>
               <p className="mt-4 text-gray-400 max-w-lg">
-                Get the latest insights on productivity visibility, Mira, operational control, and product updates delivered to your inbox.
+                Get the latest insights on productivity visibility, MIRA, operational control, and product updates delivered to your inbox.
               </p>
               <div className="mt-8">
                 <Link

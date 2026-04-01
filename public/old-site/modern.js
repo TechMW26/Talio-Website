@@ -19,13 +19,19 @@ document.addEventListener('DOMContentLoaded', function() {
         const scrollTop = window.scrollY;
         const docHeight = document.documentElement.scrollHeight - window.innerHeight;
         const scrollPercent = (scrollTop / docHeight) * 100;
-        scrollProgress.style.width = scrollPercent + '%';
+        if (scrollProgress) {
+            scrollProgress.style.width = scrollPercent + '%';
+        }
     });
 
     // Navbar Scroll Effect
-    const navbar = document.getElementById('navbar');
-    
     window.addEventListener('scroll', () => {
+        const navbar = document.getElementById('navbar');
+
+        if (!navbar) {
+            return;
+        }
+
         if (window.scrollY > 50) {
             navbar.classList.add('scrolled');
         } else {

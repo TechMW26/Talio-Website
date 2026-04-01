@@ -9,6 +9,7 @@ import {
   Brain,
   ShieldCheck,
 } from 'lucide-react';
+import { useCompensatedMinWidth } from '@/app/hooks/useZoomCompensatedViewport';
 
 /* ── Integration icons (6 icons at top) ── */
 const ICONS = [
@@ -48,16 +49,16 @@ const CONNECTOR_PATHS = ICON_X.map((x, i) => ({
 }));
 
 /* ── Unified SVG connector lines ── */
-function ConnectorLines({ isInView }: { isInView: boolean }) {
+function ConnectorLines({ isInView, showDesktopConnector }: { isInView: boolean; showDesktopConnector: boolean }) {
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={isInView ? { opacity: 1 } : {}}
       transition={{ duration: 1, delay: 0.3 }}
-      className="hidden md:flex justify-center -mt-1 relative z-0"
+      className={showDesktopConnector ? 'flex justify-center -mt-1 relative z-0' : 'hidden'}
       style={{ overflow: 'visible' }}
     >
-      <svg viewBox="0 0 600 280" className="w-full max-w-[700px]" style={{ overflow: 'visible', height: 'auto', minHeight: '220px' }} fill="none">
+      <svg viewBox="0 0 600 280" className="w-full max-w-4xl" style={{ overflow: 'visible', height: 'auto', minHeight: '13.75rem' }} fill="none">
         <defs>
           {CONNECTOR_PATHS.map((p, i) => (
             <linearGradient key={`g${i}`} id={`aiLineGrad-${i}`} x1="0" y1="0" x2="0" y2="1">
@@ -213,7 +214,7 @@ function IconBox({
           background: `linear-gradient(135deg, ${color}18 0%, ${color}08 100%)`,
           borderColor: glowing ? `${color}60` : `${color}25`,
           boxShadow: glowing
-            ? `0 0 24px 6px ${color}35, 0 0 8px 2px ${color}20`
+            ? `0 0 1.5rem 0.375rem ${color}35, 0 0 0.5rem 0.125rem ${color}20`
             : `0 0 0 0 ${color}00`,
           transition: 'box-shadow 0.15s ease-out, border-color 0.15s ease-out',
         }}
@@ -221,7 +222,7 @@ function IconBox({
         <Icon className="w-5 h-5 md:w-6 md:h-6" style={{ color }} />
       </div>
       <span
-        className="absolute -bottom-7 left-1/2 -translate-x-1/2 text-[10px] font-medium opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap"
+        className="absolute -bottom-7 left-1/2 -translate-x-1/2 text-[0.625rem] font-medium opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap"
         style={{ color }}
       >
         {label}
@@ -233,7 +234,8 @@ function IconBox({
 export function AISection() {
   const sectionRef = useRef(null);
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: '-80px' });
+  const isInView = useInView(ref, { once: true, margin: '-10%' });
+  const showDesktopConnector = useCompensatedMinWidth(768);
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
@@ -250,14 +252,14 @@ export function AISection() {
           className="absolute inset-0 opacity-[0.02]"
           style={{
             backgroundImage:
-              'radial-gradient(circle, rgba(255,255,255,0.15) 1px, transparent 1px)',
-            backgroundSize: '32px 32px',
+              'radial-gradient(circle, rgba(255,255,255,0.15) 0.0625rem, transparent 0.0625rem)',
+            backgroundSize: '2rem 2rem',
           }}
         />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-to-b from-violet-600/5 via-blue-500/4 to-transparent rounded-full blur-[140px]" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[50rem] h-[50rem] bg-gradient-to-b from-violet-600/5 via-blue-500/4 to-transparent rounded-full blur-[8.75rem]" />
       </div>
 
-      <div ref={ref} className="relative max-w-[1200px] mx-auto px-6 md:px-8 lg:px-12">
+      <div ref={ref} className="relative mx-auto max-w-7xl px-6 md:px-8 lg:px-12">
         {/* ── Heading ── */}
         <div className="flex flex-col items-center text-center">
           <motion.div
@@ -277,9 +279,9 @@ export function AISection() {
             className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-10 leading-[1.05] tracking-tighter text-center"
           >
             AI trained on millions of{' '}
-            <br className="hidden md:block" />
+            {showDesktopConnector ? <br /> : ' '}
             workforce insights from{' '}
-            <br className="hidden md:block" />
+            {showDesktopConnector ? <br /> : ' '}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#3E86C6] via-[#EC4492] to-[#F05427]">
               top organizations
             </span>
@@ -289,7 +291,7 @@ export function AISection() {
         {/* ── Icon Stack — justify-around keeps centers at viewBox 50,150,…,550 ── */}
         <motion.div
           style={{ y: iconY }}
-          className="flex items-center justify-around max-w-[700px] mx-auto mt-4 mb-0 relative z-10"
+          className="relative z-10 mx-auto mt-4 mb-0 flex max-w-4xl items-center justify-around"
         >
           {ICONS.map(({ icon: Icon, color, label }, i) => (
             <IconBox key={label} icon={Icon} color={color} label={label} index={i} isInView={isInView} />
@@ -297,7 +299,7 @@ export function AISection() {
         </motion.div>
 
         {/* ── SVG Connector Paths ── */}
-        <ConnectorLines isInView={isInView} />
+        <ConnectorLines isInView={isInView} showDesktopConnector={showDesktopConnector} />
 
         {/* ── Sub-heading ── */}
         <div className="flex flex-col items-center text-center -mt-4 md:-mt-8 relative z-10">
@@ -326,7 +328,7 @@ export function AISection() {
           initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.8, delay: 0.6 }}
-          className="relative z-10 grid grid-cols-2 md:grid-cols-4 gap-5 md:gap-6 mt-12 md:mt-16 max-w-[1000px] mx-auto"
+          className={`relative z-10 mx-auto mt-12 grid max-w-6xl gap-5 md:mt-16 md:gap-6 ${showDesktopConnector ? 'grid-cols-4' : 'grid-cols-2'}`}
         >
           {STATS.map((stat, i) => (
             <motion.div
@@ -335,7 +337,7 @@ export function AISection() {
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.6, delay: 0.7 + i * 0.1 }}
               whileHover={{ y: -4, scale: 1.02 }}
-              className="relative rounded-2xl border px-5 py-7 md:px-6 md:py-9 text-center cursor-default group overflow-visible min-h-[160px] md:min-h-[190px] flex flex-col items-center justify-center"
+              className="relative rounded-2xl border px-5 py-7 md:px-6 md:py-9 text-center cursor-default group overflow-visible min-h-[10rem] md:min-h-[11.875rem] flex flex-col items-center justify-center"
               style={{
                 background: 'rgba(18,18,22,0.6)',
                 borderColor: 'rgba(255,255,255,0.06)',
@@ -359,7 +361,7 @@ export function AISection() {
               </div>
 
               {/* Description */}
-              <p className="text-[13px] md:text-sm text-zinc-500 leading-relaxed font-light">
+              <p className="text-[0.8125rem] md:text-sm text-zinc-500 leading-relaxed font-light">
                 {stat.desc}
               </p>
             </motion.div>

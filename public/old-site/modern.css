@@ -82,7 +82,7 @@ ul, ol {
 /* =============================================
    GLOBAL PARTICLE CANVAS
    ============================================= */
-#mira-canvas {
+#MIRA-canvas {
     position: fixed;
     top: 0;
     left: 0;
@@ -3810,7 +3810,7 @@ body {
     }
     
     /* MIRA Feature Section - Centered on mobile */
-    .mira-feature-card {
+    .MIRA-feature-card {
         flex-direction: column !important;
         text-align: center;
         gap: 40px;
@@ -3818,7 +3818,7 @@ body {
         justify-content: center;
     }
     
-    .mira-feature-text {
+    .MIRA-feature-text {
         text-align: center;
         align-items: center;
     }
@@ -3845,18 +3845,18 @@ body {
 }
 
 /* MIRA AI Section - Liquid Glass Experience */
-.mira-experience {
+.MIRA-experience {
     position: relative;
     background: transparent;
     z-index: 2;
 }
 
-.mira-scroll-container {
+.MIRA-scroll-container {
     position: relative;
     height: 1100vh;
 }
 
-.mira-viewport {
+.MIRA-viewport {
     position: sticky;
     top: 0;
     height: 100vh;
@@ -3868,7 +3868,7 @@ body {
 }
 
 /* Gradient overlay - animated position */
-.mira-gradient-overlay {
+.MIRA-gradient-overlay {
     position: fixed;
     inset: 0;
     z-index: -1;
@@ -3877,12 +3877,12 @@ body {
     pointer-events: none;
 }
 
-.mira-gradient-overlay.active {
+.MIRA-gradient-overlay.active {
     opacity: 1;
 }
 
 /* Vignette effect */
-.mira-vignette {
+.MIRA-vignette {
     position: fixed;
     inset: 0;
     pointer-events: none;
@@ -3959,7 +3959,7 @@ body {
 }
 
 /* MIRA Content Layers */
-.mira-content-layer {
+.MIRA-content-layer {
     position: absolute;
     inset: 0;
     display: flex;
@@ -3973,34 +3973,34 @@ body {
     background: rgba(0, 0, 0, 0) !important;
 }
 
-.mira-content-layer.active {
+.MIRA-content-layer.active {
     opacity: 1;
     transform: translateY(0);
     pointer-events: auto;
 }
 
-.mira-content-layer.exiting {
+.MIRA-content-layer.exiting {
     opacity: 0;
     transform: translateY(-50px);
 }
 
-.mira-content-layer.fade-up {
+.MIRA-content-layer.fade-up {
     transform: translateY(30px);
 }
 
-.mira-content-layer.active.fade-up {
+.MIRA-content-layer.active.fade-up {
     transform: translateY(0);
 }
 
 /* MIRA Intro */
-.mira-intro {
+.MIRA-intro {
     text-align: center;
     max-width: 800px;
     padding: 0 24px;
     position: relative;
 }
 
-.mira-intro::before {
+.MIRA-intro::before {
     content: '';
     position: absolute;
     top: 50%;
@@ -4019,7 +4019,7 @@ body {
     pointer-events: none;
 }
 
-.mira-badge {
+.MIRA-badge {
     display: inline-flex;
     align-items: center;
     gap: 8px;
@@ -4032,11 +4032,11 @@ body {
     margin-bottom: 24px;
 }
 
-.mira-badge i {
+.MIRA-badge i {
     font-size: 0.9rem;
 }
 
-.mira-title {
+.MIRA-title {
     font-family: var(--font-display);
     font-size: clamp(3.5rem, 10vw, 7rem);
     font-weight: 700;
@@ -4049,7 +4049,7 @@ body {
     background-clip: text;
 }
 
-.mira-subtitle {
+.MIRA-subtitle {
     font-size: 1.35rem;
     color: var(--text-secondary);
     line-height: 1.7;
@@ -4058,7 +4058,7 @@ body {
 }
 
 /* MIRA Feature Cards */
-.mira-feature-card {
+.MIRA-feature-card {
     display: flex;
     align-items: center;
     gap: 60px;
@@ -4066,12 +4066,12 @@ body {
     padding: 0 40px;
 }
 
-.mira-feature-card.reverse {
+.MIRA-feature-card.reverse {
     flex-direction: row-reverse;
 }
 
 /* Feature Visual with Icon */
-.mira-feature-visual {
+.MIRA-feature-visual {
     flex: 1;
     display: flex;
     align-items: center;
@@ -4079,7 +4079,7 @@ body {
     position: relative;
 }
 
-.mira-feature-icon-wrapper {
+.MIRA-feature-icon-wrapper {
     position: relative;
     width: 140px;
     height: 140px;
@@ -4103,7 +4103,7 @@ body {
     overflow: visible;
 }
 
-.mira-feature-icon-wrapper i {
+.MIRA-feature-icon-wrapper i {
     font-size: 3.5rem;
     color: #c4b5fd;
     position: relative;
@@ -4115,7 +4115,7 @@ body {
     filter: drop-shadow(0 0 15px rgba(196, 181, 253, 0.7));
 }
 
-.mira-feature-particles {
+.MIRA-feature-particles {
     position: absolute;
     width: 800px !important;
     height: 800px !important;
@@ -4127,12 +4127,12 @@ body {
 }
 
 /* Feature Text */
-.mira-feature-text {
+.MIRA-feature-text {
     flex: 1.2;
     position: relative;
 }
 
-.mira-feature-text::before {
+.MIRA-feature-text::before {
     content: '';
     position: absolute;
     top: 50%;
@@ -4152,7 +4152,7 @@ body {
     pointer-events: none;
 }
 
-.mira-feature-number {
+.MIRA-feature-number {
     font-family: var(--font-display);
     font-size: 0.85rem;
     text-transform: uppercase;
@@ -4161,7 +4161,7 @@ body {
     margin-bottom: 12px;
 }
 
-.mira-feature-title {
+.MIRA-feature-title {
     font-family: var(--font-display);
     font-size: clamp(1.75rem, 4vw, 2.5rem);
     font-weight: 700;
@@ -4169,20 +4169,20 @@ body {
     margin-bottom: 16px;
 }
 
-.mira-feature-description {
+.MIRA-feature-description {
     font-size: 1.1rem;
     color: var(--text-secondary);
     line-height: 1.7;
     margin-bottom: 24px;
 }
 
-.mira-feature-highlights {
+.MIRA-feature-highlights {
     display: flex;
     flex-wrap: wrap;
     gap: 12px;
 }
 
-.mira-highlight-tag {
+.MIRA-highlight-tag {
     display: inline-flex;
     align-items: center;
     gap: 6px;
@@ -4194,13 +4194,13 @@ body {
     color: var(--text-secondary);
 }
 
-.mira-highlight-tag i {
+.MIRA-highlight-tag i {
     font-size: 0.7rem;
     color: var(--accent-secondary);
 }
 
 /* MIRA Progress Indicator */
-.mira-progress {
+.MIRA-progress {
     position: fixed;
     right: 40px;
     top: 50%;
@@ -4213,11 +4213,11 @@ body {
     transition: opacity 0.3s ease;
 }
 
-.mira-progress.visible {
+.MIRA-progress.visible {
     opacity: 1;
 }
 
-.mira-progress-dot {
+.MIRA-progress-dot {
     width: 10px;
     height: 10px;
     border-radius: 50%;
@@ -4226,18 +4226,18 @@ body {
     cursor: pointer;
 }
 
-.mira-progress-dot.active {
+.MIRA-progress-dot.active {
     background: var(--accent-secondary);
     box-shadow: 0 0 15px var(--accent-secondary);
     transform: scale(1.3);
 }
 
-.mira-progress-dot:hover {
+.MIRA-progress-dot:hover {
     background: rgba(255, 255, 255, 0.5);
 }
 
 /* MIRA Scroll indicator */
-.mira-scroll-hint {
+.MIRA-scroll-hint {
     position: absolute;
     bottom: 40px;
     left: 50%;
@@ -4250,14 +4250,14 @@ body {
     transition: opacity 0.3s ease;
 }
 
-.mira-scroll-hint span {
+.MIRA-scroll-hint span {
     font-size: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 0.1em;
     color: var(--text-muted);
 }
 
-.mira-scroll-hint i {
+.MIRA-scroll-hint i {
     font-size: 1.25rem;
     color: var(--accent-secondary);
     animation: bounce 2s infinite;
@@ -4712,32 +4712,32 @@ body {
         grid-template-columns: repeat(2, 1fr);
     }
 
-    .mira-feature-particle {
+    .MIRA-feature-particle {
         display: none;
     }
 }
 
 @media (max-width: 900px) {
-    .mira-feature-card {
+    .MIRA-feature-card {
         flex-direction: column !important;
         text-align: center;
         gap: 40px;
     }
 
-    .mira-feature-icon-wrapper {
+    .MIRA-feature-icon-wrapper {
         width: 140px;
         height: 140px;
     }
 
-    .mira-feature-icon-wrapper i {
+    .MIRA-feature-icon-wrapper i {
         font-size: 3rem;
     }
 
-    .mira-feature-highlights {
+    .MIRA-feature-highlights {
         justify-content: center;
     }
 
-    .mira-progress {
+    .MIRA-progress {
         display: none;
     }
 }
@@ -4764,12 +4764,12 @@ body {
     }
 
     /* MIRA Section Mobile Styles */
-    .mira-experience {
+    .MIRA-experience {
         overflow: visible !important;
         position: relative;
     }
     
-    .mira-scroll-container {
+    .MIRA-scroll-container {
         height: 800vh !important;
         min-height: 800vh !important;
         position: relative !important;
@@ -4777,7 +4777,7 @@ body {
         display: block;
     }
 
-    .mira-viewport {
+    .MIRA-viewport {
         position: relative;
         top: 0;
         left: 0;
@@ -4791,7 +4791,7 @@ body {
         z-index: 10;
     }
 
-    .mira-content-layer {
+    .MIRA-content-layer {
         position: absolute;
         inset: 0;
         display: flex;
@@ -4805,35 +4805,35 @@ body {
         background: #0a0a0f;
     }
 
-    .mira-content-layer.active {
+    .MIRA-content-layer.active {
         opacity: 1;
         transform: translateY(0);
         pointer-events: auto;
         background: #0a0a0f;
     }
 
-    .mira-content-layer.exiting {
+    .MIRA-content-layer.exiting {
         opacity: 0;
         transform: translateY(-40px);
     }
 
-    .mira-intro {
+    .MIRA-intro {
         padding: 20px;
         margin: 0 auto;
         max-width: 100%;
         text-align: center;
     }
 
-    .mira-title {
+    .MIRA-title {
         font-size: 2.2rem !important;
     }
 
-    .mira-subtitle {
+    .MIRA-subtitle {
         font-size: 0.95rem;
         line-height: 1.5;
     }
 
-    .mira-scroll-hint {
+    .MIRA-scroll-hint {
         display: flex !important;
         font-size: 0.8rem;
         position: absolute;
@@ -4842,7 +4842,7 @@ body {
         transform: translateX(-50%);
     }
 
-    .mira-feature-card {
+    .MIRA-feature-card {
         flex-direction: column !important;
         gap: 20px;
         padding: 0 20px;
@@ -4850,76 +4850,76 @@ body {
         max-width: 100%;
     }
 
-    .mira-feature-card.reverse {
+    .MIRA-feature-card.reverse {
         flex-direction: column !important;
     }
 
-    .mira-feature-visual {
+    .MIRA-feature-visual {
         order: -1;
     }
 
-    .mira-feature-icon-wrapper {
+    .MIRA-feature-icon-wrapper {
         width: 90px;
         height: 90px;
     }
 
-    .mira-feature-icon-wrapper i {
+    .MIRA-feature-icon-wrapper i {
         font-size: 2rem;
     }
 
-    .mira-feature-text {
+    .MIRA-feature-text {
         text-align: center;
     }
 
-    .mira-feature-text::before {
+    .MIRA-feature-text::before {
         display: none;
     }
 
-    .mira-feature-number {
+    .MIRA-feature-number {
         font-size: 0.75rem;
     }
 
-    .mira-feature-title {
+    .MIRA-feature-title {
         font-size: 1.35rem !important;
     }
 
-    .mira-feature-description {
+    .MIRA-feature-description {
         font-size: 0.95rem;
         line-height: 1.6;
     }
 
-    .mira-feature-highlights {
+    .MIRA-feature-highlights {
         justify-content: center;
         flex-wrap: wrap;
         gap: 8px;
     }
 
-    .mira-highlight-tag {
+    .MIRA-highlight-tag {
         font-size: 0.75rem;
         padding: 4px 10px;
     }
 
     /* Keep particle rings on mobile but smaller */
-    .mira-feature-particles {
+    .MIRA-feature-particles {
         display: block !important;
         width: 500px !important;
         height: 500px !important;
     }
 
     /* Progress dots on mobile */
-    .mira-progress {
+    .MIRA-progress {
         display: flex !important;
         right: 10px;
         gap: 8px;
     }
 
-    .mira-progress-dot {
+    .MIRA-progress-dot {
         width: 8px;
         height: 8px;
     }
 
-    .mira-gradient-overlay,
-    .mira-vignette {
+    .MIRA-gradient-overlay,
+    .MIRA-vignette {
         display: block;
     }
 
@@ -6430,7 +6430,7 @@ h1, h2, h3, h4, h5, h6, p, span, a {
         font-size: clamp(1.5rem, 6vw, 2rem);
     }
     
-    .mira-title {
+    .MIRA-title {
         font-size: clamp(2rem, 10vw, 3rem) !important;
     }
     

@@ -19,7 +19,7 @@ const ROWS: FlagCode[][] = [
 
 export function LanguagesSection() {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: '-80px' });
+  const isInView = useInView(ref, { once: true, margin: '-10%' });
   const [showFlags, setShowFlags] = useState(false);
 
   // Delay flag entrance by 0.8s after section enters viewport
@@ -38,13 +38,13 @@ export function LanguagesSection() {
           className="absolute inset-0 opacity-[0.02]"
           style={{
             backgroundImage:
-              'radial-gradient(circle, rgba(255,255,255,0.15) 1px, transparent 1px)',
-            backgroundSize: '32px 32px',
+              'radial-gradient(circle, rgba(255,255,255,0.15) 0.0625rem, transparent 0.0625rem)',
+            backgroundSize: '2rem 2rem',
           }}
         />
       </div>
 
-      <div ref={ref} className="relative max-w-[1400px] mx-auto px-6 md:px-8 lg:px-12">
+      <div ref={ref} className="relative mx-auto max-w-7xl px-6 md:px-8 lg:px-12">
         {/* Heading */}
         <div className="flex flex-col items-center text-center">
           <motion.div
@@ -129,7 +129,7 @@ export function LanguagesSection() {
                           className="cursor-default select-none"
                         >
                           <FlagIcon
-                            className="w-10 h-auto md:w-12 lg:w-14 rounded-[3px] md:rounded-[4px]"
+                            className="w-10 h-auto md:w-12 lg:w-14 rounded-[0.1875rem] md:rounded-[0.25rem]"
                           />
                         </motion.div>
                       );

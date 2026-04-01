@@ -3,21 +3,24 @@ import { useRef } from 'react';
 import { Link } from 'react-router';
 import { ArrowRight } from 'lucide-react';
 import { usePageMeta } from '@/app/hooks/usePageMeta';
+import { useCompensatedMinWidth } from '@/app/hooks/useZoomCompensatedViewport';
 import { AnimatedButton } from '@/app/components/AnimatedButton';
 import { communicationFeatures, coreFeatures } from '@/app/content/featuresOverviewData';
 
 export function FeaturesOverview() {
-  usePageMeta('Features', 'Explore Talio\'s productivity utility modules, Mira workflow support, and built-in HRMS add-ons for attendance, leave, payroll, coordination, and team visibility.');
+  usePageMeta('Features', 'Explore Talio\'s productivity utility modules, MIRA workflow support, and built-in HRMS add-ons for attendance, leave, payroll, coordination, and team visibility.');
 
   const heroRef = useRef(null);
   const coreRef = useRef(null);
   const commRef = useRef(null);
   const ctaRef = useRef(null);
 
-  const heroInView = useInView(heroRef, { once: true, margin: '-100px' });
-  const coreInView = useInView(coreRef, { once: true, margin: '-100px' });
-  const commInView = useInView(commRef, { once: true, margin: '-100px' });
-  const ctaInView = useInView(ctaRef, { once: true, margin: '-100px' });
+  const heroInView = useInView(heroRef, { once: true, margin: '-10%' });
+  const coreInView = useInView(coreRef, { once: true, margin: '-10%' });
+  const commInView = useInView(commRef, { once: true, margin: '-10%' });
+  const ctaInView = useInView(ctaRef, { once: true, margin: '-10%' });
+  const hasTabletFeatureGrid = useCompensatedMinWidth(768);
+  const hasDesktopFeatureGrid = useCompensatedMinWidth(1024);
 
   return (
     <div className="bg-black relative transition-colors duration-300">
@@ -36,7 +39,7 @@ export function FeaturesOverview() {
           <motion.div
             animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
             transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
-            className="absolute top-1/4 -left-1/4 w-[600px] h-[600px] bg-gradient-to-br from-indigo-900/20 via-purple-900/10 to-transparent rounded-full blur-3xl"
+            className="absolute top-1/4 -left-1/4 w-[37.5rem] h-[37.5rem] bg-gradient-to-br from-indigo-900/20 via-purple-900/10 to-transparent rounded-full blur-3xl"
           />
         </div>
 
@@ -55,7 +58,7 @@ export function FeaturesOverview() {
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">and HRMS Add-Ons</span>
           </h1>
           <p className="text-lg md:text-xl text-gray-400 font-light leading-relaxed max-w-xl text-center">
-            Talio combines productivity visibility, coordination, Mira, and connected HR workflows so teams can run day-to-day operations from one platform.
+            Talio combines productivity visibility, coordination, MIRA, and connected HR workflows so teams can run day-to-day operations from one platform.
           </p>
         </motion.div>
       </section>
@@ -78,7 +81,7 @@ export function FeaturesOverview() {
             </p>
           </motion.div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className={`grid gap-6 ${hasDesktopFeatureGrid ? 'grid-cols-3' : hasTabletFeatureGrid ? 'grid-cols-2' : 'grid-cols-1'}`}>
             {coreFeatures.map((feature, i) => (
               <motion.div
                 key={feature.title}
@@ -113,16 +116,16 @@ export function FeaturesOverview() {
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
             className="flex flex-col items-center text-center "
           >
-            <span className="inline-flex items-center gap-2 text-xs md:text-sm font-semibold text-gray-500 uppercase tracking-widest mb-6">Mira & Coordination</span>
+            <span className="inline-flex items-center gap-2 text-xs md:text-sm font-semibold text-gray-500 uppercase tracking-widest mb-6">MIRA & Coordination</span>
             <h2 className="text-3xl md:text-5xl lg:text-6xl font-bold text-white tracking-tighter leading-[1.05] text-center" style={{ marginBottom: '1rem' }}>
               Faster coordination with embedded intelligence
             </h2>
             <p className="text-gray-400 font-light max-w-lg">
-              Keep communication, alerts, and Mira-driven workflow support inside the same operating layer your team already uses.
+              Keep communication, alerts, and MIRA-driven workflow support inside the same operating layer your team already uses.
             </p>
           </motion.div>
 
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className={`grid gap-6 ${hasTabletFeatureGrid ? 'grid-cols-3' : 'grid-cols-1'}`}>
             {communicationFeatures.map((feature, i) => (
               <motion.div
                 key={feature.title}

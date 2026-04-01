@@ -46,7 +46,7 @@ const steps = [
 ];
 
 const inputClass =
-  'w-full rounded-xl border border-gray-700/60 bg-gray-950/80 px-4 py-3 text-[16px] md:text-[13px] text-white placeholder-gray-500 outline-none transition-all duration-200 focus:border-blue-500/60 focus:ring-2 focus:ring-blue-500/15 hover:border-gray-600';
+  'site-dark-input w-full rounded-xl px-4 py-3 text-[1rem] md:text-[0.8125rem] text-white placeholder-gray-500 outline-none transition-all duration-200';
 
 function StepInput(props: ComponentPropsWithoutRef<'input'>) {
   return <input {...props} className={inputClass} />;
@@ -71,6 +71,7 @@ export function DemoBookingStepper({
 }: DemoBookingStepperProps) {
   const [currentStep, setCurrentStep] = useState(0);
   const isLastStep = currentStep === steps.length - 1;
+  const currentStepMeta = steps[currentStep];
 
   useEffect(() => {
     setCurrentStep(0);
@@ -104,14 +105,14 @@ export function DemoBookingStepper({
   return (
     <form onSubmit={handleFormSubmit} className="space-y-5">
       {planInfo && (
-        <div className="rounded-2xl border border-gray-700/40 bg-gradient-to-r from-gray-800/40 to-gray-800/20 p-4">
+        <div className="flex items-center gap-3 border-b border-white/8 pb-4">
           <div className="flex items-center gap-3">
             <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br ${planInfo.gradient} shadow-lg`}>
               <Sparkles className="h-4 w-4 text-white" />
             </div>
             <div className="min-w-0">
               <span className="block text-sm font-semibold text-white">{planInfo.name} Plan</span>
-              <span className="block text-[12px] text-gray-400">{planInfo.price}</span>
+              <span className="block text-[0.75rem] text-gray-400">{planInfo.price}</span>
             </div>
           </div>
         </div>
@@ -132,40 +133,39 @@ export function DemoBookingStepper({
               onClick={() => canOpenStep(index) && setCurrentStep(index)}
               className={`group relative flex flex-1 items-center justify-center sm:justify-start gap-1.5 sm:gap-2 rounded-xl border px-2 sm:px-3 py-2.5 text-left transition-all duration-200 min-w-0 ${
                 active
-                  ? 'border-blue-500/30 bg-blue-500/[0.08] shadow-sm shadow-blue-500/5'
+                  ? 'border-white/14 bg-white/[0.06] shadow-[0_0.625rem_1.5rem_rgba(0,0,0,0.18)]'
                   : complete
                     ? 'border-emerald-500/20 bg-emerald-500/[0.06]'
-                    : 'border-gray-800/60 bg-gray-950/40'
+                      : 'border-gray-800/60 bg-black'
               } ${!canOpenStep(index) ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer hover:border-gray-600'}`}
             >
               <div className={`hidden sm:flex h-7 w-7 shrink-0 items-center justify-center rounded-lg transition-all ${
                 active
-                  ? 'bg-blue-500/20 text-blue-400'
+                  ? 'bg-white/10 text-violet-300'
                   : complete
                     ? 'bg-emerald-500/20 text-emerald-400'
-                    : 'bg-gray-800/60 text-gray-500'
+                    : 'bg-white/[0.04] text-gray-500'
               }`}>
                 {complete && !active ? <Check className="h-3.5 w-3.5" /> : <StepIcon className="h-3.5 w-3.5" />}
               </div>
               <div className="min-w-0 hidden sm:block">
-                <span className={`block text-[10px] font-medium leading-none ${
-                  active ? 'text-blue-300' : complete ? 'text-emerald-300' : 'text-gray-500'
+                <span className={`block text-[0.625rem] font-medium leading-none ${
+                  active ? 'text-white' : complete ? 'text-emerald-300' : 'text-gray-500'
                 }`}>
                   {String(index + 1).padStart(2, '0')}
                 </span>
-                <span className="mt-0.5 block truncate text-[11px] font-medium text-white/80">{step.label}</span>
+                <span className="mt-0.5 block truncate text-[0.6875rem] font-medium text-white/80">{step.label}</span>
               </div>
               {/* Mobile: just label */}
               <span className={`block sm:hidden text-xs font-semibold text-center w-full ${
-                active ? 'text-blue-300' : complete ? 'text-emerald-300' : 'text-gray-500'
+                active ? 'text-white' : complete ? 'text-emerald-300' : 'text-gray-500'
               }`}>{step.label}</span>
             </button>
           );
         })}
       </div>
 
-      {/* Step content card */}
-      <div className="rounded-2xl border border-gray-800/60 bg-gradient-to-b from-gray-900/60 to-gray-950/80 p-4 md:p-5">
+      <div className="space-y-4">
         <div className="flex items-center gap-3 mb-4">
           {currentStep > 0 && (
             <button
@@ -179,14 +179,14 @@ export function DemoBookingStepper({
           )}
 
           <div className="min-w-0">
-            <span className="block text-base md:text-lg font-semibold text-white">{steps[currentStep].title}</span>
-            <span className="block text-[12px] md:text-[13px] text-gray-400">{steps[currentStep].description}</span>
+            <span className="block text-base md:text-lg font-semibold text-white">{currentStepMeta.title}</span>
+            <span className="block text-[0.75rem] md:text-[0.8125rem] text-gray-400">{currentStepMeta.description}</span>
           </div>
         </div>
 
         <AnimatePresence mode="wait">
           <motion.div
-            key={steps[currentStep].label}
+            key={currentStepMeta.label}
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
@@ -235,46 +235,44 @@ export function DemoBookingStepper({
 
             {currentStep === 2 && (
               <div className="space-y-4">
-                <div className="rounded-xl border border-gray-800/50 bg-black/20 p-4">
-                  <div className="mb-3 flex items-center gap-2.5">
-                    <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-500/15">
-                      <Calendar className="h-3.5 w-3.5 text-blue-400" />
-                    </div>
-                    <span className="text-[13px] font-medium text-white">When works for you?</span>
+                <div className="flex items-center gap-2.5">
+                  <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-white/[0.06]">
+                    <Calendar className="h-3.5 w-3.5 text-violet-300" />
+                  </div>
+                  <span className="text-[0.8125rem] font-medium text-white">When works for you?</span>
+                </div>
+
+                <div className="space-y-3">
+                  <div>
+                    <span className="mb-1.5 block text-[0.6875rem] font-medium uppercase tracking-wider text-gray-500">Preferred Date</span>
+                    <DatePicker
+                      name="preferredDate"
+                      value={form.preferredDate}
+                        onChange={(dateStr: string) =>
+                        onFieldChange({
+                          target: { name: 'preferredDate', value: dateStr },
+                        } as ChangeEvent<HTMLInputElement>)
+                      }
+                      minDate={minDate}
+                      placeholder="Pick a date"
+                      required
+                    />
                   </div>
 
-                  <div className="space-y-3">
-                    <div>
-                      <span className="mb-1.5 block text-[11px] font-medium uppercase tracking-wider text-gray-500">Preferred Date</span>
-                      <DatePicker
-                        name="preferredDate"
-                        value={form.preferredDate}
-                        onChange={(dateStr) =>
-                          onFieldChange({
-                            target: { name: 'preferredDate', value: dateStr },
-                          } as ChangeEvent<HTMLInputElement>)
-                        }
-                        minDate={minDate}
-                        placeholder="Pick a date"
-                        required
-                      />
-                    </div>
-
-                    <div>
-                      <span className="mb-1.5 block text-[11px] font-medium uppercase tracking-wider text-gray-500">Preferred Time (IST)</span>
-                      <TimePicker
-                        name="preferredTime"
-                        value={form.preferredTime}
-                        onChange={(timeStr) =>
-                          onFieldChange({
-                            target: { name: 'preferredTime', value: timeStr },
-                          } as ChangeEvent<HTMLInputElement>)
-                        }
-                        slots={demoTimeSlots}
-                        placeholder="Pick a time slot"
-                        required
-                      />
-                    </div>
+                  <div>
+                    <span className="mb-1.5 block text-[0.6875rem] font-medium uppercase tracking-wider text-gray-500">Preferred Time (IST)</span>
+                    <TimePicker
+                      name="preferredTime"
+                      value={form.preferredTime}
+                        onChange={(timeStr: string) =>
+                        onFieldChange({
+                          target: { name: 'preferredTime', value: timeStr },
+                        } as ChangeEvent<HTMLInputElement>)
+                      }
+                      slots={demoTimeSlots}
+                      placeholder="Pick a time slot"
+                      required
+                    />
                   </div>
                 </div>
               </div>
@@ -289,7 +287,7 @@ export function DemoBookingStepper({
         disabled={!isStepComplete(currentStep) || submitting || submitted}
         whileHover={!submitting && isStepComplete(currentStep) ? { scale: 1.01 } : {}}
         whileTap={!submitting && isStepComplete(currentStep) ? { scale: 0.98 } : {}}
-        className="group inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 px-5 py-3.5 text-[14px] font-semibold text-white shadow-lg shadow-blue-500/20 transition-all duration-200 hover:shadow-xl hover:shadow-blue-500/25 disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none"
+        className="group inline-flex w-full items-center justify-center gap-2 rounded-xl bg-white px-5 py-3.5 text-[0.875rem] font-semibold text-black shadow-lg shadow-white/10 transition-all duration-200 hover:bg-gray-100 hover:shadow-xl hover:shadow-white/15 disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none"
       >
         <span>{isLastStep ? (submitting ? submittingLabel : submitLabel) : 'Continue'}</span>
         {(!submitting || !isLastStep) && <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />}

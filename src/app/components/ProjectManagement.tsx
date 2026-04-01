@@ -3,6 +3,7 @@ import { useRef, useState, useEffect, forwardRef } from 'react';
 import { DndProvider, useDrag, useDrop } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { Sparkles, Plus, MoreHorizontal, Layout, Settings, Share2, ZoomIn, ZoomOut } from 'lucide-react';
+import { useCompensatedMinWidth } from '@/app/hooks/useZoomCompensatedViewport';
 
 const ItemType = 'CARD';
 
@@ -84,8 +85,8 @@ const DraggableCard = forwardRef<HTMLDivElement, {
         backgroundColor: colors.bg,
         borderColor: colors.border,
         boxShadow: isAnimating 
-          ? `0 20px 60px -10px ${colors.accent}40, 0 8px 20px -6px rgba(0,0,0,0.5)` 
-          : `0 1px 3px rgba(0,0,0,0.2)`,
+          ? `0 1.25rem 3.75rem -0.625rem ${colors.accent}40, 0 0.5rem 1.25rem -0.375rem rgba(0,0,0,0.5)` 
+          : `0 0.0625rem 0.1875rem rgba(0,0,0,0.2)`,
         scale: isAnimating ? 1.05 : 1,
         zIndex: isAnimating ? 50 : 0,
       }}
@@ -106,7 +107,7 @@ const DraggableCard = forwardRef<HTMLDivElement, {
       `}
     >
       {/* Top color strip */}
-      <div className={`absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r ${colors.strip} transition-all duration-700`} />
+      <div className={`absolute top-0 left-0 right-0 h-[0.125rem] bg-gradient-to-r ${colors.strip} transition-all duration-700`} />
 
       <div className="flex justify-between items-start mb-2">
         <div className="flex items-center gap-2">
@@ -115,7 +116,7 @@ const DraggableCard = forwardRef<HTMLDivElement, {
             animate={{ backgroundColor: colors.accent }}
             transition={{ duration: 0.6 }}
           />
-          <span className="text-[10px] font-bold tracking-wider uppercase text-zinc-500">
+          <span className="text-[0.625rem] font-bold tracking-wider uppercase text-zinc-500">
             {card.label}
           </span>
         </div>
@@ -129,10 +130,10 @@ const DraggableCard = forwardRef<HTMLDivElement, {
       </h4>
 
       <div className="flex items-center justify-between mt-auto">
-        <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-zinc-700 to-zinc-600 border border-zinc-800 flex items-center justify-center text-[9px] font-bold text-zinc-400">
+        <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-zinc-700 to-zinc-600 border border-zinc-800 flex items-center justify-center text-[0.5625rem] font-bold text-zinc-400">
           {card.assignee}
         </div>
-        <div className="text-[10px] font-medium text-zinc-600">
+        <div className="text-[0.625rem] font-medium text-zinc-600">
           {card.id.split('-')[1]}
         </div>
       </div>
@@ -177,7 +178,7 @@ function DroppableColumn({
   return (
     <div
       ref={dropRef}
-      className={`flex flex-col h-full bg-zinc-900/50 rounded-2xl p-2 border backdrop-blur-[2px] transition-colors duration-200 ${
+      className={`flex flex-col h-full bg-zinc-900/50 rounded-2xl p-2 border backdrop-blur-[0.125rem] transition-colors duration-200 ${
         isOver ? 'border-white/20 bg-zinc-800/60' : 'border-zinc-800/50'
       }`}
     >
@@ -188,7 +189,7 @@ function DroppableColumn({
           <h3 className="text-sm font-bold text-zinc-200">
             {column.title}
           </h3>
-          <span className="w-5 h-5 flex items-center justify-center rounded-full bg-zinc-800 text-[10px] font-bold text-gray-500">
+          <span className="w-5 h-5 flex items-center justify-center rounded-full bg-zinc-800 text-[0.625rem] font-bold text-gray-500">
             {column.cards.length}
           </span>
         </div>
@@ -196,7 +197,7 @@ function DroppableColumn({
       </div>
 
       {/* Drop Zone */}
-      <div className={`flex-1 min-h-[300px] rounded-xl transition-colors duration-200 ${
+      <div className={`flex-1 min-h-[18.75rem] rounded-xl transition-colors duration-200 ${
         isOver ? 'bg-white/5' : ''
       }`}>
         <AnimatePresence mode="popLayout">
@@ -250,7 +251,7 @@ function HandwrittenText({ text, active }: { text: string; active: boolean }) {
           fontFamily: "'DynaPuff', cursive",
           fontWeight: 400,
           fontSize: 'clamp(2.8rem, 8vw, 7rem)',
-          filter: 'drop-shadow(0 0 40px rgba(168, 85, 247, 0.45)) drop-shadow(0 0 80px rgba(96, 165, 250, 0.2))',
+          filter: 'drop-shadow(0 0 2.5rem rgba(168, 85, 247, 0.45)) drop-shadow(0 0 5rem rgba(96, 165, 250, 0.2))',
         }}
       >
         {words.map((word, wi) => {
@@ -307,6 +308,8 @@ function HandwrittenText({ text, active }: { text: string; active: boolean }) {
 
 function ProjectManagementContent() {
   const containerRef = useRef(null);
+  const hasDesktopBoardWidth = useCompensatedMinWidth(1280);
+  const hasTabletBoardWidth = useCompensatedMinWidth(768);
   
   // Track scroll within this 300vh section
   const { scrollYProgress } = useScroll({
@@ -318,14 +321,14 @@ function ProjectManagementContent() {
   // 0 to 0.3 scroll progress triggers the expansion
   
   // Start width at 85%, expand to 100%
-  const width = useTransform(scrollYProgress, [0, 0.3], ["85%", "100%"]);
+  const width = useTransform(scrollYProgress, [0, 0.3], ["88%", "100%"]);
   
   // Start height at 60vh, expand to 100vh
-  const height = useTransform(scrollYProgress, [0, 0.3], ["60vh", "100vh"]);
+  const height = useTransform(scrollYProgress, [0, 0.3], ["62vh", "100dvh"]);
   
   // Start position: Push down by 35vh to leave room for header
   // End position: 0vh (top of screen)
-  const top = useTransform(scrollYProgress, [0, 0.3], ["35vh", "0vh"]);
+  const top = useTransform(scrollYProgress, [0, 0.3], ["32vh", "0vh"]);
   
   // Border radius change
   const borderRadius = useTransform(scrollYProgress, [0, 0.3], [32, 0]);
@@ -375,12 +378,19 @@ function ProjectManagementContent() {
 
   // Track when board is fully expanded to trigger tagline animation
   const [boardFullscreen, setBoardFullscreen] = useState(false);
+  const [compactTaglineVisible, setCompactTaglineVisible] = useState(false);
 
   // Single scroll-triggered animation: pick a random card, move it to the next column
   useMotionValueEvent(scrollYProgress, "change", (latest) => {
     // Track fullscreen state for tagline animation
     if (latest >= 0.32 && !boardFullscreen) setBoardFullscreen(true);
     if (latest < 0.25 && boardFullscreen) setBoardFullscreen(false);
+
+    setCompactTaglineVisible((current) => {
+      if (latest >= 0.12 && !current) return true;
+      if (latest < 0.05 && current) return false;
+      return current;
+    });
 
     // Trigger once when the board is fully expanded (~40% scroll)
     if (latest > 0.4 && !hasAnimated.current) {
@@ -447,16 +457,16 @@ function ProjectManagementContent() {
   };
 
   return (
-    <section ref={containerRef} className="relative h-[140vh] bg-black z-[60]" style={{ position: 'relative' }}>
+    <section ref={containerRef} className="relative h-[155vh] xl:h-[140vh] bg-black z-[60]" style={{ position: 'relative' }}>
       
       {/* Sticky Container — z-[60] on section ensures it overlays the fixed navbar (z-50) when the board expands fullscreen */}
-      <div className="sticky top-0 h-screen w-full overflow-hidden">
+      <div className="sticky top-0 h-[100dvh] w-full overflow-hidden">
         
         {/* Decorative Glows */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-blue-500/5 rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[50rem] h-[50rem] bg-blue-500/5 rounded-full blur-[7.5rem] pointer-events-none" />
 
         {/* Header Section - Fixed in the top 35% of the screen */}
-        <div className="absolute top-0 left-0 right-0 h-[35vh] flex flex-col items-center justify-center z-10 px-6">
+        <div className="absolute top-0 left-0 right-0 h-[30vh] xl:h-[35vh] flex flex-col items-center justify-center z-10 px-4 sm:px-6">
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -481,7 +491,7 @@ function ProjectManagementContent() {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-lg md:text-xl text-zinc-400 font-light text-center max-w-2xl hidden md:block leading-relaxed"
+            className="text-base md:text-lg xl:text-xl text-zinc-400 font-light text-center max-w-2xl hidden md:block leading-relaxed"
           >
             Experience a fluid workflow on our intelligent canvas.
           </motion.p>
@@ -517,36 +527,36 @@ function ProjectManagementContent() {
               {/* Screen Header / Toolbar */}
               <motion.div
                 style={{ borderTopLeftRadius: innerRadius, borderTopRightRadius: innerRadius }}
-                className="flex items-center justify-between px-8 py-6 border-b border-zinc-800 bg-zinc-900/50 backdrop-blur-sm sticky top-0 z-10"
+                className="flex items-center justify-between px-4 sm:px-5 md:px-6 xl:px-8 py-4 sm:py-5 xl:py-6 border-b border-zinc-800 bg-zinc-900/50 backdrop-blur-sm sticky top-0 z-10"
               >
-                <div className="flex items-center gap-4">
-                  <div className="w-3 h-3 rounded-full bg-red-400/80" />
-                  <div className="w-3 h-3 rounded-full bg-yellow-400/80" />
-                  <div className="w-3 h-3 rounded-full bg-green-400/80" />
-                  <div className="h-6 w-px bg-zinc-700 mx-2" />
-                  <h3 className="text-sm font-semibold text-zinc-300">Product Roadmap</h3>
+                <div className="flex min-w-0 items-center gap-2 sm:gap-3">
+                  <div className="w-2.5 h-2.5 rounded-full bg-red-400/80" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-yellow-400/80" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-green-400/80" />
+                  <div className="h-5 w-px bg-zinc-700 mx-1 sm:mx-2" />
+                  <h3 className="truncate text-xs sm:text-sm font-semibold text-zinc-300">Product Roadmap</h3>
                 </div>
-                <div className="flex items-center gap-4 text-gray-400">
-                  <div className="flex -space-x-2 mr-4">
+                <div className="flex items-center gap-2 sm:gap-3 text-gray-400">
+                  <div className="hidden md:flex -space-x-2 mr-2 xl:mr-4">
                      {[1,2,3].map(i => (
-                       <div key={i} className="w-8 h-8 rounded-full border-2 border-zinc-900 bg-zinc-800" />
+                       <div key={i} className="w-7 h-7 xl:w-8 xl:h-8 rounded-full border-2 border-zinc-900 bg-zinc-800" />
                      ))}
                   </div>
-                  <Settings className="w-5 h-5 hover:text-zinc-300 transition-colors cursor-pointer" />
-                  <Share2 className="w-5 h-5 hover:text-zinc-300 transition-colors cursor-pointer" />
-                  <div className="w-px h-6 bg-zinc-700" />
-                  <ZoomOut className="w-4 h-4 cursor-pointer" />
-                  <span className="text-xs font-mono">100%</span>
-                  <ZoomIn className="w-4 h-4 cursor-pointer" />
+                  <Settings className="w-4 h-4 xl:w-5 xl:h-5 hover:text-zinc-300 transition-colors cursor-pointer" />
+                  <Share2 className="hidden sm:block w-4 h-4 xl:w-5 xl:h-5 hover:text-zinc-300 transition-colors cursor-pointer" />
+                  <div className="w-px h-5 bg-zinc-700" />
+                  <ZoomOut className="w-3.5 h-3.5 xl:w-4 xl:h-4 cursor-pointer" />
+                  <span className="text-[0.625rem] sm:text-xs font-mono">100%</span>
+                  <ZoomIn className="w-3.5 h-3.5 xl:w-4 xl:h-4 cursor-pointer" />
                 </div>
               </motion.div>
 
               {/* Board Content Grid */}
-              <div className="p-8 flex-1 overflow-y-auto flex flex-col">
+              <div className="p-4 sm:p-5 md:p-6 xl:p-8 pb-32 sm:pb-36 md:pb-40 xl:pb-8 flex-1 overflow-y-auto flex flex-col">
                 {/* Subtle Dot Grid Background */}
-                <div className="absolute inset-0 top-[80px] opacity-[0.4] bg-[radial-gradient(#3f3f46_1px,transparent_1px)] [background-size:24px_24px] pointer-events-none" />
+                <div className="absolute inset-0 top-[5rem] opacity-[0.4] bg-[radial-gradient(#3f3f46_0.0625rem,transparent_0.0625rem)] [background-size:1.5rem_1.5rem] pointer-events-none" />
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 relative z-0">
+                <div className={`grid relative z-0 gap-4 md:gap-6 ${hasDesktopBoardWidth ? 'grid-cols-4' : hasTabletBoardWidth ? 'grid-cols-2' : 'grid-cols-1'}`}>
                   {kanbanData.map((column, colIndex) => {
                     const colColors = COLUMN_COLORS[colIndex] || COLUMN_COLORS[0];
                     return (
@@ -563,7 +573,7 @@ function ProjectManagementContent() {
                 </div>
 
                 {/* Handwriting tagline — only animates when board is fullscreen */}
-                <div className="relative flex flex-1 items-center justify-center min-h-[140px] md:min-h-[200px] lg:min-h-[260px] w-full">
+                <div className={`relative flex-1 items-center justify-center min-h-[16.25rem] w-full ${hasDesktopBoardWidth ? 'flex' : 'hidden'}`}>
                   <motion.div
                     initial={{ opacity: 0 }}
                     animate={boardFullscreen ? { opacity: 1 } : { opacity: 0 }}
@@ -597,6 +607,31 @@ function ProjectManagementContent() {
                   </motion.div>
                 </div>
               </div>
+
+              <motion.div
+                initial={false}
+                animate={compactTaglineVisible ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
+                transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+                className={`pointer-events-none absolute inset-x-0 bottom-0 z-30 ${hasDesktopBoardWidth ? 'hidden' : 'block'}`}
+              >
+                <div className="bg-gradient-to-t from-black via-black/96 to-transparent px-4 sm:px-6 md:px-8 pb-5 sm:pb-6 md:pb-7 pt-14 sm:pt-16">
+                  <div className="mx-auto max-w-4xl">
+                    <HandwrittenText
+                      text="Drag. Drop. Done."
+                      active={compactTaglineVisible}
+                    />
+
+                    <motion.p
+                      initial={false}
+                      animate={compactTaglineVisible ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 }}
+                      transition={{ duration: 0.7, delay: compactTaglineVisible ? 0.2 : 0, ease: [0.16, 1, 0.3, 1] }}
+                      className="mx-auto mt-4 max-w-2xl text-center text-sm sm:text-base md:text-lg text-zinc-300 font-light tracking-wide"
+                    >
+                      Organize anything — ship everything, on time
+                    </motion.p>
+                  </div>
+                </div>
+              </motion.div>
               
             </motion.div>
           </div>

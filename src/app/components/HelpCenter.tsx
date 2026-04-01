@@ -7,7 +7,9 @@ import {
   X,
   ArrowRight,
 } from "lucide-react";
+import { ElfsightReviewsSection } from '@/app/components/ElfsightReviewsSection';
 import { categories, faqs, resources, type CategoryData } from '@/app/content/helpCenterData';
+import { useCompensatedMinWidth } from '@/app/hooks/useZoomCompensatedViewport';
 
 export function HelpCenter() {
   usePageMeta('Help Center', 'Find answers, guides, and resources for using Talio as your daily productivity utility with connected HRMS add-ons.');
@@ -15,16 +17,20 @@ export function HelpCenter() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<CategoryData | null>(null);
   const [expandedArticle, setExpandedArticle] = useState<number | null>(null);
+  const hasThreeColumnCategoryGrid = useCompensatedMinWidth(1380);
+  const hasTwoColumnCategoryGrid = useCompensatedMinWidth(920);
+  const hasThreeColumnResourceGrid = useCompensatedMinWidth(1220);
+  const hasTwoColumnResourceGrid = useCompensatedMinWidth(860);
 
   const heroRef = useRef(null);
   const catRef = useRef(null);
   const faqRef = useRef(null);
   const resRef = useRef(null);
 
-  const heroInView = useInView(heroRef, { once: true, margin: "-100px" });
-  const catInView = useInView(catRef, { once: true, margin: "-100px" });
-  const faqInView = useInView(faqRef, { once: true, margin: "-100px" });
-  const resInView = useInView(resRef, { once: true, margin: "-100px" });
+  const heroInView = useInView(heroRef, { once: true, margin: '-10%' });
+  const catInView = useInView(catRef, { once: true, margin: '-10%' });
+  const faqInView = useInView(faqRef, { once: true, margin: '-10%' });
+  const resInView = useInView(resRef, { once: true, margin: '-10%' });
 
   // Lock body scroll when modal is open
   useEffect(() => {
@@ -62,7 +68,7 @@ export function HelpCenter() {
 
       {/* Categories */}
       <section ref={catRef} className="pb-20">
-        <div className="max-w-7xl mx-auto px-6 md:px-8 lg:px-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className={`max-w-7xl mx-auto px-6 md:px-8 lg:px-12 grid gap-6 ${hasThreeColumnCategoryGrid ? 'grid-cols-3' : hasTwoColumnCategoryGrid ? 'grid-cols-2' : 'grid-cols-1'}`}>
           {categories.map((cat, i) => (
             <motion.button
               key={cat.title}
@@ -84,6 +90,13 @@ export function HelpCenter() {
           ))}
         </div>
       </section>
+
+      <ElfsightReviewsSection
+        sectionClassName="relative bg-black py-8 md:py-12 overflow-hidden"
+        eyebrow="✦ Google Reviews"
+        title="Trusted by Real Teams"
+        subtitle="Live Google reviews from teams using Talio across operations and HR workflows."
+      />
 
       {/* FAQ */}
       <section ref={faqRef} className="py-20 md:py-32">
@@ -139,7 +152,7 @@ export function HelpCenter() {
           className="max-w-4xl mx-auto px-6 md:px-8 lg:px-12"
         >
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-center mb-16 tracking-tighter leading-[1.05]">Resources</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+          <div className={`grid gap-6 ${hasThreeColumnResourceGrid ? 'grid-cols-3' : hasTwoColumnResourceGrid ? 'grid-cols-2' : 'grid-cols-1'}`}>
             {resources.map((res, i) => {
               const inner = (
                 <div className="bg-gray-900 border border-gray-800 rounded-3xl p-6 hover:border-gray-700 transition-colors text-center">

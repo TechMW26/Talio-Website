@@ -4,9 +4,15 @@ import { Lightbulb, Users, Shield, TrendingUp, ChevronLeft, ChevronRight, Sparkl
 import { AnimatedButton } from '@/app/components/AnimatedButton';
 import { ZoomStorySection } from '@/app/components/ZoomStorySection';
 import { usePageMeta } from '@/app/hooks/usePageMeta';
+import { useCompensatedMinWidth } from '@/app/hooks/useZoomCompensatedViewport';
 
 export function About() {
-  usePageMeta('About', 'Learn how Talio is building an AI-powered productivity utility with Mira and HRMS add-ons for modern teams.');
+  usePageMeta('About', 'Learn how Talio is building an AI-powered productivity utility with MIRA and HRMS add-ons for modern teams.');
+  const hasAboutSplitLayout = useCompensatedMinWidth(1120);
+  const hasAboutAsymmetricGrid = useCompensatedMinWidth(1320);
+  const hasAboutTwoColumnGrid = useCompensatedMinWidth(900);
+  const hasFourStatColumns = useCompensatedMinWidth(1240);
+  const hasTwoColumnCtaForm = useCompensatedMinWidth(920);
 
   const heroRef = useRef(null);
   const visionRef = useRef(null);
@@ -16,11 +22,11 @@ export function About() {
   const cardsRef = useRef(null);
   const valuesCardsRef = useRef(null);
   
-  const heroInView = useInView(heroRef, { once: true, margin: "-100px" });
-  const visionInView = useInView(visionRef, { once: true, margin: "-100px" });
-  const ventureInView = useInView(ventureRef, { once: true, margin: "-100px" });
-  const valuesInView = useInView(valuesRef, { once: true, margin: "-100px" });
-  const ctaInView = useInView(ctaRef, { once: true, margin: "-100px" });
+  const heroInView = useInView(heroRef, { once: true, margin: '-10%' });
+  const visionInView = useInView(visionRef, { once: true, margin: '-10%' });
+  const ventureInView = useInView(ventureRef, { once: true, margin: '-10%' });
+  const valuesInView = useInView(valuesRef, { once: true, margin: '-10%' });
+  const ctaInView = useInView(ctaRef, { once: true, margin: '-10%' });
 
   // Scroll progress for cards section
   const { scrollYProgress: cardsScrollProgress } = useScroll({
@@ -101,7 +107,7 @@ export function About() {
               repeat: Infinity,
               ease: "easeInOut"
             }}
-            className="absolute top-1/4 -left-1/4 w-[600px] h-[600px] bg-gradient-to-br from-blue-900/20 via-purple-900/10 to-transparent rounded-full blur-3xl"
+            className="absolute top-1/4 -left-1/4 w-[37.5rem] h-[37.5rem] bg-gradient-to-br from-blue-900/20 via-purple-900/10 to-transparent rounded-full blur-3xl"
           />
           <motion.div
             animate={{
@@ -114,7 +120,7 @@ export function About() {
               ease: "easeInOut",
               delay: 4
             }}
-            className="absolute bottom-1/4 -right-1/4 w-[500px] h-[500px] bg-gradient-to-br from-purple-900/20 via-pink-900/10 to-transparent rounded-full blur-3xl"
+            className="absolute bottom-1/4 -right-1/4 w-[31.25rem] h-[31.25rem] bg-gradient-to-br from-purple-900/20 via-pink-900/10 to-transparent rounded-full blur-3xl"
           />
         </div>
 
@@ -257,7 +263,7 @@ export function About() {
               </h2>
 
               {/* Description with Clean Layout */}
-              <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-start max-w-6xl">
+              <div className={`grid items-start max-w-6xl gap-12 ${hasAboutSplitLayout ? 'grid-cols-2 lg:gap-20' : 'grid-cols-1'}`}>
                 {/* Left Column - Main Description */}
                 <motion.div
                   initial={{ opacity: 0, x: -60 }}
@@ -342,34 +348,34 @@ export function About() {
             </div>
 
             {/* Cards with Creative Layout */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-0 relative">
+            <div className={`grid gap-0 relative ${hasAboutAsymmetricGrid ? 'grid-cols-12' : hasAboutTwoColumnGrid ? 'grid-cols-2' : 'grid-cols-1'}`}>
               {[
                 { 
                   icon: '01', 
                   title: 'Unified Flexibility', 
                   desc: 'Complete ecosystem for all industries',
-                  span: 'lg:col-span-6',
+                  span: 'col-span-6',
                   gradient: 'from-blue-600 to-cyan-600'
                 },
                 { 
                   icon: '02', 
                   title: 'Making Ideas Work', 
                   desc: 'Turn ambitions into executable actions',
-                  span: 'lg:col-span-6',
+                  span: 'col-span-6',
                   gradient: 'from-purple-600 to-pink-600'
                 },
                 { 
                   icon: '03', 
                   title: 'Real Innovation', 
                   desc: 'Cutting-edge AI and data analytics',
-                  span: 'lg:col-span-7',
+                  span: 'col-span-7',
                   gradient: 'from-violet-600 to-indigo-600'
                 },
                 { 
                   icon: '04', 
                   title: 'Strategic Execution', 
                   desc: 'Long-term excellence with data insights',
-                  span: 'lg:col-span-5',
+                  span: 'col-span-5',
                   gradient: 'from-orange-600 to-red-600'
                 }
               ].map((item, index) => (
@@ -377,7 +383,7 @@ export function About() {
                   key={item.title}
                   initial={{ opacity: 0, y: 60 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-50px" }}
+                  viewport={{ once: true, margin: '-6%' }}
                   transition={{ 
                     duration: 1, 
                     delay: index * 0.15,
@@ -387,10 +393,10 @@ export function About() {
                     y: -8,
                     transition: { duration: 0.3 }
                   }}
-                  className={`${item.span} group relative cursor-pointer`}
+                  className={`${hasAboutAsymmetricGrid ? item.span : ''} group relative cursor-pointer`}
                 >
                   {/* Card Container */}
-                  <div className="relative h-full min-h-[320px] md:min-h-[380px] p-8 md:p-10 lg:p-12 overflow-hidden border-r border-b border-gray-800">
+                  <div className="relative h-full min-h-[20rem] md:min-h-[23.75rem] p-8 md:p-10 lg:p-12 overflow-hidden border-r border-b border-gray-800">
                     {/* Hover Background Effect */}
                     <div
                       className={`absolute inset-0 bg-gradient-to-br ${item.gradient} opacity-0 group-hover:opacity-10 transition-all duration-500`}
@@ -398,7 +404,7 @@ export function About() {
 
                     {/* Animated Corner Accent */}
                     <div
-                      className="absolute top-0 left-0 border-t-2 border-l-2 border-white w-0 h-0 group-hover:w-[60px] group-hover:h-[60px] transition-all duration-400"
+                      className="absolute top-0 left-0 border-t-2 border-l-2 border-white w-0 h-0 group-hover:w-[3.75rem] group-hover:h-[3.75rem] transition-all duration-400"
                     />
 
                     {/* Number Badge */}
@@ -456,11 +462,11 @@ export function About() {
           <motion.div
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-50px" }}
+            viewport={{ once: true, margin: '-6%' }}
             transition={{ duration: 1 }}
             className="mt-32 pt-16 border-t border-gray-800"
           >
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
+            <div className={`grid gap-8 ${hasFourStatColumns ? 'grid-cols-4 lg:gap-12' : 'grid-cols-2'}`}>
               {[
                 { value: 'AI-first', label: 'Product direction' },
                 { value: 'Daily-use', label: 'Operating model' },
@@ -473,7 +479,7 @@ export function About() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.8, delay: index * 0.1 }}
-                  className="text-center lg:text-left"
+                  className={hasFourStatColumns ? 'text-left' : 'text-center'}
                 >
                   <motion.div
                     initial={{ scale: 0.5 }}
@@ -544,7 +550,7 @@ export function About() {
                     transition={{ duration: 0.6, delay: index * 0.1 }}
                     className="flex-shrink-0 w-[85vw] md:w-[70vw] lg:w-[50vw] xl:w-[40vw]"
                   >
-                    <div className="relative w-full h-[500px] md:h-[550px] rounded-[2rem] overflow-hidden group shadow-2xl backdrop-blur-xl bg-white/10 border border-white/20">
+                    <div className="relative w-full h-[31.25rem] md:h-[34.375rem] rounded-[2rem] overflow-hidden group shadow-2xl backdrop-blur-xl bg-white/10 border border-white/20">
                       {/* Full Image Background */}
                       <img 
                         src={[
@@ -558,7 +564,7 @@ export function About() {
                       />
                       
                       {/* Glass Overlay with Gradient */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/20 backdrop-blur-[2px]" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/20 backdrop-blur-[0.125rem]" />
                       
                       {/* Glass Effect Border */}
                       <div className="absolute inset-0 rounded-[2rem] bg-gradient-to-br from-white/20 via-transparent to-transparent opacity-50" />
@@ -615,7 +621,7 @@ export function About() {
               repeat: Infinity,
               ease: "linear"
             }}
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-white rounded-full blur-3xl"
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[50rem] h-[50rem] bg-white rounded-full blur-3xl"
           />
         </div>
 
@@ -646,7 +652,7 @@ export function About() {
             className="max-w-2xl mx-auto mb-8"
           >
             <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-6 md:p-8 border border-white/20 shadow-2xl">
-              <div className="grid md:grid-cols-2 gap-4 mb-4">
+              <div className={`grid gap-4 mb-4 ${hasTwoColumnCtaForm ? 'grid-cols-2' : 'grid-cols-1'}`}>
                 {/* Email Input */}
                 <div className="relative group">
                   <input

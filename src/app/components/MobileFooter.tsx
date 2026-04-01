@@ -6,6 +6,7 @@ const quickLinks = [
   { label: 'Features', href: '/features' },
   { label: 'Pricing', href: '/pricing' },
   { label: 'Downloads', href: '/downloads' },
+  { label: 'MIRA', href: '/MIRA-ai' },
   { label: 'Docs', href: '/documents' },
   { label: 'Contact', href: '/contact' },
   { label: 'Help Center', href: '/help' },
@@ -24,8 +25,8 @@ export function MobileFooter() {
       <div className="h-px w-full bg-gradient-to-r from-transparent via-white/20 to-transparent" />
 
       <div className="relative w-full px-4 pb-10 pt-8">
-        <div className="w-full rounded-[2rem] border border-white/10 bg-[radial-gradient(circle_at_top,rgba(88,80,236,0.14),transparent_40%),linear-gradient(180deg,#0f1016_0%,#06070b_100%)] p-4 shadow-[0_0_40px_rgba(37,99,235,0.08)]">
-          <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-gray-400">
+        <div className="w-full rounded-[2rem] border border-white/10 bg-[radial-gradient(circle_at_top,rgba(88,80,236,0.14),transparent_40%),linear-gradient(180deg,#0f1016_0%,#06070b_100%)] p-4 shadow-[0_0_2.5rem_rgba(37,99,235,0.08)]">
+          <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3.5 py-1.5 text-[0.6875rem] font-semibold uppercase tracking-[0.18em] text-gray-400">
             ✦ Experience Talio
           </span>
           <span className="mt-4 block text-[2rem] font-bold tracking-tighter leading-[1.02] text-white">
@@ -59,7 +60,7 @@ export function MobileFooter() {
           </div>
 
           <span className="mt-4 block text-sm font-light leading-relaxed text-gray-500">
-            Talio combines daily productivity visibility, coordination, Mira, and HRMS add-ons in one operating layer.
+            Talio combines daily productivity visibility, coordination, MIRA, and HRMS add-ons in one operating layer.
           </span>
 
           <div className="mt-5 space-y-2.5 text-sm text-gray-500">
@@ -106,13 +107,13 @@ export function MobileFooter() {
         </div>
 
         <div className="mt-4 flex items-center justify-between gap-4">
-          <span className="max-w-[220px] text-[11px] font-light leading-relaxed text-gray-600">
+          <span className="max-w-[13.75rem] text-[0.6875rem] font-light leading-relaxed text-gray-600">
             © {new Date().getFullYear()} Talio. A Venture of MW FutureTech.
           </span>
           <button
             type="button"
             onClick={() => window.scrollTo({ top: 0, behavior: 'auto' })}
-            className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-2 text-[11px] font-medium text-gray-400 transition hover:text-white"
+            className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-2 text-[0.6875rem] font-medium text-gray-400 transition hover:text-white"
           >
             <span>Top</span>
             <ArrowUp className="h-3.5 w-3.5" />

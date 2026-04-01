@@ -12,6 +12,7 @@ import {
 import type { LucideIcon } from 'lucide-react';
 import { isSoundAllowed } from './SoundContext';
 import { adaptiveVolume } from './adaptiveVolume';
+import { useCompensatedMinWidth } from '@/app/hooks/useZoomCompensatedViewport';
 
 /* ─── Flow Node ─── */
 interface FlowNode {
@@ -133,7 +134,7 @@ function PopNode({ node, sectionInView, ...rest }: { node: FlowNode; sectionInVi
       whileHover={{
         scale: 1.12,
         y: -5,
-        boxShadow: `0 18px 50px ${node.color}30, 0 0 24px ${node.color}20`,
+        boxShadow: `0 1.125rem 3.125rem ${node.color}30, 0 0 1.5rem ${node.color}20`,
       }}
       className="absolute flex items-center gap-2 px-3 py-2.5 rounded-xl border backdrop-blur-2xl cursor-default z-10 whitespace-nowrap"
       style={{
@@ -142,12 +143,12 @@ function PopNode({ node, sectionInView, ...rest }: { node: FlowNode; sectionInVi
         transform: 'translate(-50%, -50%)',
         background: 'rgba(10,10,14,0.82)',
         borderColor: `${node.color}20`,
-        boxShadow: `0 4px 20px ${node.color}06, inset 0 1px 0 rgba(255,255,255,0.04)`,
+        boxShadow: `0 0.25rem 1.25rem ${node.color}06, inset 0 0.0625rem 0 rgba(255,255,255,0.04)`,
       }}
     >
       <div
         className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 rounded-full"
-        style={{ background: node.color, boxShadow: `0 0 6px ${node.color}` }}
+        style={{ background: node.color, boxShadow: `0 0 0.375rem ${node.color}` }}
       >
         <div className="absolute inset-0 rounded-full animate-ping opacity-25" style={{ background: node.color }} />
       </div>
@@ -155,8 +156,8 @@ function PopNode({ node, sectionInView, ...rest }: { node: FlowNode; sectionInVi
         <node.icon className="w-3.5 h-3.5" style={{ color: node.color }} strokeWidth={2.5} />
       </div>
       <div>
-        <p className="text-[12px] font-semibold text-white leading-tight">{node.label}</p>
-        <p className="text-[10px] text-zinc-500 leading-tight">{node.desc}</p>
+        <p className="text-[0.75rem] font-semibold text-white leading-tight">{node.label}</p>
+        <p className="text-[0.625rem] text-zinc-500 leading-tight">{node.desc}</p>
       </div>
     </motion.div>
   );
@@ -245,7 +246,7 @@ function Phone3D({ phoneY, isInView, children }: { phoneY: any; isInView: boolea
       onMouseMove={handleMouseMove}
       onMouseLeave={() => { rotateX.set(0); rotateY.set(0); }}
     >
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[520px] bg-gradient-to-b from-violet-500/25 via-blue-500/15 to-emerald-500/10 rounded-full blur-[80px] pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[18.75rem] h-[32.5rem] bg-gradient-to-b from-violet-500/25 via-blue-500/15 to-emerald-500/10 rounded-full blur-[5rem] pointer-events-none" />
       <motion.div style={{ y: phoneY, rotateX, rotateY, transformStyle: 'preserve-3d' }} className="relative">
         {children}
       </motion.div>
@@ -257,7 +258,8 @@ function Phone3D({ phoneY, isInView, children }: { phoneY: any; isInView: boolea
 export function PayrollSection() {
   const ref = useRef(null);
   const containerRef = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: '-60px' });
+  const isInView = useInView(ref, { once: true, margin: '-8%' });
+  const showDesktopFlow = useCompensatedMinWidth(768);
 
   const { scrollYProgress } = useScroll({ target: containerRef, offset: ['start end', 'end start'] });
   const bgY = useTransform(scrollYProgress, [0, 1], [60, -60]);
@@ -268,17 +270,17 @@ export function PayrollSection() {
       {/* Background */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute inset-0 opacity-[0.025]" style={{
-          backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)',
-          backgroundSize: '60px 60px',
+          backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 0.0625rem, transparent 0.0625rem), linear-gradient(90deg, rgba(255,255,255,0.1) 0.0625rem, transparent 0.0625rem)',
+          backgroundSize: '3.75rem 3.75rem',
         }} />
-        <motion.div style={{ y: bgY }} className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[1000px] h-[1000px] bg-gradient-to-br from-violet-600/10 via-blue-500/8 to-transparent rounded-full blur-[140px]" />
-        <div className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-gradient-to-tl from-emerald-500/6 via-transparent to-transparent rounded-full blur-[100px]" />
+        <motion.div style={{ y: bgY }} className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[62.5rem] h-[62.5rem] bg-gradient-to-br from-violet-600/10 via-blue-500/8 to-transparent rounded-full blur-[8.75rem]" />
+        <div className="absolute bottom-0 right-0 w-[37.5rem] h-[37.5rem] bg-gradient-to-tl from-emerald-500/6 via-transparent to-transparent rounded-full blur-[6.25rem]" />
       </div>
 
       <div ref={ref} className="relative w-full">
 
         {/* ═══ Desktop: Full-viewport flowchart ═══ */}
-        <div className="hidden md:block relative" style={{ height: 'clamp(800px, 100vh, 1100px)' }}>
+        <div className={`${showDesktopFlow ? 'block' : 'hidden'} relative`} style={{ height: 'clamp(50rem, 100vh, 68.75rem)' }}>
 
           {/* SVG connector lines */}
           <ConnectorLines isInView={isInView} />
@@ -293,8 +295,8 @@ export function PayrollSection() {
             {/* Strong dark backdrop so heading is always readable */}
             <div className="absolute inset-0 -z-10" style={{
               background: 'radial-gradient(ellipse 120% 160% at center, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.7) 50%, transparent 100%)',
-              margin: '-20px -80px',
-              filter: 'blur(30px)',
+              margin: '-1.25rem -5rem',
+              filter: 'blur(1.875rem)',
             }} />
 
             <motion.div
@@ -332,22 +334,22 @@ export function PayrollSection() {
           {/* Phone (centered, pushed lower to clear headings, z-20) */}
           <div className="absolute top-[58%] left-1/2 -translate-x-1/2 -translate-y-1/2 z-20">
             <Phone3D phoneY={phoneY} isInView={isInView}>
-              <div className="absolute -bottom-6 left-1/2 w-[65%] h-[30px] rounded-[50%] blur-2xl" style={{ background: 'radial-gradient(ellipse, rgba(0,0,0,0.5) 0%, transparent 70%)', transform: 'translateX(-50%)' }} />
-              <div className="relative w-[260px] md:w-[280px] lg:w-[310px]" style={{ transformStyle: 'preserve-3d' }}>
-                <div className="relative rounded-[52px]" style={{ transformStyle: 'preserve-3d', background: 'linear-gradient(145deg, #a1a1aa 0%, #71717a 15%, #52525b 50%, #71717a 85%, #a1a1aa 100%)', padding: '3px' }}>
-                  <div className="absolute inset-0 rounded-[52px]" style={{ transform: 'translateZ(-8px)', background: 'linear-gradient(145deg, #3f3f46, #27272a)', boxShadow: '0 30px 80px rgba(0,0,0,0.7), 0 12px 40px rgba(0,0,0,0.5)' }} />
-                  <div className="relative rounded-[50px] bg-[#1a1a1e] overflow-hidden" style={{ padding: '10px', boxShadow: 'inset 0 1px 2px rgba(255,255,255,0.08), inset 0 -1px 2px rgba(0,0,0,0.3)' }}>
-                    <div className="relative rounded-[42px] overflow-hidden bg-black">
-                      <div className="absolute top-[10px] left-1/2 -translate-x-1/2 z-20">
-                        <div className="relative w-[126px] h-[37px] bg-black rounded-full flex items-center justify-between px-[14px]">
-                          <div className="w-[10px] h-[10px] rounded-full bg-[#1c1c1e] relative">
-                            <div className="absolute inset-[1.5px] rounded-full bg-gradient-to-br from-[#2a2a2e] to-[#0c0c0e]" />
-                            <div className="absolute inset-[3px] rounded-full bg-[#0a0a0c]" />
-                            <div className="absolute top-[1px] left-[2px] w-[2px] h-[2px] rounded-full bg-blue-400/30" />
+              <div className="absolute -bottom-6 left-1/2 w-[65%] h-[1.875rem] rounded-[50%] blur-2xl" style={{ background: 'radial-gradient(ellipse, rgba(0,0,0,0.5) 0%, transparent 70%)', transform: 'translateX(-50%)' }} />
+              <div className="relative w-[16.25rem] md:w-[17.5rem] lg:w-[19.375rem]" style={{ transformStyle: 'preserve-3d' }}>
+                <div className="relative rounded-[3.25rem]" style={{ transformStyle: 'preserve-3d', background: 'linear-gradient(145deg, #a1a1aa 0%, #71717a 15%, #52525b 50%, #71717a 85%, #a1a1aa 100%)', padding: '0.1875rem' }}>
+                  <div className="absolute inset-0 rounded-[3.25rem]" style={{ transform: 'translateZ(-0.5rem)', background: 'linear-gradient(145deg, #3f3f46, #27272a)', boxShadow: '0 1.875rem 5rem rgba(0,0,0,0.7), 0 0.75rem 2.5rem rgba(0,0,0,0.5)' }} />
+                  <div className="relative rounded-[3.125rem] bg-[#1a1a1e] overflow-hidden" style={{ padding: '0.625rem', boxShadow: 'inset 0 0.0625rem 0.125rem rgba(255,255,255,0.08), inset 0 -0.0625rem 0.125rem rgba(0,0,0,0.3)' }}>
+                    <div className="relative rounded-[2.625rem] overflow-hidden bg-black">
+                      <div className="absolute top-[0.625rem] left-1/2 -translate-x-1/2 z-20">
+                        <div className="relative w-[7.875rem] h-[2.3125rem] bg-black rounded-full flex items-center justify-between px-[0.875rem]">
+                          <div className="w-[0.625rem] h-[0.625rem] rounded-full bg-[#1c1c1e] relative">
+                            <div className="absolute inset-[0.0938rem] rounded-full bg-gradient-to-br from-[#2a2a2e] to-[#0c0c0e]" />
+                            <div className="absolute inset-[0.1875rem] rounded-full bg-[#0a0a0c]" />
+                            <div className="absolute top-[0.0625rem] left-[0.125rem] w-[0.125rem] h-[0.125rem] rounded-full bg-blue-400/30" />
                           </div>
-                          <div className="flex items-center gap-[6px]">
-                            <div className="w-[4px] h-[4px] rounded-full bg-[#1c1c1e]" />
-                            <div className="w-[6px] h-[6px] rounded-full bg-[#1c1c1e] border border-[#2a2a2e]/50" />
+                          <div className="flex items-center gap-[0.375rem]">
+                            <div className="w-[0.25rem] h-[0.25rem] rounded-full bg-[#1c1c1e]" />
+                            <div className="w-[0.375rem] h-[0.375rem] rounded-full bg-[#1c1c1e] border border-[#2a2a2e]/50" />
                           </div>
                         </div>
                       </div>
@@ -355,14 +357,14 @@ export function PayrollSection() {
                         <img src="/payroll-app.jpg" alt="Talio Check-In App" className="w-full h-full object-cover object-top" />
                         <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(115deg, rgba(255,255,255,0.07) 0%, transparent 25%, transparent 60%, rgba(255,255,255,0.03) 100%)' }} />
                       </div>
-                      <div className="absolute bottom-[8px] left-1/2 -translate-x-1/2 w-[120px] h-[4px] rounded-full bg-white/20 z-20" />
+                      <div className="absolute bottom-[0.5rem] left-1/2 -translate-x-1/2 w-[7.5rem] h-[0.25rem] rounded-full bg-white/20 z-20" />
                     </div>
                   </div>
                 </div>
-                <div className="absolute left-[-3px] top-[100px] w-[4px] h-[28px] rounded-l-sm" style={{ background: 'linear-gradient(to right, #71717a, #52525b)', boxShadow: '-2px 0 4px rgba(0,0,0,0.4)' }} />
-                <div className="absolute left-[-3px] top-[144px] w-[4px] h-[52px] rounded-l-sm" style={{ background: 'linear-gradient(to right, #71717a, #52525b)', boxShadow: '-2px 0 4px rgba(0,0,0,0.4)' }} />
-                <div className="absolute left-[-3px] top-[204px] w-[4px] h-[52px] rounded-l-sm" style={{ background: 'linear-gradient(to right, #71717a, #52525b)', boxShadow: '-2px 0 4px rgba(0,0,0,0.4)' }} />
-                <div className="absolute right-[-3px] top-[160px] w-[4px] h-[68px] rounded-r-sm" style={{ background: 'linear-gradient(to left, #71717a, #52525b)', boxShadow: '2px 0 4px rgba(0,0,0,0.4)' }} />
+                <div className="absolute left-[-0.1875rem] top-[6.25rem] w-[0.25rem] h-[1.75rem] rounded-l-sm" style={{ background: 'linear-gradient(to right, #71717a, #52525b)', boxShadow: '-0.125rem 0 0.25rem rgba(0,0,0,0.4)' }} />
+                <div className="absolute left-[-0.1875rem] top-[9rem] w-[0.25rem] h-[3.25rem] rounded-l-sm" style={{ background: 'linear-gradient(to right, #71717a, #52525b)', boxShadow: '-0.125rem 0 0.25rem rgba(0,0,0,0.4)' }} />
+                <div className="absolute left-[-0.1875rem] top-[12.75rem] w-[0.25rem] h-[3.25rem] rounded-l-sm" style={{ background: 'linear-gradient(to right, #71717a, #52525b)', boxShadow: '-0.125rem 0 0.25rem rgba(0,0,0,0.4)' }} />
+                <div className="absolute right-[-0.1875rem] top-[10rem] w-[0.25rem] h-[4.25rem] rounded-r-sm" style={{ background: 'linear-gradient(to left, #71717a, #52525b)', boxShadow: '0.125rem 0 0.25rem rgba(0,0,0,0.4)' }} />
               </div>
             </Phone3D>
           </div>
@@ -376,8 +378,8 @@ export function PayrollSection() {
           >
             <div className="absolute inset-0 -z-10" style={{
               background: 'radial-gradient(ellipse at center, rgba(0,0,0,0.9) 0%, transparent 100%)',
-              margin: '-12px -40px',
-              filter: 'blur(20px)',
+              margin: '-0.75rem -2.5rem',
+              filter: 'blur(1.25rem)',
             }} />
             <Link to="/features/attendance">
               <motion.span whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.98 }} className="group inline-flex items-center gap-2 text-sm font-semibold text-zinc-400 hover:text-white transition-colors">
@@ -389,7 +391,7 @@ export function PayrollSection() {
         </div>
 
         {/* ═══ Mobile: stacked layout ═══ */}
-        <div className="md:hidden py-20 px-6">
+        <div className={`${showDesktopFlow ? 'hidden' : 'block'} py-20 px-6`}>
           <div className="flex flex-col items-center text-center mb-10">
             <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="inline-flex items-center gap-2 text-sm font-semibold text-purple-400 uppercase tracking-widest mb-6">
               <Smartphone className="w-4 h-4" />
@@ -406,10 +408,10 @@ export function PayrollSection() {
 
           <div className="flex justify-center mb-8">
             <Phone3D phoneY={phoneY} isInView={isInView}>
-              <div className="relative w-[240px]" style={{ transformStyle: 'preserve-3d' }}>
-                <div className="relative rounded-[44px]" style={{ background: 'linear-gradient(145deg, #a1a1aa 0%, #71717a 15%, #52525b 50%, #71717a 85%, #a1a1aa 100%)', padding: '3px' }}>
-                  <div className="relative rounded-[42px] bg-[#1a1a1e] overflow-hidden" style={{ padding: '8px', boxShadow: 'inset 0 1px 2px rgba(255,255,255,0.08)' }}>
-                    <div className="relative rounded-[36px] overflow-hidden bg-black">
+              <div className="relative w-[15rem]" style={{ transformStyle: 'preserve-3d' }}>
+                <div className="relative rounded-[2.75rem]" style={{ background: 'linear-gradient(145deg, #a1a1aa 0%, #71717a 15%, #52525b 50%, #71717a 85%, #a1a1aa 100%)', padding: '0.1875rem' }}>
+                  <div className="relative rounded-[2.625rem] bg-[#1a1a1e] overflow-hidden" style={{ padding: '0.5rem', boxShadow: 'inset 0 0.0625rem 0.125rem rgba(255,255,255,0.08)' }}>
+                    <div className="relative rounded-[2.25rem] overflow-hidden bg-black">
                       <div className="relative aspect-[9/19.5] w-full overflow-hidden">
                         <img src="/payroll-app.jpg" alt="Talio Check-In App" className="w-full h-full object-cover object-top" />
                       </div>
@@ -424,14 +426,14 @@ export function PayrollSection() {
             {NODES.slice(0, 8).map((node, i) => (
               <motion.div key={node.id} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.4, delay: i * 0.08 }}
                 className="flex items-center gap-2.5 px-3.5 py-3 rounded-xl border backdrop-blur-xl shrink-0 snap-center"
-                style={{ background: 'rgba(12,12,16,0.8)', borderColor: `${node.color}20`, minWidth: '190px' }}
+                style={{ background: 'rgba(12,12,16,0.8)', borderColor: `${node.color}20`, minWidth: '11.875rem' }}
               >
                 <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: `${node.color}12` }}>
                   <node.icon className="w-3.5 h-3.5" style={{ color: node.color }} strokeWidth={2.5} />
                 </div>
                 <div>
-                  <p className="text-[11px] font-semibold text-white leading-tight">{node.label}</p>
-                  <p className="text-[10px] text-zinc-500 leading-tight mt-0.5">{node.desc}</p>
+                  <p className="text-[0.6875rem] font-semibold text-white leading-tight">{node.label}</p>
+                  <p className="text-[0.625rem] text-zinc-500 leading-tight mt-0.5">{node.desc}</p>
                 </div>
               </motion.div>
             ))}

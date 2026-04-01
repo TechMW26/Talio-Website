@@ -5,7 +5,7 @@ import { usePageMeta } from '@/app/hooks/usePageMeta';
 import { communicationFeatures, coreFeatures } from '@/app/content/featuresOverviewData';
 
 export function MobileFeaturesPage() {
-  usePageMeta('Features', 'Explore Talio\'s productivity utility modules, Mira workflow support, and built-in HRMS add-ons for attendance, leave, payroll, coordination, and team visibility.');
+  usePageMeta('Features', 'Explore Talio\'s productivity utility modules, MIRA workflow support, and built-in HRMS add-ons for attendance, leave, payroll, coordination, and team visibility.');
 
   return (
     <div className="min-h-screen bg-black text-white">
@@ -25,7 +25,7 @@ export function MobileFeaturesPage() {
               </span>
             </h1>
             <p className="mobile-hero-copy max-w-md text-base font-light leading-relaxed text-gray-400">
-              Talio combines productivity visibility, coordination, Mira, and connected HR workflows in one daily-use platform.
+              Talio combines productivity visibility, coordination, MIRA, and connected HR workflows in one daily-use platform.
             </p>
           </div>
         </div>

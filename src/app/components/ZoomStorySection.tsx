@@ -188,7 +188,7 @@ export function ZoomStorySection() {
             {/* Animated Warp Grid Background — blurs during zoom, sharpens when fully expanded */}
             <motion.div
               className="absolute inset-0 opacity-80"
-              style={{ filter: useTransform(zoomProgress, [0, 0.85, 1], ['blur(6px)', 'blur(2px)', 'blur(0px)']) }}
+              style={{ filter: useTransform(zoomProgress, [0, 0.85, 1], ['blur(0.375rem)', 'blur(0.125rem)', 'blur(0rem)']) }}
             >
               <WarpGrid className="absolute inset-0" />
             </motion.div>
@@ -196,7 +196,7 @@ export function ZoomStorySection() {
             {/* Content Container */}
             <div className="relative h-full flex items-center justify-center px-8 md:px-16 lg:px-24 py-12 md:py-16">
               {/* Content Grid */}
-              <div className="relative grid lg:grid-cols-2 gap-8 lg:gap-12 xl:gap-16 items-center max-w-[1400px] w-full">
+              <div className="relative grid lg:grid-cols-2 gap-8 lg:gap-12 xl:gap-16 items-center max-w-[87.5rem] w-full">
                 {/* Left Column - Text Content */}
                 <div className="space-y-6 md:space-y-8">
                   {/* Label */}

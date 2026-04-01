@@ -153,8 +153,8 @@ export function PrivacyPolicy() {
   const heroRef = useRef(null);
   const contentRef = useRef(null);
 
-  const heroInView = useInView(heroRef, { once: true, margin: "-100px" });
-  const contentInView = useInView(contentRef, { once: true, margin: "-100px" });
+  const heroInView = useInView(heroRef, { once: true, margin: '-10%' });
+  const contentInView = useInView(contentRef, { once: true, margin: '-10%' });
 
   return (
     <div className="min-h-screen bg-black text-white">

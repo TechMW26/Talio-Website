@@ -41,13 +41,25 @@ function RouteFallback() {
   return <div className="min-h-[60vh] bg-gray-950" />;
 }
 
-function ScrollToTop() {
+function ScrollToTop({ lenisRef }: { lenisRef?: React.RefObject<Lenis | null> }) {
   const { pathname } = useLocation();
   useEffect(() => {
-    // Reset Lenis smooth scroll AND native scroll position on route change
+    // Force Lenis to scroll to top immediately, bypassing smooth interpolation
+    if (lenisRef?.current) {
+      lenisRef.current.scrollTo(0, { immediate: true });
+    }
+    // Also reset native scroll position as fallback
     window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
+
+    // Double-tap after a frame to guarantee it sticks even if Lenis re-renders
+    requestAnimationFrame(() => {
+      if (lenisRef?.current) {
+        lenisRef.current.scrollTo(0, { immediate: true });
+      }
+      window.scrollTo(0, 0);
+    });
   }, [pathname]);
   return null;
 }
@@ -94,6 +106,7 @@ function AppLayout() {
 
   return (
     <div className={`min-h-screen bg-gray-950 transition-colors duration-300 relative ${isMobileViewport ? '' : 'cursor-none'}`} style={{ position: 'relative' }}>
+      <ScrollToTop lenisRef={lenisRef} />
       {!isMobileViewport && <CustomCursor />}
       {!isMobileViewport && <MouseFollower />}
       {!isAdmin && <AnalyticsTracker />}
@@ -139,7 +152,6 @@ export default function App() {
   return (
     <SoundProvider>
       <BrowserRouter>
-        <ScrollToTop />
         {!isMobileViewport && <SoundDisclaimer />}
         <AppLayout />
       </BrowserRouter>

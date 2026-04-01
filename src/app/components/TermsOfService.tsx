@@ -19,7 +19,8 @@ const sections = [
       <ul className="list-disc list-inside space-y-2 text-gray-400 leading-relaxed mb-4">
         <li>
           <span className="font-medium text-gray-300">"Service"</span> refers to
-          the Talio workforce management platform
+          the Talio productivity utility, related web and desktop applications,
+          and connected HRMS add-on features
         </li>
         <li>
           <span className="font-medium text-gray-300">"User"</span> refers to
@@ -45,7 +46,7 @@ const sections = [
     content: (
       <>
         <p className="text-gray-400 leading-relaxed mb-3">
-          When creating an account, you agree to:
+          When creating or using an account, you agree to:
         </p>
         <ul className="list-disc list-inside space-y-2 text-gray-400 leading-relaxed mb-4">
           <li>Provide accurate and complete information</li>
@@ -81,7 +82,7 @@ const sections = [
         <p className="text-gray-400 leading-relaxed mb-3">For paid plans:</p>
         <ul className="list-disc list-inside space-y-2 text-gray-400 leading-relaxed mb-4">
           <li>You agree to pay all applicable fees</li>
-          <li>Provide valid payment information</li>
+          <li>Provide valid payment or billing information</li>
           <li>Subscriptions auto-renew unless cancelled</li>
           <li>Refunds are not provided except as required by law</li>
         </ul>
@@ -93,8 +94,8 @@ const sections = [
     content: (
       <p className="text-gray-400 leading-relaxed mb-4">
         Your use of the Service is also governed by our Privacy Policy. By using
-        the Service, you consent to the collection and use of data as described
-        therein.
+        the Service, you acknowledge the collection and use of data as
+        described there.
       </p>
     ),
   },
@@ -103,9 +104,10 @@ const sections = [
     content: (
       <p className="text-gray-400 leading-relaxed mb-4">
         All content, features, and functionality of the Service are owned by MW
-        Umbrella and are protected by international copyright, trademark, and
-        other intellectual property laws. You may not copy, modify, or distribute
-        any part of the Service without prior written consent.
+        FutureTech or its licensors and are protected by applicable copyright,
+        trademark, and other intellectual property laws. You may not copy,
+        modify, or distribute any part of the Service without prior written
+        consent.
       </p>
     ),
   },
@@ -171,7 +173,7 @@ const sections = [
 ];
 
 export function TermsOfService() {
-  usePageMeta('Terms of Service', 'Talio\'s terms of service. Review the terms and conditions for using our AI-powered workforce management platform.');
+  usePageMeta('Terms of Service', 'Talio\'s terms of service. Review the terms and conditions for using our productivity utility, related apps, and HRMS add-on workflows.');
 
   const heroRef = useRef(null);
   const contentRef = useRef(null);

@@ -122,7 +122,7 @@ export function MobilePricingPage() {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="mobile-hero-copy max-w-md text-base font-light leading-relaxed text-gray-400"
           >
-            Choose the plan that works for your team. All plans include a free trial.
+            Talio is priced for operational value, so growing teams can replace fragmented attendance, coordination, reporting, and HR tools with one daily-use utility.
           </motion.p>
         </div>
       </section>

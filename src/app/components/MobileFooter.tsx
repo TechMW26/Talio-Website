@@ -59,7 +59,7 @@ export function MobileFooter() {
           </div>
 
           <span className="mt-4 block text-sm font-light leading-relaxed text-gray-500">
-            Revolutionizing workforce management with intelligent automation, real-time insights, and AI-assisted execution.
+            Talio combines daily productivity visibility, coordination, Mira, and HRMS add-ons in one operating layer.
           </span>
 
           <div className="mt-5 space-y-2.5 text-sm text-gray-500">

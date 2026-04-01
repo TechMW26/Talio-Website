@@ -4,10 +4,10 @@ import { MessageCircle, FileBarChart, Lightbulb, Cog, HelpCircle, Brain } from '
 export function MiraAIFeature() {
   return (
     <FeatureDetailPage
-      badge="MIRA AI ASSISTANT"
-      title="MIRA AI"
+      badge="MIRA INSIDE WORKFLOWS"
+      title="Mira"
       titleGradient="from-violet-400 to-purple-400"
-      subtitle="Your natural language HR companion — ask anything, get instant answers, and automate tasks."
+      subtitle="Talio's embedded intelligence layer for summaries, drafting, reporting, and faster execution across daily workflows."
       accentColor="text-purple-400"
       gradientFrom="to-purple-950/30"
       heroImage="https://images.unsplash.com/photo-1700427296131-0cc4c4610fc6?auto=format&fit=crop&w=1920&q=80"
@@ -44,8 +44,8 @@ export function MiraAIFeature() {
         },
         {
           icon: HelpCircle,
-          title: 'Employee Helper',
-          description: 'Self-service queries for policies, payslips, and leave balances.',
+          title: 'Team Self-Service',
+          description: 'Help employees answer policy, payslip, and leave questions without extra manager follow-up.',
           details: ['Policy lookups', 'Payslip queries', 'Leave balances'],
         },
         {
@@ -57,11 +57,11 @@ export function MiraAIFeature() {
       ]}
       steps={[
         { step: '1', title: 'Ask Anything', description: 'Type your question in natural language.' },
-        { step: '2', title: 'Get Instant Response', description: 'MIRA analyzes and responds in seconds.' },
-        { step: '3', title: 'Take Action', description: 'Act on insights or let MIRA automate the task.' },
+        { step: '2', title: 'Get Instant Response', description: 'Mira analyzes context and responds in seconds.' },
+        { step: '3', title: 'Take Action', description: 'Act on insights or let Mira accelerate the workflow.' },
       ]}
       testimonial={{
-        quote: "MIRA has become our team's go-to for HR questions. It's like having a personal HR assistant.",
+        quote: "Mira helps our managers move faster because summaries, reports, and follow-ups happen inside the work itself.",
         author: 'Priya Sharma',
         role: 'HR Head, TechVentures Ltd',
       }}

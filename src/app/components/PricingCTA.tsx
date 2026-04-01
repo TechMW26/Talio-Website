@@ -42,10 +42,10 @@ export function PricingCTA() {
             transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
             className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-8 leading-[1.05] tracking-tighter text-center"
           >
-            Ready to transform{' '}
+            Ready to run{' '}
             <br className="hidden md:block" />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 via-blue-400 to-cyan-400">
-              your workforce?
+              work and HR together?
             </span>
           </motion.h2>
 
@@ -56,8 +56,7 @@ export function PricingCTA() {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="text-lg md:text-xl text-zinc-500 font-light leading-relaxed max-w-xl text-center"
           >
-            Start your free trial today. No credit card required — see the
-            difference in minutes, not months.
+            Start your free trial and see how Talio can replace fragmented visibility, coordination, and HR workflows with one daily-use utility.
           </motion.p>
 
           {/* CTA Buttons */}

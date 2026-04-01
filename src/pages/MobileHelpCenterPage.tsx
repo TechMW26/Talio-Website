@@ -6,7 +6,7 @@ import { usePageMeta } from '@/app/hooks/usePageMeta';
 import { categories, faqs, resources } from '@/app/content/helpCenterData';
 
 export function MobileHelpCenterPage() {
-  usePageMeta('Help Center', 'Find answers to common questions about Talio. Browse FAQs, guides, and resources to get the most out of your workforce management platform.');
+  usePageMeta('Help Center', 'Find answers, guides, and resources for using Talio as your daily productivity utility with connected HRMS add-ons.');
 
   const [openCategory, setOpenCategory] = useState<number | null>(0);
   const [openArticle, setOpenArticle] = useState<string | null>(null);

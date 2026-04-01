@@ -54,14 +54,14 @@ const values = [
 ];
 
 const stats = [
-  { value: '15+', label: 'Years legacy' },
-  { value: '500+', label: 'Enterprise clients' },
-  { value: '50K+', label: 'Active users' },
-  { value: '99.9%', label: 'Uptime SLA' },
+  { value: 'AI-first', label: 'Product direction' },
+  { value: 'Daily-use', label: 'Operating model' },
+  { value: 'One stack', label: 'Platform philosophy' },
+  { value: 'Ops-ready', label: 'Team fit' },
 ];
 
 export function MobileAboutPage() {
-  usePageMeta('About', 'Learn about Talio\'s mission to revolutionize workforce management with AI. Meet the team behind the platform transforming how businesses manage their people.');
+  usePageMeta('About', 'Learn how Talio is building an AI-powered productivity utility with Mira and HRMS add-ons for modern teams.');
 
   return (
     <div className="min-h-screen bg-gray-950 text-white">
@@ -90,7 +90,7 @@ export function MobileAboutPage() {
             >
               Building the future
               <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">
-                of workforce management
+                of workforce productivity
               </span>
             </motion.h1>
 

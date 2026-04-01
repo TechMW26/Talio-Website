@@ -7,7 +7,7 @@ import { AnimatedButton } from '@/app/components/AnimatedButton';
 import { communicationFeatures, coreFeatures } from '@/app/content/featuresOverviewData';
 
 export function FeaturesOverview() {
-  usePageMeta('Features', 'Explore Talio\'s powerful features: smart attendance, automated payroll, leave management, project tracking, OKRs, AI workflows, MIRA AI, team chat, and notifications.');
+  usePageMeta('Features', 'Explore Talio\'s productivity utility modules, Mira workflow support, and built-in HRMS add-ons for attendance, leave, payroll, coordination, and team visibility.');
 
   const heroRef = useRef(null);
   const coreRef = useRef(null);
@@ -50,12 +50,12 @@ export function FeaturesOverview() {
             ✦ FEATURES
           </span>
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold leading-[1.05] tracking-tighter text-center" style={{ marginBottom: '1.5rem' }}>
-            <span className="text-white">Everything You Need to </span>
+            <span className="text-white">One System for Daily Work </span>
             <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">Manage Your Team</span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">and HRMS Add-Ons</span>
           </h1>
           <p className="text-lg md:text-xl text-gray-400 font-light leading-relaxed max-w-xl text-center">
-            From attendance to AI — a complete suite of tools to streamline your workforce operations.
+            Talio combines productivity visibility, coordination, Mira, and connected HR workflows so teams can run day-to-day operations from one platform.
           </p>
         </motion.div>
       </section>
@@ -69,12 +69,12 @@ export function FeaturesOverview() {
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
             className="flex flex-col items-center text-center "
           >
-            <span className="inline-flex items-center gap-2 text-xs md:text-sm font-semibold text-gray-500 uppercase tracking-widest mb-6">CORE PLATFORM</span>
+            <span className="inline-flex items-center gap-2 text-xs md:text-sm font-semibold text-gray-500 uppercase tracking-widest mb-6">PRODUCTIVITY CORE</span>
             <h2 className="text-3xl md:text-5xl lg:text-6xl font-bold text-white tracking-tighter leading-[1.05] text-center" style={{ marginBottom: '1rem' }}>
-              Six Powerful Modules
+              Daily visibility and execution tools
             </h2>
             <p className="text-gray-400 font-light max-w-lg">
-              Each module works seamlessly together to give you full control over your workforce.
+              Track work as it happens, coordinate faster, and keep leaders close to execution without stitching together separate tools.
             </p>
           </motion.div>
 
@@ -113,12 +113,12 @@ export function FeaturesOverview() {
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
             className="flex flex-col items-center text-center "
           >
-            <span className="inline-flex items-center gap-2 text-xs md:text-sm font-semibold text-gray-500 uppercase tracking-widest mb-6">COMMUNICATION & AI</span>
+            <span className="inline-flex items-center gap-2 text-xs md:text-sm font-semibold text-gray-500 uppercase tracking-widest mb-6">Mira & Coordination</span>
             <h2 className="text-3xl md:text-5xl lg:text-6xl font-bold text-white tracking-tighter leading-[1.05] text-center" style={{ marginBottom: '1rem' }}>
-              Stay Connected, Work Smarter
+              Faster coordination with embedded intelligence
             </h2>
             <p className="text-gray-400 font-light max-w-lg">
-              AI-powered communication tools that keep your team aligned and productive.
+              Keep communication, alerts, and Mira-driven workflow support inside the same operating layer your team already uses.
             </p>
           </motion.div>
 
@@ -161,7 +161,7 @@ export function FeaturesOverview() {
               Ready to Get Started?
             </h2>
             <p className="text-gray-400 font-light max-w-lg mb-12">
-              See how Talio can transform your workforce management. Start with a 14-day free trial.
+              See how Talio can replace fragmented visibility, coordination, and HR workflows with one daily-use utility.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link to="/get-started">

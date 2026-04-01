@@ -22,7 +22,7 @@ export function Footer() {
         { label: 'Pricing', href: '/pricing' },
         { label: 'Downloads', href: '/downloads' },
         { label: 'Solutions', href: '/solutions' },
-        { label: 'MIRA AI', href: '/features/mira-ai' },
+        { label: 'Mira', href: '/mira-ai' },
       ]
     },
     {
@@ -149,7 +149,7 @@ export function Footer() {
               </div>
               
               <p className="text-sm text-gray-500 leading-relaxed mb-8 max-w-xs">
-                Revolutionizing workforce management with intelligent automation, real-time insights, and AI-powered assistance.
+                Talio is an AI-powered productivity utility for modern teams, with Mira and built-in HRMS add-ons in one operating layer.
               </p>
 
               {/* Contact Info */}

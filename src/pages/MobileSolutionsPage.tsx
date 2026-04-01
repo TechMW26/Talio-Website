@@ -5,7 +5,7 @@ import { usePageMeta } from '@/app/hooks/usePageMeta';
 import { solutions } from '@/app/content/solutionsData';
 
 export function MobileSolutionsPage() {
-  usePageMeta('Solutions', 'Talio workforce management solutions for businesses of all sizes. From startups to enterprise, find the right plan for your team.');
+  usePageMeta('Solutions', 'Explore how Talio fits modern teams that need productivity visibility, coordination, Mira, and HRMS add-ons in one operating system.');
 
   return (
     <div className="min-h-screen bg-gray-950 text-white">
@@ -25,7 +25,7 @@ export function MobileSolutionsPage() {
               </span>
             </h1>
             <p className="mobile-hero-copy max-w-md text-base font-light leading-relaxed text-gray-400">
-              From startups to enterprises, Talio adapts to the structure, speed, and complexity of your team.
+              From startups to distributed operations, Talio adapts to teams that need daily visibility, coordination, and connected HR workflows.
             </p>
           </div>
         </div>

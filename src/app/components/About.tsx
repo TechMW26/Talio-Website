@@ -6,7 +6,7 @@ import { ZoomStorySection } from '@/app/components/ZoomStorySection';
 import { usePageMeta } from '@/app/hooks/usePageMeta';
 
 export function About() {
-  usePageMeta('About', 'Learn about Talio\'s mission to revolutionize workforce management with AI. Meet the team behind the platform transforming how businesses manage their people.');
+  usePageMeta('About', 'Learn how Talio is building an AI-powered productivity utility with Mira and HRMS add-ons for modern teams.');
 
   const heroRef = useRef(null);
   const visionRef = useRef(null);
@@ -44,9 +44,9 @@ export function About() {
   const [activeValueIndex, setActiveValueIndex] = useState(0);
 
   const stats = [
-    { value: '500+', label: 'Enterprise Signups' },
-    { value: '50K+', label: 'Active Users' },
-    { value: '15+', label: 'Years of Legacy' }
+    { value: 'AI-first', label: 'Product direction' },
+    { value: 'Daily-use', label: 'Operating model' },
+    { value: 'One stack', label: 'Platform philosophy' }
   ];
 
   const values = [
@@ -65,7 +65,7 @@ export function About() {
     {
       icon: Shield,
       title: 'Trust & Security',
-      description: 'Your data security is our top priority. Enterprise-grade protection you can rely on.',
+      description: 'Permission-based controls and accountable infrastructure are built into how Talio operates.',
       gradient: 'from-green-500 to-emerald-500'
     },
     {
@@ -462,10 +462,10 @@ export function About() {
           >
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
               {[
-                { value: '15+', label: 'Years Legacy' },
-                { value: '500+', label: 'Enterprise Clients' },
-                { value: '50K+', label: 'Active Users' },
-                { value: '99.9%', label: 'Uptime SLA' }
+                { value: 'AI-first', label: 'Product direction' },
+                { value: 'Daily-use', label: 'Operating model' },
+                { value: 'One stack', label: 'Platform philosophy' },
+                { value: 'Ops-ready', label: 'Team fit' }
               ].map((stat, index) => (
                 <motion.div
                   key={stat.label}

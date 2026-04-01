@@ -6,7 +6,7 @@ import { ArrowRight, Check } from "lucide-react";
 import { solutions } from '@/app/content/solutionsData';
 
 export function Solutions() {
-  usePageMeta('Solutions', 'Talio workforce management solutions for businesses of all sizes. From startups to enterprise, find the right plan for your team.');
+  usePageMeta('Solutions', 'Explore how Talio fits modern teams that need productivity visibility, coordination, Mira, and HRMS add-ons in one operating system.');
 
   const heroRef = useRef(null);
   const ctaRef = useRef(null);
@@ -33,7 +33,7 @@ export function Solutions() {
             </span>
           </h1>
           <p className="text-lg md:text-xl text-gray-400 font-light leading-relaxed max-w-2xl text-center">
-            Talio adapts to your industry and team size with purpose-built solutions.
+            Talio fits teams that need daily visibility, coordination, Mira, and HRMS add-ons in one practical operating utility.
           </p>
         </motion.div>
       </section>
@@ -59,7 +59,7 @@ export function Solutions() {
             Find the Right Solution for Your Team
           </h2>
           <p className="text-lg md:text-xl text-gray-400 font-light leading-relaxed mb-12 text-center">
-            Talk to our team and discover the perfect plan for your organization.
+            Talk to our team and discover how Talio fits your operating model, team structure, and growth stage.
           </p>
           <Link
             to="/get-started"

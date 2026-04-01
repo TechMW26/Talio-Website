@@ -153,9 +153,9 @@ export function ZoomStorySection() {
   });
 
   const stats = [
-    { value: '500+', label: 'Enterprise Signups', icon: TrendingUp },
-    { value: '50K+', label: 'Active Users', icon: Users },
-    { value: '15+', label: 'Years of Legacy', icon: Sparkles }
+    { value: 'AI-first', label: 'Product direction', icon: TrendingUp },
+    { value: 'Daily-use', label: 'Operating model', icon: Users },
+    { value: 'One stack', label: 'Platform philosophy', icon: Sparkles }
   ];
 
   return (
@@ -232,7 +232,7 @@ export function ZoomStorySection() {
                     transition={{ duration: 0.8, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
                     className="text-base md:text-lg lg:text-xl text-gray-300 leading-relaxed font-light"
                   >
-                    We believe that workforce management should empower teams, not burden them. That's why we built Talio - to make managing your team effortless.
+                    We believe daily work systems should empower teams, not burden them. That's why we built Talio to bring productivity visibility, coordination, and HR workflows into one operating layer.
                   </motion.p>
 
                   <motion.p
@@ -250,7 +250,7 @@ export function ZoomStorySection() {
                     transition={{ duration: 0.8, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
                     className="text-sm md:text-base lg:text-lg text-gray-400 leading-relaxed font-light"
                   >
-                    Join thousands of organizations who trust Talio to streamline their operations and unlock their team's full potential.
+                    Talio is built for organizations that want fewer tools, faster managers, and better day-to-day operational clarity.
                   </motion.p>
 
                   {/* CTA Button */}

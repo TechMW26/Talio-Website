@@ -51,7 +51,7 @@ export function Navbar() {
   };
 
   const navItems = [
-    { name: 'MIRA AI', href: '/mira-ai', isRoute: true, gradient: true },
+    { name: 'Mira', href: '/mira-ai', isRoute: true, gradient: true },
     { name: 'Features', href: '/features', isRoute: true },
     { name: 'Pricing', href: '/pricing', isRoute: true },
     { name: 'Downloads', href: '/downloads', isRoute: true },
@@ -175,18 +175,18 @@ export function Navbar() {
                                       </h3>
                                     </div>
                                     <div className="space-y-0.5">
-                                      <FeatureItem icon={Bot} title="MIRA AI Assistant" description="Your intelligent HR companion" accentColor="violet" href="/features/mira-ai" delay={0.04} badge="New" />
+                                      <FeatureItem icon={Bot} title="Mira" description="Embedded intelligence for daily workflows" accentColor="violet" href="/features/mira-ai" delay={0.04} badge="New" />
                                       <FeatureItem icon={MessageSquare} title="Team Chat" description="Real-time messaging and channels" accentColor="pink" href="/features/team-chat" delay={0.07} />
                                       <FeatureItem icon={Bell} title="Notifications" description="Stay updated with real-time alerts" accentColor="orange" href="/features/notifications" delay={0.1} />
                                     </div>
                                   </div>
 
-                                  {/* HRMS FEATURES */}
+                                  {/* HRMS ADD-ONS */}
                                   <div className="p-5 relative">
                                     <div className="flex items-center gap-2 mb-4 px-2">
                                       <div className="w-1.5 h-1.5 rounded-full bg-purple-400 shadow-[0_0_6px_2px_rgba(168,85,247,0.4)]" />
                                       <h3 className="text-[10px] font-bold text-purple-400/80 uppercase tracking-[0.2em]">
-                                        HRMS Features
+                                        HRMS Add-Ons
                                       </h3>
                                     </div>
                                     <div className="space-y-0.5">

@@ -55,7 +55,7 @@ export function FeatureDetailPage({
   accentColor = 'text-blue-400',
   heroImage
 }: FeatureDetailPageProps) {
-  usePageMeta(`${badge} — Features`, `${subtitle} Discover how Talio's ${badge.toLowerCase()} features help streamline your workforce management.`);
+  usePageMeta(`${badge} — Features`, `${subtitle} Discover how Talio's ${badge.toLowerCase()} features support daily productivity, coordination, and connected HR workflows.`);
 
   const heroRef = useRef(null);
   const statsRef = useRef(null);

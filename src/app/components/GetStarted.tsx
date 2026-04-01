@@ -10,7 +10,7 @@ import { submitSignup, enrichVisitorFromForm } from '@/lib/firebase';
 import { getPageLabelFromPath } from '@/lib/leadAttribution';
 
 export function GetStarted() {
-  usePageMeta('Get Started', 'Book a free demo of Talio and see how it can transform your workforce management.');
+  usePageMeta('Get Started', 'Book a free demo of Talio and see how it brings productivity visibility, coordination, Mira, and HRMS add-ons into one daily-use system.');
 
   const location = useLocation();
 
@@ -60,23 +60,23 @@ export function GetStarted() {
   const benefits = [
     {
       icon: Bot,
-      title: 'MIRA AI Assistant',
-      description: 'Get instant answers and automate tasks with our intelligent AI assistant.',
+      title: 'Mira inside workflows',
+      description: 'Use embedded intelligence for summaries, drafting, follow-ups, and faster operational decisions.',
     },
     {
       icon: Clock,
-      title: 'Save 10+ Hours Weekly',
-      description: 'Automate attendance, payroll, leaves, and other repetitive HR tasks.',
+      title: 'Daily operational visibility',
+      description: 'See attendance, approvals, task flow, and manager actions in one connected operating layer.',
     },
     {
       icon: Shield,
-      title: 'Enterprise Security',
-      description: 'Your data is encrypted and never shared. SOC 2 compliant infrastructure.',
+      title: 'HRMS add-ons that stay connected',
+      description: 'Attendance, leave, payroll, employee records, and performance workflows stay tied to the same system.',
     },
     {
       icon: Headphones,
-      title: '24/7 Support',
-      description: 'Our team is always ready to help you succeed with Talio.',
+      title: 'Replace fragmented tools',
+      description: 'Reduce manual reporting and tool switching by consolidating coordination, visibility, and HR workflows.',
     },
   ];
 
@@ -99,11 +99,11 @@ export function GetStarted() {
             </span>
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-10 leading-[1.05] tracking-tighter text-center">
               <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-                Transform Your Workforce Management
+                See Talio in your daily operating flow
               </span>
             </h1>
             <p className="text-lg md:text-xl text-gray-400 font-light leading-relaxed max-w-2xl text-center">
-              Book a free demo and experience the future of HR management with Talio.
+              Book a guided demo to explore productivity visibility, coordination, Mira, and HRMS add-ons in one system.
             </p>
           </motion.div>
         </div>
@@ -190,7 +190,7 @@ export function GetStarted() {
                         </div>
                         <span className="text-xs font-semibold uppercase tracking-widest text-blue-400">Free Demo</span>
                       </div>
-                      <h2 className="text-xl sm:text-2xl font-bold text-white leading-tight">Book your guided walkthrough</h2>
+                      <h2 className="text-xl sm:text-2xl font-bold text-white leading-tight">Book a free demo.</h2>
                       <p className="mt-2 text-[13px] sm:text-sm text-gray-400 leading-relaxed">
                         See Talio in action — tailored to your workforce setup.
                       </p>

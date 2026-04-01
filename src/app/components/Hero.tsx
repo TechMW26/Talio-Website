@@ -89,7 +89,7 @@ export function Hero() {
                 className="w-2 h-2 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full"
               />
               <span className="text-xs md:text-sm font-semibold tracking-wide text-gray-200">
-                AI-Powered Workforce Management
+                AI-Powered Productivity Utility
               </span>
             </motion.div>
           </motion.div>
@@ -100,11 +100,11 @@ export function Hero() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
             style={{ marginBottom: 0 }}
-            className="text-[clamp(2.5rem,5.5vw,6rem)] font-bold tracking-tighter leading-[1.1] text-center mb-10"
+            className="text-[clamp(2.4rem,4.8vw,5rem)] font-bold tracking-tighter leading-[1.03] text-center mb-10"
           >
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-200 to-white">Manage Your Team</span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-200 to-white">Less Chasing.</span>
             <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-blue-600 to-purple-600">Smarter with AI</span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-blue-600 to-purple-600">More Doing.</span>
           </motion.h1>
 
           {/* Subheadline */}
@@ -115,7 +115,7 @@ export function Hero() {
             className="max-w-4xl mx-auto text-center mb-16 px-4 flex justify-center"
           >
             <div className="text-base md:text-lg lg:text-xl xl:text-2xl font-light leading-relaxed tracking-tight text-gray-400">
-              {"Talio revolutionizes workforce management with intelligent automation, real-time insights, and MIRA - your AI assistant that understands your business.".split(" ").map((word, i) => (
+              {"Talio helps companies manage day-to-day work with better visibility, real-time coordination, Mira inside workflows, and built-in HRMS add-ons for attendance, leave, payroll, and employee management.".split(" ").map((word, i) => (
                 <motion.span
                   key={i}
                   className="inline-block cursor-default mr-[0.25em]"

@@ -10,7 +10,7 @@ import {
 import { categories, faqs, resources, type CategoryData } from '@/app/content/helpCenterData';
 
 export function HelpCenter() {
-  usePageMeta('Help Center', 'Find answers to common questions about Talio. Browse FAQs, guides, and resources to get the most out of your workforce management platform.');
+  usePageMeta('Help Center', 'Find answers, guides, and resources for using Talio as your daily productivity utility with connected HRMS add-ons.');
 
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<CategoryData | null>(null);

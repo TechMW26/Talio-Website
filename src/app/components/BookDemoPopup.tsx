@@ -129,7 +129,7 @@ export function BookDemoPopup({ isOpen, onClose, planInfo }: BookDemoPopupProps)
                       </div>
                       <span className="text-xs font-semibold uppercase tracking-widest text-blue-400">Free Demo</span>
                     </div>
-                    <h2 className="text-xl sm:text-2xl font-bold text-white leading-tight">Book your guided walkthrough</h2>
+                    <h2 className="text-xl sm:text-2xl font-bold text-white leading-tight">Book a free demo.</h2>
                     <p className="mt-2 text-[13px] sm:text-sm text-gray-400 leading-relaxed">
                       See Talio in action — tailored to your team and workflow.
                     </p>

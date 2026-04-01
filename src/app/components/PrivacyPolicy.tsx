@@ -9,8 +9,9 @@ const sections = [
       <p className="text-gray-400 leading-relaxed mb-4">
         At Talio (operated by MW FutureTech), we are committed to protecting your
         privacy. This Privacy Policy explains how we collect, use, disclose, and
-        safeguard your information when you use our workforce management
-        platform.
+        safeguard your information when you use our productivity utility,
+        related web and desktop applications, and connected HRMS add-on
+        features.
       </p>
     ),
   },
@@ -22,20 +23,22 @@ const sections = [
           <span className="font-medium text-gray-300">
             Personal Information:
           </span>{" "}
-          Name, email address, employment information, profile photos, and bank
-          details for payroll processing.
+          Name, email address, employment information, profile photos, and
+          payment or payroll-related details when your organization enables
+          those workflows.
         </li>
         <li>
           <span className="font-medium text-gray-300">
-            Attendance & Location Data:
+            Attendance, Work, and Location Data:
           </span>{" "}
-          GPS coordinates, timestamps, and geofence logs when using attendance
-          features.
+          Timestamps, approvals, task or coordination inputs, and optional GPS
+          or geofence logs when your organization uses attendance or
+          location-aware features.
         </li>
         <li>
           <span className="font-medium text-gray-300">Usage Data:</span> Device
-          type, IP address, usage patterns, and error logs to improve our
-          services.
+          type, IP address, diagnostics, product interactions, and error logs to
+          operate, secure, and improve the Service.
         </li>
       </ul>
     ),
@@ -48,12 +51,12 @@ const sections = [
           We use the information we collect to:
         </p>
         <ul className="list-disc list-inside space-y-2 text-gray-400 leading-relaxed mb-4">
-          <li>Provide and maintain our services</li>
-          <li>Process attendance, payroll, and leave management</li>
-          <li>Communicate with you about your account</li>
-          <li>Analyze usage patterns and improve our platform</li>
-          <li>Ensure security and prevent fraud</li>
-          <li>Comply with legal obligations</li>
+          <li>Provide, maintain, and support the Service</li>
+          <li>Operate productivity, coordination, attendance, leave, payroll, and employee workflows</li>
+          <li>Communicate with you about your account, updates, or support needs</li>
+          <li>Analyze usage patterns to improve product quality and reliability</li>
+          <li>Protect the Service, investigate misuse, and prevent fraud</li>
+          <li>Comply with legal, contractual, and regulatory obligations</li>
         </ul>
       </>
     ),
@@ -66,8 +69,8 @@ const sections = [
           We may share your information with:
         </p>
         <ul className="list-disc list-inside space-y-2 text-gray-400 leading-relaxed mb-3">
-          <li>Your organization's administrators (as configured)</li>
-          <li>Service providers who assist in operating our platform</li>
+          <li>Your organization’s authorized administrators, managers, or operators, as configured</li>
+          <li>Service providers who help us host, operate, secure, or support the Service</li>
           <li>Legal authorities when required by law</li>
         </ul>
         <p className="text-gray-400 leading-relaxed mb-4">
@@ -84,10 +87,10 @@ const sections = [
           We protect your data with:
         </p>
         <ul className="list-disc list-inside space-y-2 text-gray-400 leading-relaxed mb-4">
-          <li>256-bit SSL/TLS encryption in transit</li>
-          <li>AES-256 encryption at rest</li>
-          <li>Regular security audits and penetration testing</li>
-          <li>Role-based access control (RBAC)</li>
+          <li>Encryption in transit</li>
+          <li>Encryption at rest where supported and appropriate</li>
+          <li>Access controls and permission-based visibility</li>
+          <li>Administrative, technical, and organizational safeguards</li>
         </ul>
       </>
     ),
@@ -145,7 +148,7 @@ const sections = [
 ];
 
 export function PrivacyPolicy() {
-  usePageMeta('Privacy Policy', 'Talio\'s privacy policy. Learn how we collect, use, and protect your personal data and workforce information.');
+  usePageMeta('Privacy Policy', 'Talio\'s privacy policy. Learn how we collect, use, and protect data used in our productivity utility and HRMS add-on workflows.');
 
   const heroRef = useRef(null);
   const contentRef = useRef(null);

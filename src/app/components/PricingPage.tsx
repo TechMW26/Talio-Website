@@ -6,7 +6,7 @@ const DesktopPricingPage = lazy(() => import('@/app/components/DesktopPricingPag
 const MobilePricingPage = lazy(() => import('@/app/components/MobilePricingPage').then((module) => ({ default: module.MobilePricingPage })));
 
 export function PricingPage() {
-  usePageMeta('Pricing', 'Simple, transparent pricing for teams of all sizes. Start free, upgrade when you need. Explore Talio Starter, Professional, and Enterprise plans.');
+  usePageMeta('Pricing', 'Talio is priced for operational value: one daily-use productivity utility with Mira and built-in HRMS add-ons for attendance, leave, payroll, and employee management.');
   const isMobileViewport = useIsMobileViewport();
 
   return (

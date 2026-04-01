@@ -25,8 +25,8 @@ const PRIVACY_FEATURES = [
   },
   {
     icon: Database,
-    title: 'SOC 2 Compliant',
-    description: 'Enterprise-grade infrastructure with continuous compliance monitoring.',
+    title: 'Controlled Infrastructure',
+    description: 'Protected infrastructure and accountable operational controls keep sensitive data handled with care.',
     color: 'from-emerald-500/20 to-teal-500/20',
     borderColor: 'border-emerald-500/20',
     iconColor: 'text-emerald-400',
@@ -450,10 +450,10 @@ export function PrivacySection() {
           className="mt-16 flex flex-wrap items-center justify-center gap-8 md:gap-12"
         >
           {[
-            { icon: Server, label: 'SOC 2 Type II' },
+            { icon: Server, label: 'Protected infrastructure' },
             { icon: Lock, label: 'AES-256 Encryption' },
-            { icon: Eye, label: 'GDPR Compliant' },
-            { icon: ShieldCheck, label: '99.9% Uptime SLA' },
+            { icon: Eye, label: 'Permission-based visibility' },
+            { icon: ShieldCheck, label: 'Operational accountability' },
           ].map((badge) => (
             <div key={badge.label} className="flex items-center gap-2.5 text-sm text-gray-500">
               <badge.icon className="w-4 h-4 text-gray-600" />

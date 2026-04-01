@@ -6,7 +6,7 @@ import { SiAndroid, SiApple } from 'react-icons/si';
 import { usePageMeta } from '@/app/hooks/usePageMeta';
 
 export function Downloads() {
-  usePageMeta('Downloads', 'Download Talio for macOS, Windows, and iOS. Android support is coming soon. Get the app on any device and manage your workforce on the go.');
+  usePageMeta('Downloads', 'Download Talio for macOS, Windows, and iOS. Android support is coming soon. Get productivity visibility, coordination, and connected HR workflows on every device.');
 
   const heroRef = useRef(null);
   const platformsRef = useRef(null);
@@ -178,7 +178,7 @@ export function Downloads() {
             transition={{ duration: 0.8, delay: 0.5 }}
             className="text-lg md:text-xl text-gray-400 mb-12 leading-relaxed max-w-2xl mx-auto font-light text-center"
           >
-            Get the native experience for attendance tracking, productivity monitoring, and seamless HR management.
+            Get the native experience for attendance, productivity visibility, real-time coordination, and connected HR workflows.
           </motion.p>
 
           {/* Recommended Download */}

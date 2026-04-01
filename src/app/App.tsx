@@ -18,7 +18,6 @@ const HelpPage = lazy(() => import('@/pages/HelpPage').then((module) => ({ defau
 const PricingPage = lazy(() => import('@/app/components/PricingPage').then((module) => ({ default: module.PricingPage })));
 const Downloads = lazy(() => import('@/app/components/Downloads').then((module) => ({ default: module.Downloads })));
 const Documents = lazy(() => import('@/app/components/Documents').then((module) => ({ default: module.Documents })));
-const MiraComingSoon = lazy(() => import('@/app/components/MiraComingSoon').then((module) => ({ default: module.MiraComingSoon })));
 const Contact = lazy(() => import('@/app/components/Contact').then((module) => ({ default: module.Contact })));
 const GetStarted = lazy(() => import('@/app/components/GetStarted').then((module) => ({ default: module.GetStarted })));
 const Partners = lazy(() => import('@/app/components/Partners').then((module) => ({ default: module.Partners })));
@@ -117,7 +116,7 @@ function AppLayout() {
           <Route path="/about" element={<AboutPage />} />
           <Route path="/downloads" element={<Downloads />} />
           <Route path="/documents" element={<Documents />} />
-          <Route path="/mira-ai" element={<MiraComingSoon />} />
+          <Route path="/mira-ai" element={<MiraAIFeature />} />
           <Route path="/features" element={<FeaturesPage />} />
           <Route path="/features/attendance" element={<AttendanceFeature />} />
           <Route path="/features/payroll" element={<PayrollFeature />} />

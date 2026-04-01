@@ -5,7 +5,7 @@ import { usePageMeta } from '@/app/hooks/usePageMeta';
 import { communicationFeatures, coreFeatures } from '@/app/content/featuresOverviewData';
 
 export function MobileFeaturesPage() {
-  usePageMeta('Features', 'Explore Talio\'s powerful features: smart attendance, automated payroll, leave management, project tracking, OKRs, AI workflows, MIRA AI, team chat, and notifications.');
+  usePageMeta('Features', 'Explore Talio\'s productivity utility modules, Mira workflow support, and built-in HRMS add-ons for attendance, leave, payroll, coordination, and team visibility.');
 
   return (
     <div className="min-h-screen bg-gray-950 text-white">
@@ -19,13 +19,13 @@ export function MobileFeaturesPage() {
               ✦ Features
             </span>
             <h1 className="mobile-hero-title text-[clamp(2.7rem,10vw,4.6rem)] font-bold tracking-tighter leading-[0.98] text-white">
-              Everything you need to
+              One system for daily work
               <span className="block text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">
-                manage your team
+                and HRMS add-ons
               </span>
             </h1>
             <p className="mobile-hero-copy max-w-md text-base font-light leading-relaxed text-gray-400">
-              Explore Talio's core platform and communication capabilities in one connected product suite.
+              Talio combines productivity visibility, coordination, Mira, and connected HR workflows in one daily-use platform.
             </p>
           </div>
         </div>
@@ -98,7 +98,7 @@ export function MobileFeaturesPage() {
           <div className="rounded-[2.5rem] border border-white/10 bg-gray-900/60 p-6 text-center">
             <h2 className="text-3xl font-bold tracking-tighter leading-[1.02] text-white">Ready to get started?</h2>
             <p className="mt-4 text-sm font-light leading-relaxed text-gray-400">
-              See how Talio can transform workforce management with a 14-day free trial.
+              See how Talio can replace fragmented visibility, coordination, and HR workflows with one daily-use utility.
             </p>
             <div className="mt-8 flex flex-col gap-3">
               <Link to="/get-started" className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-white px-8 py-4 text-base font-semibold text-black transition hover:bg-gray-100">

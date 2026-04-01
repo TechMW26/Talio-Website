@@ -76,7 +76,7 @@ export function DesktopPricingPage() {
           </span>
         </h1>
         <p className="text-lg md:text-xl text-gray-400 font-light leading-relaxed max-w-xl text-center">
-          Choose the plan that works for your team. All plans include a free trial.
+          Talio is priced for operational value: replace fragmented attendance, coordination, reporting, and HR tools with one daily-use productivity utility.
         </p>
       </motion.section>
 

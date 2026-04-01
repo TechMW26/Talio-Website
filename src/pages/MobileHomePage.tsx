@@ -32,7 +32,7 @@ const workflowColumns = [
   {
     title: 'Review',
     accent: 'text-violet-300',
-    tasks: ['Manager approvals', 'MIRA recommendations'],
+    tasks: ['Manager approvals', 'Mira recommendations'],
   },
   {
     title: 'Done',
@@ -67,7 +67,7 @@ const goalCards = [
 ];
 
 const aiCapabilities = [
-  { icon: Bot, title: 'MIRA answers', description: 'Policy, attendance, and people questions in seconds.' },
+  { icon: Bot, title: 'Mira inside workflows', description: 'Get summaries, follow-ups, and operational help without leaving the flow of work.' },
   { icon: Sparkles, title: 'Smart nudges', description: 'Flag delays, risks, and follow-ups before they become blockers.' },
   { icon: Clock, title: 'Weekly time savings', description: 'Automate repetitive HR operations that eat into the day.' },
   { icon: MessageCircle, title: 'Contextual support', description: 'Bring help, updates, and approvals into one conversation layer.' },
@@ -176,20 +176,20 @@ export function MobileHomePage() {
               transition={{ duration: 0.6 }}
               className="mobile-hero-eyebrow inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-blue-300"
             >
-              ✦ AI Workforce Operating System
+              ✦ AI-Powered Productivity Utility
             </motion.div>
 
             <motion.h1
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-              className="mobile-hero-title text-[clamp(2.8rem,11vw,4.4rem)] font-bold leading-[0.95] tracking-tighter"
+              className="mobile-hero-title text-[clamp(2.35rem,10vw,3.9rem)] font-bold leading-[0.94] tracking-tighter"
             >
               <span className="block text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-200 to-white">
-                Manage Your Team
+                Less Chasing.
               </span>
               <span className="block text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-400">
-                Smarter with AI
+                More Doing.
               </span>
             </motion.h1>
 
@@ -199,7 +199,7 @@ export function MobileHomePage() {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="mobile-hero-copy max-w-[320px] text-sm font-light leading-relaxed text-gray-400"
             >
-              Talio brings attendance, payroll, goals, communication, and AI support into a mobile workflow that is fast to use and easy to trust.
+              Talio gives teams daily visibility, real-time coordination, Mira inside workflows, and HRMS add-ons that keep attendance, leave, payroll, and employee management connected.
             </motion.p>
 
             <motion.div
@@ -291,9 +291,9 @@ export function MobileHomePage() {
       <section className="relative py-16 overflow-hidden bg-black">
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
           <SectionHeading
-            label="HRMS Features"
+            label="HRMS Add-Ons"
             title="Attendance and payroll in one connected flow"
-            subtitle="Keep attendance, leave, and payroll actions connected so teams move faster with cleaner approvals and fewer handoffs."
+            subtitle="Keep attendance, leave, and payroll connected to the same daily operating layer so managers move faster with fewer handoffs."
             accentClassName="text-gray-400"
           />
 
@@ -454,7 +454,7 @@ export function MobileHomePage() {
           </div>
 
           <div className="mt-6 flex flex-wrap gap-3">
-            {['SOC 2 ready', 'AES-256 encryption', 'Role-based access', 'Audit friendly'].map((item) => (
+            {['Protected infrastructure', 'AES-256 encryption', 'Role-based access', 'Audit trails'].map((item) => (
               <span key={item} className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-medium text-gray-300">
                 {item}
               </span>

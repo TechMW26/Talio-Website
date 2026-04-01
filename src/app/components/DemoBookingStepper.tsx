@@ -1,7 +1,9 @@
 import { AnimatePresence, motion } from 'motion/react';
-import { ArrowLeft, ArrowRight, Calendar } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Calendar, User, Building2, Clock, Sparkles, Check } from 'lucide-react';
 import { useEffect, useState, type ChangeEvent, type ComponentPropsWithoutRef, type FormEvent, type ReactNode } from 'react';
 import { demoTimeSlots, type DemoBookingFormValues, type PlanInfo } from '@/app/components/demoBookingTypes';
+import { DatePicker } from '@/app/components/ui/date-picker';
+import { TimePicker } from '@/app/components/ui/time-picker';
 
 type FieldName = keyof DemoBookingFormValues;
 
@@ -22,26 +24,29 @@ interface DemoBookingStepperProps {
 const steps = [
   {
     label: 'Personal',
-    title: 'Personal details',
-    description: 'Tell us who should receive the demo confirmation.',
+    title: 'Your details',
+    description: 'We\'ll send the confirmation here.',
+    icon: User,
     fields: ['firstName', 'lastName', 'email', 'phone'] as FieldName[],
   },
   {
     label: 'Company',
-    title: 'Company details',
-    description: 'Add the business context so the walkthrough stays relevant.',
+    title: 'Your company',
+    description: 'Helps us tailor the demo to your needs.',
+    icon: Building2,
     fields: ['company', 'jobTitle', 'industry', 'companySize'] as FieldName[],
   },
   {
-    label: 'Timing',
-    title: 'Schedule the demo',
-    description: 'Pick the session slot that works best for your team.',
+    label: 'Schedule',
+    title: 'Pick a slot',
+    description: 'Choose your preferred date and time.',
+    icon: Clock,
     fields: ['preferredDate', 'preferredTime'] as FieldName[],
   },
 ];
 
 const inputClass =
-  'w-full rounded-2xl border border-gray-800 bg-gray-950 px-3 py-2.5 text-[13px] text-white placeholder-gray-500 outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500';
+  'w-full rounded-xl border border-gray-700/60 bg-gray-950/80 px-4 py-3 text-[16px] md:text-[13px] text-white placeholder-gray-500 outline-none transition-all duration-200 focus:border-blue-500/60 focus:ring-2 focus:ring-blue-500/15 hover:border-gray-600';
 
 function StepInput(props: ComponentPropsWithoutRef<'input'>) {
   return <input {...props} className={inputClass} />;
@@ -97,25 +102,27 @@ export function DemoBookingStepper({
   };
 
   return (
-    <form onSubmit={handleFormSubmit} className="space-y-4">
+    <form onSubmit={handleFormSubmit} className="space-y-5">
       {planInfo && (
-        <div className="rounded-[1.5rem] border border-gray-700/50 bg-gray-800/35 p-3.5">
+        <div className="rounded-2xl border border-gray-700/40 bg-gradient-to-r from-gray-800/40 to-gray-800/20 p-4">
           <div className="flex items-center gap-3">
-            <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br ${planInfo.gradient}`}>
-              <span className="text-xs font-bold text-white">{planInfo.name[0]}</span>
+            <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br ${planInfo.gradient} shadow-lg`}>
+              <Sparkles className="h-4 w-4 text-white" />
             </div>
             <div className="min-w-0">
               <span className="block text-sm font-semibold text-white">{planInfo.name} Plan</span>
-              <span className="block text-[11px] text-gray-400">{planInfo.price}</span>
+              <span className="block text-[12px] text-gray-400">{planInfo.price}</span>
             </div>
           </div>
         </div>
       )}
 
-      <div className="grid grid-cols-3 gap-2">
+      {/* Step indicators */}
+      <div className="flex items-center gap-1.5 sm:gap-2">
         {steps.map((step, index) => {
           const active = index === currentStep;
           const complete = isStepComplete(index);
+          const StepIcon = step.icon;
 
           return (
             <button
@@ -123,144 +130,188 @@ export function DemoBookingStepper({
               type="button"
               disabled={!canOpenStep(index)}
               onClick={() => canOpenStep(index) && setCurrentStep(index)}
-              className={`rounded-2xl border px-3 py-2 text-left transition ${
+              className={`group relative flex flex-1 items-center justify-center sm:justify-start gap-1.5 sm:gap-2 rounded-xl border px-2 sm:px-3 py-2.5 text-left transition-all duration-200 min-w-0 ${
                 active
-                  ? 'border-white/20 bg-white/[0.08]'
+                  ? 'border-blue-500/30 bg-blue-500/[0.08] shadow-sm shadow-blue-500/5'
                   : complete
-                    ? 'border-emerald-500/20 bg-emerald-500/10'
-                    : 'border-gray-800 bg-gray-950/70'
-              } ${!canOpenStep(index) ? 'opacity-50' : ''}`}
+                    ? 'border-emerald-500/20 bg-emerald-500/[0.06]'
+                    : 'border-gray-800/60 bg-gray-950/40'
+              } ${!canOpenStep(index) ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer hover:border-gray-600'}`}
             >
-              <span className={`block text-[10px] font-semibold uppercase tracking-[0.18em] ${active ? 'text-blue-300' : complete ? 'text-emerald-300' : 'text-gray-500'}`}>
-                {String(index + 1).padStart(2, '0')}
-              </span>
-              <span className="mt-1 block text-[12px] font-medium text-white">{step.label}</span>
+              <div className={`hidden sm:flex h-7 w-7 shrink-0 items-center justify-center rounded-lg transition-all ${
+                active
+                  ? 'bg-blue-500/20 text-blue-400'
+                  : complete
+                    ? 'bg-emerald-500/20 text-emerald-400'
+                    : 'bg-gray-800/60 text-gray-500'
+              }`}>
+                {complete && !active ? <Check className="h-3.5 w-3.5" /> : <StepIcon className="h-3.5 w-3.5" />}
+              </div>
+              <div className="min-w-0 hidden sm:block">
+                <span className={`block text-[10px] font-medium leading-none ${
+                  active ? 'text-blue-300' : complete ? 'text-emerald-300' : 'text-gray-500'
+                }`}>
+                  {String(index + 1).padStart(2, '0')}
+                </span>
+                <span className="mt-0.5 block truncate text-[11px] font-medium text-white/80">{step.label}</span>
+              </div>
+              {/* Mobile: just label */}
+              <span className={`block sm:hidden text-xs font-semibold text-center w-full ${
+                active ? 'text-blue-300' : complete ? 'text-emerald-300' : 'text-gray-500'
+              }`}>{step.label}</span>
             </button>
           );
         })}
       </div>
 
-      <div className="rounded-[1.75rem] border border-gray-800/80 bg-gray-950/70 p-4 md:p-5">
-        <div className="flex items-start gap-3">
+      {/* Progress bar */}
+      <div className="h-[2px] w-full rounded-full bg-gray-800/60 overflow-hidden">
+        <motion.div
+          className="h-full rounded-full bg-gradient-to-r from-blue-500 to-blue-400"
+          initial={false}
+          animate={{ width: `${((currentStep + (isStepComplete(currentStep) ? 1 : 0.5)) / steps.length) * 100}%` }}
+          transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+        />
+      </div>
+
+      {/* Step content card */}
+      <div className="rounded-2xl border border-gray-800/60 bg-gradient-to-b from-gray-900/60 to-gray-950/80 p-4 md:p-5">
+        <div className="flex items-center gap-3 mb-4">
           {currentStep > 0 && (
             <button
               type="button"
               onClick={goToPreviousStep}
               aria-label="Go back to previous step"
-              className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/[0.04] text-white transition hover:bg-white/[0.08]"
+              className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-white/[0.04] text-gray-400 transition-all hover:bg-white/[0.08] hover:text-white"
             >
-              <ArrowLeft className="h-4 w-4" />
+              <ArrowLeft className="h-3.5 w-3.5" />
             </button>
           )}
 
           <div className="min-w-0">
-            <span className="block text-[11px] font-semibold uppercase tracking-[0.18em] text-blue-300">
-              Step {currentStep + 1} of {steps.length}
-            </span>
-            <span className="mt-2 block text-lg font-semibold text-white">{steps[currentStep].title}</span>
-            <span className="mt-1 block text-sm leading-relaxed text-gray-400">{steps[currentStep].description}</span>
+            <span className="block text-base md:text-lg font-semibold text-white">{steps[currentStep].title}</span>
+            <span className="block text-[12px] md:text-[13px] text-gray-400">{steps[currentStep].description}</span>
           </div>
         </div>
 
-        <div className="mt-4 overflow-hidden">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={steps[currentStep].label}
-              initial={{ opacity: 0, x: 18 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -18 }}
-              transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
-              className="space-y-3"
-            >
-              {currentStep === 0 && (
-                <>
-                  <div className="grid grid-cols-2 gap-2.5 md:gap-3">
-                    <StepInput name="firstName" value={form.firstName} onChange={onFieldChange} placeholder="First Name" required />
-                    <StepInput name="lastName" value={form.lastName} onChange={onFieldChange} placeholder="Last Name" required />
-                  </div>
-                  <div className="grid grid-cols-2 gap-2.5 md:gap-3">
-                    <StepInput name="email" type="email" value={form.email} onChange={onFieldChange} placeholder="Work Email" required />
-                    <StepInput name="phone" type="tel" value={form.phone} onChange={onFieldChange} placeholder="Phone" required />
-                  </div>
-                </>
-              )}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={steps[currentStep].label}
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+            className="space-y-3"
+          >
+            {currentStep === 0 && (
+              <>
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  <StepInput name="firstName" value={form.firstName} onChange={onFieldChange} placeholder="First Name" required />
+                  <StepInput name="lastName" value={form.lastName} onChange={onFieldChange} placeholder="Last Name" required />
+                </div>
+                <StepInput name="email" type="email" value={form.email} onChange={onFieldChange} placeholder="Work Email" required />
+                <StepInput name="phone" type="tel" value={form.phone} onChange={onFieldChange} placeholder="Phone Number" required />
+              </>
+            )}
 
-              {currentStep === 1 && (
-                <>
-                  <div className="grid grid-cols-2 gap-2.5 md:gap-3">
-                    <StepInput name="company" value={form.company} onChange={onFieldChange} placeholder="Company Name" required />
-                    <StepInput name="jobTitle" value={form.jobTitle} onChange={onFieldChange} placeholder="Job Title" required />
-                  </div>
-                  <div className="grid grid-cols-2 gap-2.5 md:gap-3">
-                    <StepSelect name="industry" value={form.industry} onChange={onFieldChange} required>
-                      <option value="" disabled>Select Industry</option>
-                      <option value="Technology">Technology</option>
-                      <option value="Healthcare">Healthcare</option>
-                      <option value="Finance">Finance</option>
-                      <option value="Retail">Retail</option>
-                      <option value="Manufacturing">Manufacturing</option>
-                      <option value="Education">Education</option>
-                      <option value="Other">Other</option>
-                    </StepSelect>
-                    <StepSelect name="companySize" value={form.companySize} onChange={onFieldChange} required>
-                      <option value="" disabled>Company Size</option>
-                      <option value="1-10">1-10 employees</option>
-                      <option value="11-50">11-50 employees</option>
-                      <option value="51-200">51-200 employees</option>
-                      <option value="201-500">201-500 employees</option>
-                      <option value="501+">501+ employees</option>
-                    </StepSelect>
-                  </div>
-                </>
-              )}
+            {currentStep === 1 && (
+              <>
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  <StepInput name="company" value={form.company} onChange={onFieldChange} placeholder="Company Name" required />
+                  <StepInput name="jobTitle" value={form.jobTitle} onChange={onFieldChange} placeholder="Job Title" required />
+                </div>
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  <StepSelect name="industry" value={form.industry} onChange={onFieldChange} required>
+                    <option value="" disabled>Select Industry</option>
+                    <option value="Technology">Technology</option>
+                    <option value="Healthcare">Healthcare</option>
+                    <option value="Finance">Finance</option>
+                    <option value="Retail">Retail</option>
+                    <option value="Manufacturing">Manufacturing</option>
+                    <option value="Education">Education</option>
+                    <option value="Other">Other</option>
+                  </StepSelect>
+                  <StepSelect name="companySize" value={form.companySize} onChange={onFieldChange} required>
+                    <option value="" disabled>Company Size</option>
+                    <option value="1-10">1–10 employees</option>
+                    <option value="11-50">11–50 employees</option>
+                    <option value="51-200">51–200 employees</option>
+                    <option value="201-500">201–500 employees</option>
+                    <option value="501+">501+ employees</option>
+                  </StepSelect>
+                </div>
+              </>
+            )}
 
-              {currentStep === 2 && (
-                <div className="rounded-[1.5rem] border border-gray-800 bg-black/30 p-3.5 md:p-4">
-                  <div className="mb-3 flex items-center gap-2">
-                    <Calendar className="h-4 w-4 text-blue-400" />
-                    <span className="text-sm font-medium text-white">Schedule Your Demo</span>
+            {currentStep === 2 && (
+              <div className="space-y-4">
+                <div className="rounded-xl border border-gray-800/50 bg-black/20 p-4">
+                  <div className="mb-3 flex items-center gap-2.5">
+                    <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-500/15">
+                      <Calendar className="h-3.5 w-3.5 text-blue-400" />
+                    </div>
+                    <span className="text-[13px] font-medium text-white">When works for you?</span>
                   </div>
 
                   <div className="space-y-3">
                     <div>
-                      <span className="mb-1 block text-[11px] text-gray-500">Preferred Date</span>
-                      <StepInput
-                        type="date"
+                      <span className="mb-1.5 block text-[11px] font-medium uppercase tracking-wider text-gray-500">Preferred Date</span>
+                      <DatePicker
                         name="preferredDate"
                         value={form.preferredDate}
-                        onChange={onFieldChange}
-                        min={minDate}
+                        onChange={(dateStr) =>
+                          onFieldChange({
+                            target: { name: 'preferredDate', value: dateStr },
+                          } as ChangeEvent<HTMLInputElement>)
+                        }
+                        minDate={minDate}
+                        placeholder="Pick a date"
                         required
                       />
                     </div>
 
                     <div>
-                      <span className="mb-1 block text-[11px] text-gray-500">Preferred Time (IST)</span>
-                      <StepSelect name="preferredTime" value={form.preferredTime} onChange={onFieldChange} required>
-                        <option value="" disabled>Select Time</option>
-                        {demoTimeSlots.map((slot) => (
-                          <option key={slot} value={slot}>{slot}</option>
-                        ))}
-                      </StepSelect>
+                      <span className="mb-1.5 block text-[11px] font-medium uppercase tracking-wider text-gray-500">Preferred Time (IST)</span>
+                      <TimePicker
+                        name="preferredTime"
+                        value={form.preferredTime}
+                        onChange={(timeStr) =>
+                          onFieldChange({
+                            target: { name: 'preferredTime', value: timeStr },
+                          } as ChangeEvent<HTMLInputElement>)
+                        }
+                        slots={demoTimeSlots}
+                        placeholder="Pick a time slot"
+                        required
+                      />
                     </div>
                   </div>
                 </div>
-              )}
-            </motion.div>
-          </AnimatePresence>
-        </div>
+              </div>
+            )}
+          </motion.div>
+        </AnimatePresence>
       </div>
 
-      <button
+      {/* Submit / Next button */}
+      <motion.button
         type="submit"
         disabled={!isStepComplete(currentStep) || submitting || submitted}
-        className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-semibold text-black transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
+        whileHover={!submitting && isStepComplete(currentStep) ? { scale: 1.01 } : {}}
+        whileTap={!submitting && isStepComplete(currentStep) ? { scale: 0.98 } : {}}
+        className="group inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 px-5 py-3.5 text-[14px] font-semibold text-white shadow-lg shadow-blue-500/20 transition-all duration-200 hover:shadow-xl hover:shadow-blue-500/25 disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none"
       >
-        <span>{isLastStep ? (submitting ? submittingLabel : submitLabel) : 'Next'}</span>
-        {(!submitting || !isLastStep) && <ArrowRight className="h-4 w-4" />}
-      </button>
+        <span>{isLastStep ? (submitting ? submittingLabel : submitLabel) : 'Continue'}</span>
+        {(!submitting || !isLastStep) && <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />}
+        {submitting && isLastStep && (
+          <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+          </svg>
+        )}
+      </motion.button>
 
-      {legalNotice && <div className="pt-1">{legalNotice}</div>}
+      {legalNotice && <div className="pt-0.5">{legalNotice}</div>}
     </form>
   );
 }

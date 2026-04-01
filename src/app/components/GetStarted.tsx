@@ -1,6 +1,6 @@
 import { useRef, useState, type ChangeEvent, type FormEvent } from 'react';
 import { motion, useInView } from 'motion/react';
-import { Bot, Clock, Shield, Headphones, CheckCircle2 } from 'lucide-react';
+import { Bot, Clock, Shield, Headphones, CheckCircle2, Sparkles } from 'lucide-react';
 import { Link, useLocation } from 'react-router';
 import { usePageMeta } from '@/app/hooks/usePageMeta';
 import { createDemoBookingEmailPayload, sendDemoBookingEmail } from '@/app/components/demoBookingEmail';
@@ -83,7 +83,7 @@ export function GetStarted() {
   const trustBadges = ['14-day free trial', 'No credit card required', 'Cancel anytime'];
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
+    <div className="min-h-screen overflow-x-hidden bg-gray-950 text-white">
       {/* Hero */}
       <section ref={heroRef} className="relative overflow-hidden pt-32 pb-16">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(59,130,246,0.08),transparent_60%)]" />
@@ -114,33 +114,33 @@ export function GetStarted() {
         <div className="grid items-start gap-8 lg:grid-cols-2 lg:gap-12">
           {/* Left – Benefits */}
           <motion.div
-            initial={{ opacity: 0, x: -40 }}
-            animate={contentInView ? { opacity: 1, x: 0 } : {}}
+            initial={{ opacity: 0, y: 20 }}
+            animate={contentInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.6 }}
-            className="order-2 lg:order-1"
+            className="order-2 lg:order-1 min-w-0"
           >
-            <div className="space-y-6">
+            <div className="space-y-4">
               {benefits.map((item, i) => (
                 <motion.div
                   key={item.title}
                   initial={{ opacity: 0, y: 20 }}
                   animate={contentInView ? { opacity: 1, y: 0 } : {}}
                   transition={{ duration: 0.5, delay: i * 0.1 }}
-                  className="flex items-start gap-5 rounded-3xl border border-gray-800 bg-gray-900 p-6"
+                  className="flex items-start gap-4 rounded-2xl border border-gray-800/60 bg-gray-900/60 p-5 transition-all hover:border-gray-700/60 hover:bg-gray-900/80"
                 >
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500/20 to-purple-500/20">
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500/15 to-purple-500/15">
                     <item.icon className="h-5 w-5 text-blue-400" />
                   </div>
                   <div>
-                    <span className="mb-1 block font-semibold text-white">{item.title}</span>
-                    <span className="block text-sm text-gray-400">{item.description}</span>
+                    <span className="mb-1 block text-[15px] font-semibold text-white">{item.title}</span>
+                    <span className="block text-[13px] leading-relaxed text-gray-400">{item.description}</span>
                   </div>
                 </motion.div>
               ))}
             </div>
 
             {/* Trust Badges */}
-            <div className="mt-8 flex flex-wrap gap-6">
+            <div className="mt-8 flex flex-wrap justify-center gap-6">
               {trustBadges.map((badge) => (
                 <div key={badge} className="flex items-center gap-2 text-sm text-gray-400">
                   <CheckCircle2 className="h-4 w-4 text-green-400" />
@@ -152,67 +152,78 @@ export function GetStarted() {
 
           {/* Right – Registration Form */}
           <motion.div
-            initial={{ opacity: 0, x: 40 }}
-            animate={contentInView ? { opacity: 1, x: 0 } : {}}
+            initial={{ opacity: 0, y: 20 }}
+            animate={contentInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.6 }}
-            className="order-1 rounded-[2rem] border border-gray-800 bg-gray-900 p-5 md:p-8 lg:order-2"
+            className="order-1 lg:order-2 lg:sticky lg:top-28 min-w-0"
           >
-            {submitted ? (
-              <motion.div
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="flex flex-col items-center text-center py-8"
-              >
-                <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-500/10">
-                  <CheckCircle2 className="h-8 w-8 text-green-400" />
-                </div>
-                <span className="block text-2xl font-semibold text-white">Demo booked successfully</span>
-                <span className="mt-2 block max-w-sm text-sm leading-relaxed text-gray-400">
-                  We've sent a confirmation to your email. Our team will reach out shortly with the next steps.
-                </span>
-                <button
-                  type="button"
-                  onClick={() => setSubmitted(false)}
-                  className="mt-6 inline-flex items-center justify-center rounded-full bg-white px-6 py-3 text-sm font-semibold text-black transition hover:bg-gray-100"
-                >
-                  Book another demo
-                </button>
-              </motion.div>
-            ) : (
-              <>
-                <span className="block text-xl font-semibold text-white md:text-2xl">Book a Free Demo</span>
-                <span className="mt-2 block text-sm leading-relaxed text-gray-400">
-                  See Talio in action with a guided walkthrough tailored to your workforce setup.
-                </span>
-
-                <div className="mt-5">
-                  <DemoBookingStepper
-                    form={form}
-                    onFieldChange={handleChange}
-                    onSubmit={handleSubmit}
-                    submitting={submitting}
-                    submitted={submitted}
-                    minDate={minDate}
-                    submitLabel="Book Free Demo"
-                    submittingLabel="Booking Demo..."
-                    resetKey="get-started"
-                    legalNotice={
-                      <p className="text-center text-[11px] leading-relaxed text-gray-500">
-                        By booking a demo you agree to our{' '}
-                        <Link to="/terms" className="text-gray-400 underline hover:text-white">
-                          Terms of Service
-                        </Link>{' '}
-                        and{' '}
-                        <Link to="/privacy" className="text-gray-400 underline hover:text-white">
-                          Privacy Policy
-                        </Link>
-                        .
+            <div className="rounded-2xl border border-gray-700/40 bg-gray-900/80 shadow-2xl shadow-black/20 backdrop-blur-sm">
+              <div className="p-5 sm:p-7">
+                {submitted ? (
+                  <motion.div
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="flex flex-col items-center text-center py-10"
+                  >
+                    <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500/20 to-green-500/20">
+                      <CheckCircle2 className="h-8 w-8 text-emerald-400" />
+                    </div>
+                    <span className="block text-2xl font-bold text-white">You're all set!</span>
+                    <span className="mt-3 block max-w-sm text-sm leading-relaxed text-gray-400">
+                      Check your inbox for the confirmation email. Our team will reach out with next steps.
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setSubmitted(false)}
+                      className="mt-8 inline-flex items-center justify-center rounded-xl bg-white px-8 py-3 text-sm font-semibold text-black transition hover:bg-gray-100"
+                    >
+                      Book another demo
+                    </button>
+                  </motion.div>
+                ) : (
+                  <>
+                    {/* Form header */}
+                    <div className="mb-5">
+                      <div className="mb-3 flex items-center gap-2">
+                        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-500/15">
+                          <Sparkles className="h-3.5 w-3.5 text-blue-400" />
+                        </div>
+                        <span className="text-xs font-semibold uppercase tracking-widest text-blue-400">Free Demo</span>
+                      </div>
+                      <h2 className="text-xl sm:text-2xl font-bold text-white leading-tight">Book your guided walkthrough</h2>
+                      <p className="mt-2 text-[13px] sm:text-sm text-gray-400 leading-relaxed">
+                        See Talio in action — tailored to your workforce setup.
                       </p>
-                    }
-                  />
-                </div>
-              </>
-            )}
+                    </div>
+
+                    <DemoBookingStepper
+                      form={form}
+                      onFieldChange={handleChange}
+                      onSubmit={handleSubmit}
+                      submitting={submitting}
+                      submitted={submitted}
+                      minDate={minDate}
+                      submitLabel="Book Free Demo"
+                      submittingLabel="Booking..."
+                      resetKey="get-started"
+                      legalNotice={
+                        <p className="text-center text-[11px] leading-relaxed text-gray-500">
+                          By booking a demo you agree to our{' '}
+                          <Link to="/terms" className="text-gray-400 underline hover:text-white transition-colors">
+                            Terms of Service
+                          </Link>{' '}
+                          and{' '}
+                          <Link to="/privacy" className="text-gray-400 underline hover:text-white transition-colors">
+                            Privacy Policy
+                          </Link>
+                          .
+                        </p>
+                      }
+                    />
+                  </>
+                )}
+              </div>
+            </div>
           </motion.div>
         </div>
       </section>

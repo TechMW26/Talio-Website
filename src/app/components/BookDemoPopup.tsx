@@ -1,6 +1,6 @@
 import { useState, type ChangeEvent, type FormEvent } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, CheckCircle2 } from 'lucide-react';
+import { X, CheckCircle2, Sparkles, Shield, Clock } from 'lucide-react';
 import { Link, useLocation } from 'react-router';
 import { DemoBookingStepper } from '@/app/components/DemoBookingStepper';
 import { createDemoBookingEmailPayload, sendDemoBookingEmail } from '@/app/components/demoBookingEmail';
@@ -75,79 +75,96 @@ export function BookDemoPopup({ isOpen, onClose, planInfo }: BookDemoPopupProps)
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
-          className="fixed inset-0 z-[100] flex items-center justify-center p-4"
+          className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4"
           onClick={handleClose}
         >
           {/* Backdrop */}
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-md" />
 
           {/* Modal */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            initial={{ opacity: 0, scale: 0.95, y: 24 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+            exit={{ opacity: 0, scale: 0.95, y: 24 }}
+            transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
             onClick={(e) => e.stopPropagation()}
-            className="relative w-full max-w-xl max-h-[88vh] overflow-y-auto rounded-[1.75rem] border border-gray-800 bg-gray-900 shadow-2xl"
+            className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl border border-gray-700/40 bg-gray-900 shadow-2xl shadow-black/40"
           >
             {/* Close button */}
             <button
               onClick={handleClose}
-              className="absolute top-4 right-4 z-10 w-8 h-8 flex items-center justify-center rounded-full bg-gray-800 hover:bg-gray-700 transition-colors text-gray-400 hover:text-white"
+              className="absolute top-4 right-4 z-10 flex h-8 w-8 items-center justify-center rounded-lg border border-gray-700/50 bg-gray-800/80 text-gray-400 transition-all hover:bg-gray-700 hover:text-white"
             >
-              <X className="w-4 h-4" />
+              <X className="h-4 w-4" />
             </button>
 
-            <div className="p-5 md:p-6">
+            <div className="p-5 sm:p-6">
               {submitted ? (
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="flex flex-col items-center text-center py-8"
+                  className="flex flex-col items-center text-center py-10"
                 >
-                  <div className="w-16 h-16 rounded-full bg-green-500/10 flex items-center justify-center mb-4">
-                    <CheckCircle2 className="w-8 h-8 text-green-400" />
+                  <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500/20 to-green-500/20">
+                    <CheckCircle2 className="h-8 w-8 text-emerald-400" />
                   </div>
-                  <span className="block text-xl font-semibold text-white mb-2">Demo Booked! 🎉</span>
-                  <span className="block text-sm text-gray-400 mb-6 max-w-xs">
-                    We've sent a confirmation to your email. Our team will reach out shortly.
+                  <span className="block text-xl font-bold text-white mb-2">You're all set!</span>
+                  <span className="block text-sm text-gray-400 mb-8 max-w-xs leading-relaxed">
+                    Check your inbox for the confirmation. Our team will reach out with the next steps.
                   </span>
                   <button
                     onClick={handleClose}
-                    className="px-6 py-2.5 rounded-xl bg-white text-black text-sm font-semibold hover:bg-gray-100 transition-colors"
+                    className="rounded-xl bg-white px-8 py-3 text-sm font-semibold text-black transition-all hover:bg-gray-100"
                   >
                     Done
                   </button>
                 </motion.div>
               ) : (
                 <>
-                  <span className="block text-xl font-semibold text-white">Book a Free Demo</span>
-                  <span className="mt-1 block text-sm leading-relaxed text-gray-400">
-                    Schedule a guided walkthrough tailored to your team and plan.
-                  </span>
-
-                  <div className="mt-5">
-                    <DemoBookingStepper
-                      form={form}
-                      onFieldChange={handleChange}
-                      onSubmit={handleSubmit}
-                      submitting={submitting}
-                      submitted={submitted}
-                      minDate={minDate}
-                      submitLabel="Book Free Demo"
-                      submittingLabel="Booking Demo..."
-                      planInfo={planInfo}
-                      resetKey={`${isOpen}-${planInfo?.name ?? 'default'}`}
-                      legalNotice={
-                        <p className="text-center text-[11px] leading-relaxed text-gray-500">
-                          By booking a demo you agree to our{' '}
-                          <Link to="/terms" className="text-gray-400 underline hover:text-white">Terms</Link>{' '}
-                          and{' '}
-                          <Link to="/privacy" className="text-gray-400 underline hover:text-white">Privacy Policy</Link>.
-                        </p>
-                      }
-                    />
+                  {/* Header */}
+                  <div className="mb-5 pr-8">
+                    <div className="mb-3 flex items-center gap-2">
+                      <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-500/15">
+                        <Sparkles className="h-3.5 w-3.5 text-blue-400" />
+                      </div>
+                      <span className="text-xs font-semibold uppercase tracking-widest text-blue-400">Free Demo</span>
+                    </div>
+                    <h2 className="text-xl sm:text-2xl font-bold text-white leading-tight">Book your guided walkthrough</h2>
+                    <p className="mt-2 text-[13px] sm:text-sm text-gray-400 leading-relaxed">
+                      See Talio in action — tailored to your team and workflow.
+                    </p>
                   </div>
+
+                  {/* Trust badges */}
+                  <div className="mb-5 flex flex-wrap gap-x-4 gap-y-1.5">
+                    <span className="inline-flex items-center gap-1.5 text-[11px] text-gray-500">
+                      <Clock className="h-3 w-3 text-gray-600" /> 30 min session
+                    </span>
+                    <span className="inline-flex items-center gap-1.5 text-[11px] text-gray-500">
+                      <Shield className="h-3 w-3 text-gray-600" /> No commitment
+                    </span>
+                  </div>
+
+                  <DemoBookingStepper
+                    form={form}
+                    onFieldChange={handleChange}
+                    onSubmit={handleSubmit}
+                    submitting={submitting}
+                    submitted={submitted}
+                    minDate={minDate}
+                    submitLabel="Book Free Demo"
+                    submittingLabel="Booking..."
+                    planInfo={planInfo}
+                    resetKey={`${isOpen}-${planInfo?.name ?? 'default'}`}
+                    legalNotice={
+                      <p className="text-center text-[11px] leading-relaxed text-gray-500">
+                        By booking a demo you agree to our{' '}
+                        <Link to="/terms" className="text-gray-400 underline hover:text-white transition-colors">Terms</Link>{' '}
+                        and{' '}
+                        <Link to="/privacy" className="text-gray-400 underline hover:text-white transition-colors">Privacy Policy</Link>.
+                      </p>
+                    }
+                  />
                 </>
               )}
             </div>

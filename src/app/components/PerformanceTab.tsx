@@ -11,6 +11,7 @@ import {
   Minus,
 } from 'lucide-react';
 import { getPageVisits, getVisitors, getLeads, type PageVisit, type VisitorProfile, type LeadEntry } from '@/lib/firebase';
+import { DatePicker } from '@/app/components/ui/date-picker';
 
 // ── Shared style ──
 
@@ -681,18 +682,16 @@ export function PerformanceTab() {
             >
               <div className="flex items-center gap-3 pt-4 mt-4 border-t border-white/5">
                 <label className="text-xs text-slate-500">From</label>
-                <input
-                  type="date"
+                <DatePicker
                   value={customFrom}
-                  onChange={e => setCustomFrom(e.target.value)}
-                  className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-xs text-white [color-scheme:dark]"
+                  onChange={setCustomFrom}
+                  placeholder="Start date"
                 />
                 <label className="text-xs text-slate-500">To</label>
-                <input
-                  type="date"
+                <DatePicker
                   value={customTo}
-                  onChange={e => setCustomTo(e.target.value)}
-                  className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-xs text-white [color-scheme:dark]"
+                  onChange={setCustomTo}
+                  placeholder="End date"
                 />
               </div>
             </motion.div>

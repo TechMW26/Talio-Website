@@ -76,7 +76,7 @@ export function DesktopPricingPage() {
           </span>
         </h1>
         <p className="text-lg md:text-xl text-gray-400 font-light leading-relaxed max-w-xl text-center">
-          Choose the plan that works for your team. Both plans include a free trial.
+          Choose the plan that works for your team. All plans include a free trial.
         </p>
       </motion.section>
 

@@ -157,7 +157,7 @@ export function PrivacyPolicy() {
   const contentInView = useInView(contentRef, { once: true, margin: "-100px" });
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
+    <div className="min-h-screen bg-black text-white">
       {/* Hero */}
       <motion.section
         ref={heroRef}

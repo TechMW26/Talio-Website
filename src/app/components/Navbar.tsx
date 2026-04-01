@@ -51,7 +51,7 @@ export function Navbar() {
   };
 
   const navItems = [
-    { name: 'Mira', href: '/mira-ai', isRoute: true, gradient: true },
+    { name: 'Mira', href: '/old-site/index.html', isRoute: true, reloadDocument: true, gradient: true },
     { name: 'Features', href: '/features', isRoute: true },
     { name: 'Pricing', href: '/pricing', isRoute: true },
     { name: 'Downloads', href: '/downloads', isRoute: true },
@@ -220,7 +220,7 @@ export function Navbar() {
 
                 // Regular menu items
                 return item.isRoute ? (
-                    <Link key={item.name} to={item.href}>
+                  <Link key={item.name} to={item.href} reloadDocument={Boolean((item as any).reloadDocument)}>
                     <motion.div
                       initial={{ opacity: 0, y: -20 }}
                       animate={{ opacity: 1, y: 0 }}
@@ -379,6 +379,7 @@ export function Navbar() {
                       {item.isRoute ? (
                         <Link
                           to={item.href}
+                          reloadDocument={Boolean((item as any).reloadDocument)}
                           onClick={() => setIsMobileMenuOpen(false)}
                           className={`block px-6 py-4 text-lg font-medium hover:bg-gray-800 rounded-2xl transition-all duration-300 ${
                             (item as any).gradient ? '' : 'text-gray-300 hover:text-white'

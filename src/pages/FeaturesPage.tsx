@@ -8,7 +8,7 @@ export function FeaturesPage() {
   const isMobileViewport = useIsMobileViewport();
 
   return (
-    <Suspense fallback={<div className="min-h-screen bg-gray-950" />}>
+    <Suspense fallback={<div className="min-h-screen bg-black" />}>
       {isMobileViewport ? <MobileFeaturesPage /> : <DesktopFeaturesOverview />}
     </Suspense>
   );

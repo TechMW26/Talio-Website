@@ -175,12 +175,23 @@ export function DesktopPricingPage() {
                   </motion.div>
                 )}
 
-                <motion.div className="absolute -inset-[2px] rounded-[2.5rem] opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                  <div className={`absolute inset-0 rounded-[2.5rem] bg-gradient-to-br ${plan.gradient} blur-sm`} />
+                <motion.div
+                  className="pointer-events-none absolute inset-x-8 -bottom-8 h-20 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+                >
+                  <div className={`h-full w-full rounded-full bg-gradient-to-r ${plan.gradient} blur-3xl`} />
                 </motion.div>
 
                 <motion.div
                   whileHover={{ y: -8 }}
+                  animate={{
+                    boxShadow: isHovered
+                      ? plan.featured
+                        ? '0 24px 80px rgba(168, 85, 247, 0.24)'
+                        : '0 24px 72px rgba(59, 130, 246, 0.18)'
+                      : plan.featured
+                        ? '0 10px 32px rgba(0, 0, 0, 0.28)'
+                        : '0 8px 28px rgba(0, 0, 0, 0.24)',
+                  }}
                   transition={{ duration: 0.3, type: 'spring', stiffness: 300 }}
                   className={`
                     relative h-full rounded-[2.5rem] overflow-hidden
@@ -192,8 +203,8 @@ export function DesktopPricingPage() {
                   `}
                 >
                   <motion.div
-                    className={`absolute top-0 right-0 w-48 h-48 bg-gradient-to-br ${plan.gradient} rounded-full blur-3xl`}
-                    animate={isHovered ? { scale: [1, 1.2, 1], opacity: [0.08, 0.15, 0.08] } : { opacity: 0.06 }}
+                    className={`pointer-events-none absolute top-3 right-3 h-24 w-24 rounded-full bg-gradient-to-br ${plan.gradient} blur-3xl`}
+                    animate={isHovered ? { scale: [1, 1.08, 1], opacity: [0.04, 0.08, 0.04] } : { opacity: 0.03 }}
                     transition={{ duration: 3, repeat: Infinity, repeatType: 'reverse' }}
                   />
 

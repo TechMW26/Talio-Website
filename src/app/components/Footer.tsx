@@ -22,7 +22,7 @@ export function Footer() {
         { label: 'Pricing', href: '/pricing' },
         { label: 'Downloads', href: '/downloads' },
         { label: 'Solutions', href: '/solutions' },
-        { label: 'Mira', href: '/mira-ai' },
+        { label: 'Mira', href: '/old-site/index.html', reloadDocument: true },
       ]
     },
     {
@@ -212,6 +212,7 @@ export function Footer() {
                     {link.href.startsWith('/') ? (
                       <Link
                         to={link.href}
+                        reloadDocument={Boolean((link as any).reloadDocument)}
                         className="text-sm text-gray-500 hover:text-white transition-colors duration-300 font-light"
                       >
                         {link.label}

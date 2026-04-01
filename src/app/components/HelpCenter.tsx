@@ -37,7 +37,7 @@ export function HelpCenter() {
   }, [selectedCategory]);
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
+    <div className="min-h-screen bg-black text-white">
       {/* Hero */}
       <section ref={heroRef} className="pt-32 pb-20 text-center">
         <motion.div

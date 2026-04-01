@@ -72,7 +72,7 @@ export function FeatureDetailPage({
   const ctaInView = useInView(ctaRef, { once: true, margin: '-100px' });
 
   return (
-    <div className="bg-gray-950 relative transition-colors duration-300">
+    <div className="bg-black relative transition-colors duration-300">
       {/* Hero */}
       <section ref={heroRef} className={`relative min-h-[60vh] flex items-center justify-center py-20 md:py-32 overflow-hidden ${!heroImage ? `bg-gradient-to-br from-gray-900 via-gray-950 ${gradientFrom}` : ''}`}>
         {heroImage && (

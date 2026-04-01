@@ -77,7 +77,7 @@ export function About() {
   ];
 
   return (
-    <div className="bg-gray-950 relative transition-colors duration-300" style={{ position: 'relative' }}>
+    <div className="bg-black relative transition-colors duration-300" style={{ position: 'relative' }}>
       {/* Hero Section */}
       <section ref={heroRef} className="relative min-h-[80vh] flex items-center justify-center py-20 md:py-32 overflow-hidden" style={{ position: 'relative' }}>
         {/* Background Image */}

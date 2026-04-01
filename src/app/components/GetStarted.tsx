@@ -45,13 +45,18 @@ export function GetStarted() {
       };
 
       await submitSignup(submissionData);
-      await sendDemoBookingEmail(submissionData);
       enrichVisitorFromForm({ name: `${form.firstName} ${form.lastName}`.trim(), email: form.email, phone: form.phone });
+
+      try {
+        await sendDemoBookingEmail(submissionData);
+      } catch (emailError) {
+        console.error('Demo booking confirmation email failed:', emailError);
+      }
 
       setSubmitted(true);
       setForm(createEmptyDemoBookingForm());
     } catch {
-      alert('We could not send your booking confirmation email. Please try again.');
+      alert('We could not submit your demo request. Please try again.');
     } finally {
       setSubmitting(false);
     }
@@ -83,7 +88,7 @@ export function GetStarted() {
   const trustBadges = ['14-day free trial', 'No credit card required', 'Cancel anytime'];
 
   return (
-    <div className="min-h-screen overflow-x-hidden bg-gray-950 text-white">
+    <div className="min-h-screen overflow-x-hidden bg-black text-white">
       {/* Hero */}
       <section ref={heroRef} className="relative overflow-hidden pt-32 pb-16">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(59,130,246,0.08),transparent_60%)]" />
@@ -170,7 +175,7 @@ export function GetStarted() {
                     </div>
                     <span className="block text-2xl font-bold text-white">You're all set!</span>
                     <span className="mt-3 block max-w-sm text-sm leading-relaxed text-gray-400">
-                      Check your inbox for the confirmation email. Our team will reach out with next steps.
+                      Your demo request is in. Our team will reach out shortly with the next steps.
                     </span>
                     <button
                       type="button"
@@ -190,10 +195,10 @@ export function GetStarted() {
                         </div>
                         <span className="text-xs font-semibold uppercase tracking-widest text-blue-400">Free Demo</span>
                       </div>
-                      <h2 className="text-xl sm:text-2xl font-bold text-white leading-tight">Book a free demo.</h2>
-                      <p className="mt-2 text-[13px] sm:text-sm text-gray-400 leading-relaxed">
+                      <span className="block text-xl sm:text-2xl font-bold text-white leading-tight">Book a free demo.</span>
+                      <span className="mt-2 block text-[13px] sm:text-sm text-gray-400 leading-relaxed">
                         See Talio in action — tailored to your workforce setup.
-                      </p>
+                      </span>
                     </div>
 
                     <DemoBookingStepper

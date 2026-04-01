@@ -20,7 +20,7 @@ export function FeaturesOverview() {
   const ctaInView = useInView(ctaRef, { once: true, margin: '-100px' });
 
   return (
-    <div className="bg-gray-950 relative transition-colors duration-300">
+    <div className="bg-black relative transition-colors duration-300">
       {/* Hero */}
       <section ref={heroRef} className="relative min-h-[70vh] flex items-center justify-center py-20 md:py-32 overflow-hidden">
         {/* Background Image */}

@@ -164,16 +164,6 @@ export function DemoBookingStepper({
         })}
       </div>
 
-      {/* Progress bar */}
-      <div className="h-[2px] w-full rounded-full bg-gray-800/60 overflow-hidden">
-        <motion.div
-          className="h-full rounded-full bg-gradient-to-r from-blue-500 to-blue-400"
-          initial={false}
-          animate={{ width: `${((currentStep + (isStepComplete(currentStep) ? 1 : 0.5)) / steps.length) * 100}%` }}
-          transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-        />
-      </div>
-
       {/* Step content card */}
       <div className="rounded-2xl border border-gray-800/60 bg-gradient-to-b from-gray-900/60 to-gray-950/80 p-4 md:p-5">
         <div className="flex items-center gap-3 mb-4">

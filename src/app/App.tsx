@@ -37,7 +37,15 @@ const BlogPage = lazy(() => import('@/app/components/BlogPage').then((module) =>
 const BlogPostPage = lazy(() => import('@/app/components/BlogPostPage').then((module) => ({ default: module.BlogPostPage })));
 
 function RouteFallback() {
-  return <div className="min-h-[60vh] bg-gray-950" />;
+  return <div className="min-h-[60vh] bg-black" />;
+}
+
+function HtmlDocumentRedirect({ to }: { to: string }) {
+  useEffect(() => {
+    window.location.replace(to);
+  }, [to]);
+
+  return <div className="min-h-screen bg-black" />;
 }
 
 function ScrollToTop({ lenisRef }: { lenisRef?: React.RefObject<Lenis | null> }) {
@@ -66,6 +74,7 @@ function ScrollToTop({ lenisRef }: { lenisRef?: React.RefObject<Lenis | null> })
 function AppLayout() {
   const { pathname } = useLocation();
   const isAdmin = pathname === '/admin';
+  const isStandaloneHtmlRoute = pathname === '/mira-ai';
   const isMobileViewport = useIsMobileViewport();
   const lenisRef = useRef<Lenis | null>(null);
 
@@ -104,19 +113,19 @@ function AppLayout() {
   }, [isMobileViewport]);
 
   return (
-    <div className={`min-h-screen bg-gray-950 transition-colors duration-300 relative ${isMobileViewport ? '' : 'cursor-none'}`} style={{ position: 'relative' }}>
+    <div className={`${!isAdmin && !isStandaloneHtmlRoute ? 'app-site-shell ' : ''}min-h-screen bg-black transition-colors duration-300 relative ${isMobileViewport || isStandaloneHtmlRoute ? '' : 'cursor-none'}`} style={{ position: 'relative' }}>
       <ScrollToTop lenisRef={lenisRef} />
-      {!isMobileViewport && <CustomCursor />}
-      {!isMobileViewport && <MouseFollower />}
-      {!isAdmin && <AnalyticsTracker />}
-      {!isAdmin && <Navbar />}
+      {!isMobileViewport && !isStandaloneHtmlRoute && <CustomCursor />}
+      {!isMobileViewport && !isStandaloneHtmlRoute && <MouseFollower />}
+      {!isAdmin && !isStandaloneHtmlRoute && <AnalyticsTracker />}
+      {!isAdmin && !isStandaloneHtmlRoute && <Navbar />}
       <Suspense fallback={<RouteFallback />}>
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/downloads" element={<Downloads />} />
           <Route path="/documents" element={<Documents />} />
-          <Route path="/mira-ai" element={<MiraAIFeature />} />
+          <Route path="/mira-ai" element={<HtmlDocumentRedirect to="/old-site/index.html" />} />
           <Route path="/features" element={<FeaturesPage />} />
           <Route path="/features/attendance" element={<AttendanceFeature />} />
           <Route path="/features/payroll" element={<PayrollFeature />} />
@@ -140,18 +149,19 @@ function AppLayout() {
           <Route path="/admin" element={<AdminDashboard />} />
         </Routes>
       </Suspense>
-      {!isAdmin && <Footer />}
+      {!isAdmin && !isStandaloneHtmlRoute && <Footer />}
     </div>
   );
 }
 
 export default function App() {
   const isMobileViewport = useIsMobileViewport();
+  const isStandaloneHtmlRoute = typeof window !== 'undefined' && window.location.pathname === '/mira-ai';
 
   return (
     <SoundProvider>
       <BrowserRouter>
-        {!isMobileViewport && <SoundDisclaimer />}
+        {!isMobileViewport && !isStandaloneHtmlRoute && <SoundDisclaimer />}
         <AppLayout />
       </BrowserRouter>
     </SoundProvider>

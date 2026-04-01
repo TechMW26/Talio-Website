@@ -120,7 +120,7 @@ export function Downloads() {
   };
 
   return (
-    <div className="bg-gray-950 min-h-screen relative transition-colors duration-300">
+    <div className="bg-black min-h-screen relative transition-colors duration-300">
       {/* Hero Section */}
       <section 
         ref={heroRef} 
@@ -248,7 +248,7 @@ export function Downloads() {
         className="py-20 md:py-32 relative overflow-hidden"
         style={{ position: 'relative' }}
       >
-        <div className="max-w-7xl mx-auto px-6 md:px-8 lg:px-12">
+        <div className="max-w-[1600px] mx-auto px-6 md:px-8 lg:px-16">
           <motion.h2
             initial={{ opacity: 0, y: 30 }}
             animate={platformsInView ? { opacity: 1, y: 0 } : {}}
@@ -345,7 +345,7 @@ export function Downloads() {
         className="py-20 md:py-32 bg-gradient-to-b from-gray-950 to-gray-900 relative overflow-hidden"
         style={{ position: 'relative' }}
       >
-        <div className="max-w-6xl mx-auto px-6 md:px-8 lg:px-12">
+        <div className="max-w-[1600px] mx-auto px-6 md:px-8 lg:px-16">
           <motion.h2
             initial={{ opacity: 0, y: 30 }}
             animate={requirementsInView ? { opacity: 1, y: 0 } : {}}

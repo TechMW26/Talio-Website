@@ -8,7 +8,7 @@ export function MobileFeaturesPage() {
   usePageMeta('Features', 'Explore Talio\'s productivity utility modules, Mira workflow support, and built-in HRMS add-ons for attendance, leave, payroll, coordination, and team visibility.');
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
+    <div className="min-h-screen bg-black text-white">
       <section className="relative overflow-hidden pt-28 pb-18">
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute left-1/2 top-2 h-72 w-72 -translate-x-1/2 rounded-full bg-indigo-600/12 blur-3xl" />

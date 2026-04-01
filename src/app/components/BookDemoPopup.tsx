@@ -42,13 +42,18 @@ export function BookDemoPopup({ isOpen, onClose, planInfo }: BookDemoPopupProps)
       };
 
       await submitSignup(submissionData);
-      await sendDemoBookingEmail(submissionData);
       enrichVisitorFromForm({ name: `${form.firstName} ${form.lastName}`.trim(), email: form.email, phone: form.phone });
+
+      try {
+        await sendDemoBookingEmail(submissionData);
+      } catch (emailError) {
+        console.error('Demo booking confirmation email failed:', emailError);
+      }
 
       setSubmitted(true);
       setForm(createEmptyDemoBookingForm());
     } catch {
-      alert('We could not send your booking confirmation email. Please try again.');
+      alert('We could not submit your demo request. Please try again.');
     } finally {
       setSubmitting(false);
     }
@@ -110,7 +115,7 @@ export function BookDemoPopup({ isOpen, onClose, planInfo }: BookDemoPopupProps)
                   </div>
                   <span className="block text-xl font-bold text-white mb-2">You're all set!</span>
                   <span className="block text-sm text-gray-400 mb-8 max-w-xs leading-relaxed">
-                    Check your inbox for the confirmation. Our team will reach out with the next steps.
+                    Your demo request is in. Our team will reach out shortly with the next steps.
                   </span>
                   <button
                     onClick={handleClose}
@@ -129,10 +134,10 @@ export function BookDemoPopup({ isOpen, onClose, planInfo }: BookDemoPopupProps)
                       </div>
                       <span className="text-xs font-semibold uppercase tracking-widest text-blue-400">Free Demo</span>
                     </div>
-                    <h2 className="text-xl sm:text-2xl font-bold text-white leading-tight">Book a free demo.</h2>
-                    <p className="mt-2 text-[13px] sm:text-sm text-gray-400 leading-relaxed">
+                    <span className="block text-xl sm:text-2xl font-bold text-white leading-tight">Book a free demo.</span>
+                    <span className="mt-2 block text-[13px] sm:text-sm text-gray-400 leading-relaxed">
                       See Talio in action — tailored to your team and workflow.
-                    </p>
+                    </span>
                   </div>
 
                   {/* Trust badges */}

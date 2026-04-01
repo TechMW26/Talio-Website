@@ -13,7 +13,7 @@ export function MobileHelpCenterPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
+    <div className="min-h-screen bg-black text-white">
       <section className="relative overflow-hidden pt-28 pb-18">
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute left-1/2 top-0 h-72 w-72 -translate-x-1/2 rounded-full bg-green-500/10 blur-3xl" />

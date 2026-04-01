@@ -36,6 +36,19 @@ h4:not(.admin-panel h4) {
     margin-bottom: 1.5em !important;
 }
 
+body,
+#root {
+    background-color: #000 !important;
+}
+
+.app-site-shell {
+    background-color: #000 !important;
+}
+
+.app-site-shell section {
+    background: #000 !important;
+}
+
 /* Reset all global overrides inside the admin panel */
 .admin-panel p,
 .admin-panel h1,

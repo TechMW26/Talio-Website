@@ -178,11 +178,6 @@ export async function getContacts(): Promise<LeadEntry[]> {
   return sortEntriesBySubmittedAt(mapEntries(data, 'contacts'));
 }
 
-export async function getSignups(): Promise<LeadEntry[]> {
-  const data = await fbGet<LeadEntry>('signups');
-  return sortEntriesBySubmittedAt(mapEntries(data, 'signups'));
-}
-
 export async function deleteEntry(collection: EntryCollection, id: string) {
   return fbDelete(`${collection}/${id}`);
 }
@@ -216,38 +211,6 @@ export async function upsertVisitor(sessionId: string, profile: Omit<VisitorProf
     }
   }
   return fbPost('visitors', profile);
-}
-
-export async function findVisitorByEmail(email: string): Promise<[string, VisitorProfile] | null> {
-  const data = await fbGet<VisitorProfile>('visitors');
-  if (!data) return null;
-  const match = Object.entries(data).find(([, v]) => v.autoEmail === email);
-  return match ? [match[0], { ...match[1], id: match[0] }] : null;
-}
-
-export async function findVisitorByPhone(phone: string): Promise<[string, VisitorProfile] | null> {
-  const data = await fbGet<VisitorProfile>('visitors');
-  if (!data) return null;
-  const match = Object.entries(data).find(([, v]) => v.autoPhone === phone);
-  return match ? [match[0], { ...match[1], id: match[0] }] : null;
-}
-
-export async function mergeVisitorProfiles(primaryId: string, duplicateId: string) {
-  // Merge duplicate into primary by updating pageVisits session references
-  const visits = await fbGet<PageVisit>('pageVisits');
-  if (visits) {
-    const dup = await fbGet<VisitorProfile>(`visitors`);
-    const dupProfile = dup?.[duplicateId];
-    if (dupProfile) {
-      // update primary with any extra info from duplicate
-      await fbPatch(`visitors/${primaryId}`, {
-        pageViews: ((dup?.[primaryId]?.pageViews ?? 0) + (dupProfile.pageViews ?? 0)),
-        ...(dupProfile.autoName && { autoName: dupProfile.autoName }),
-        ...(dupProfile.autoEmail && { autoEmail: dupProfile.autoEmail }),
-        ...(dupProfile.autoPhone && { autoPhone: dupProfile.autoPhone }),
-      });
-    }
-  }
 }
 
 export async function getVisitors(): Promise<VisitorProfile[]> {
@@ -366,14 +329,4 @@ export async function getBlogEditors(): Promise<BlogEditor[]> {
   return Object.entries(data)
     .map(([key, val]) => ({ ...val, id: key }))
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-}
-
-export async function validateBlogEditor(email: string, password: string): Promise<BlogEditor | null> {
-  // Check admin password first
-  const adminPw = import.meta.env.VITE_ADMIN_PASSWORD as string;
-  if (!adminPw || password !== adminPw) return null;
-  const data = await fbGet<BlogEditor>('blogEditors');
-  if (!data) return null;
-  const match = Object.entries(data).find(([, v]) => v.email.toLowerCase() === email.toLowerCase());
-  return match ? { ...match[1], id: match[0] } : null;
 }

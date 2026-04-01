@@ -159,7 +159,7 @@ export function ZoomStorySection() {
   ];
 
   return (
-    <div ref={containerRef} className="relative bg-gradient-to-br from-gray-900 via-gray-950 to-blue-950/30 -mt-1" style={{ height: '200vh', position: 'relative' }}>
+    <div ref={containerRef} className="relative bg-black -mt-1" style={{ height: '200vh', position: 'relative' }}>
       {/* Sticky Container */}
       <div className="sticky top-0 h-screen flex items-center justify-center overflow-hidden">
         {/* Animated Background Gradients */}

@@ -1,15 +1,9 @@
 import { motion, useScroll, useTransform } from 'motion/react';
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { AnimatedButton } from '@/app/components/AnimatedButton';
 import { Link } from 'react-router';
 
 export function Hero() {
-  const [mounted, setMounted] = useState(false);
-  
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
   const ref = useRef<HTMLElement>(null);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   
@@ -32,8 +26,6 @@ export function Hero() {
     window.addEventListener('mousemove', handleMouseMove);
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
-
-
 
   return (
     <section ref={ref} className="relative min-h-[100vh] flex flex-col items-center justify-center overflow-hidden bg-black" style={{ position: 'relative' }}>

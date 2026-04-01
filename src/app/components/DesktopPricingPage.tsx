@@ -2,8 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 import { motion, useInView, useScroll, useTransform, AnimatePresence } from 'motion/react';
 import { Check, X, ChevronDown, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router';
-import * as SwitchPrimitive from '@radix-ui/react-switch';
 import { BookDemoPopup, type PlanInfo } from './BookDemoPopup';
+import { PricingBillingToggle } from './PricingBillingToggle';
 import { PricingChangeConfetti } from './PricingChangeConfetti';
 import { ElfsightReviewsSection } from './ElfsightReviewsSection';
 import { pricingFaqs, pricingPlans } from './pricingData';
@@ -134,41 +134,14 @@ export function DesktopPricingPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.3 }}
-        className="mb-16 mt-6 flex flex-col items-center gap-3 px-6"
+        className="mb-16 mt-6 px-6"
       >
-        <div className="inline-flex items-center gap-4 rounded-full border border-white/10 bg-white/[0.03] px-4 py-3 shadow-[0_1rem_2.5rem_-1.75rem_rgba(0,0,0,0.85)]">
-          <span className={`text-sm font-medium transition-colors duration-300 ${billing === 'monthly' ? 'text-white' : 'text-gray-500'}`}>
-            Monthly
-          </span>
-          <SwitchPrimitive.Root
-            checked={billing === 'annual'}
-            onCheckedChange={(checked) => handleBillingChange(checked ? 'annual' : 'monthly')}
-            aria-label="Billing frequency"
-            className="relative flex h-9 w-[4.125rem] cursor-pointer items-center rounded-full border border-white/10 bg-[#182132] p-1 outline-none transition-colors duration-300 data-[state=checked]:bg-[#1c2538] focus-visible:ring-2 focus-visible:ring-purple-500/50"
-          >
-            <SwitchPrimitive.Thumb asChild>
-              <motion.span
-                className="block h-7 w-7 rounded-full bg-gradient-to-r from-violet-500 via-fuchsia-500 to-pink-500 shadow-[0_0.625rem_1.875rem_rgba(192,38,211,0.45)]"
-                animate={{ x: billing === 'annual' ? 33 : 0 }}
-                transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-              />
-            </SwitchPrimitive.Thumb>
-          </SwitchPrimitive.Root>
-          <span className={`text-sm font-medium transition-colors duration-300 ${billing === 'annual' ? 'text-white' : 'text-gray-500'}`}>
-            Annual
-          </span>
-        </div>
-
-        <motion.div
-          animate={{
-            opacity: billing === 'annual' ? 1 : 0.72,
-            scale: billing === 'annual' ? 1 : 0.98,
-          }}
-          transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
-          className={`rounded-full border px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.16em] ${billing === 'annual' ? 'border-green-500/30 bg-green-500/12 text-green-400' : 'border-white/10 bg-white/[0.03] text-gray-500'}`}
-        >
-          20% off with annual billing
-        </motion.div>
+        <PricingBillingToggle
+          billing={billing}
+          onChange={handleBillingChange}
+          layoutId="desktop-pricing-billing-pill"
+          className="w-full"
+        />
       </motion.div>
 
       <motion.section

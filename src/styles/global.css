@@ -55,6 +55,30 @@ h4:not(.admin-panel h4) {
     textarea {
         font-size: 16px !important;
     }
+
+    .mobile-hero-stack > .mobile-hero-eyebrow,
+    .mobile-hero-stack > .mobile-hero-title,
+    .mobile-hero-stack > .mobile-hero-copy,
+    .mobile-hero-stack > .mobile-hero-actions,
+    .mobile-hero-stack > .mobile-hero-meta {
+        margin: 0 !important;
+    }
+
+    .mobile-hero-stack > .mobile-hero-title {
+        margin-top: 2rem !important;
+    }
+
+    .mobile-hero-stack > .mobile-hero-copy {
+        margin-top: 1.5rem !important;
+    }
+
+    .mobile-hero-stack > .mobile-hero-actions {
+        margin-top: 1.75rem !important;
+    }
+
+    .mobile-hero-stack > .mobile-hero-meta {
+        margin-top: 1.25rem !important;
+    }
 }
 
 /* ── react-day-picker dark theme overrides ── */

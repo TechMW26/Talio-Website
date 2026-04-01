@@ -169,12 +169,12 @@ export function MobileHomePage() {
         </div>
 
         <div className="relative mx-auto flex min-h-[calc(100svh-108px)] w-full items-center px-4">
-          <div className="flex w-full flex-col items-center text-center">
+          <div className="mobile-hero-stack flex w-full flex-col items-center text-center">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
-              className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-blue-300"
+              className="mobile-hero-eyebrow inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-blue-300"
             >
               ✦ AI Workforce Operating System
             </motion.div>
@@ -183,7 +183,7 @@ export function MobileHomePage() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-              className="mt-9 text-[clamp(2.8rem,11vw,4.4rem)] font-bold leading-[0.95] tracking-tighter"
+              className="mobile-hero-title text-[clamp(2.8rem,11vw,4.4rem)] font-bold leading-[0.95] tracking-tighter"
             >
               <span className="block text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-200 to-white">
                 Manage Your Team
@@ -197,7 +197,7 @@ export function MobileHomePage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="mt-5 max-w-[320px] text-sm font-light leading-relaxed text-gray-400"
+              className="mobile-hero-copy max-w-[320px] text-sm font-light leading-relaxed text-gray-400"
             >
               Talio brings attendance, payroll, goals, communication, and AI support into a mobile workflow that is fast to use and easy to trust.
             </motion.p>
@@ -206,7 +206,7 @@ export function MobileHomePage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.3 }}
-              className="mt-7 flex w-full flex-col gap-3"
+              className="mobile-hero-actions flex w-full flex-col gap-3"
             >
               <PrimaryButtonLink to="/get-started">Start Today</PrimaryButtonLink>
               <SecondaryButtonLink to="/pricing">View Plans & Pricing</SecondaryButtonLink>
@@ -216,7 +216,7 @@ export function MobileHomePage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.4 }}
-              className="mt-5 flex max-w-[320px] flex-wrap items-center justify-center gap-2"
+              className="mobile-hero-meta flex max-w-[320px] flex-wrap items-center justify-center gap-2"
             >
               {trustBadges.map((badge) => (
                 <span

@@ -14,17 +14,17 @@ export function MobileFeaturesPage() {
           <div className="absolute left-1/2 top-2 h-72 w-72 -translate-x-1/2 rounded-full bg-indigo-600/12 blur-3xl" />
         </div>
         <div className="relative mx-auto max-w-7xl px-4 md:px-8 lg:px-12">
-          <div className="flex flex-col items-center text-center">
-            <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-gray-400">
+          <div className="mobile-hero-stack flex flex-col items-center text-center">
+            <span className="mobile-hero-eyebrow inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-gray-400">
               ✦ Features
             </span>
-            <h1 className="mt-8 text-[clamp(2.7rem,10vw,4.6rem)] font-bold tracking-tighter leading-[0.98] text-white">
+            <h1 className="mobile-hero-title text-[clamp(2.7rem,10vw,4.6rem)] font-bold tracking-tighter leading-[0.98] text-white">
               Everything you need to
               <span className="block text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">
                 manage your team
               </span>
             </h1>
-            <p className="mt-8 max-w-md text-base font-light leading-relaxed text-gray-400">
+            <p className="mobile-hero-copy max-w-md text-base font-light leading-relaxed text-gray-400">
               Explore Talio's core platform and communication capabilities in one connected product suite.
             </p>
           </div>

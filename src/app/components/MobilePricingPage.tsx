@@ -94,12 +94,12 @@ export function MobilePricingPage() {
           <div className="absolute right-0 bottom-0 h-48 w-48 rounded-full bg-emerald-500/10 blur-3xl" />
         </div>
 
-        <div className="relative flex flex-col items-center text-center">
+        <div className="relative mobile-hero-stack flex flex-col items-center text-center">
           <motion.span
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-gray-400"
+            className="mobile-hero-eyebrow inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-gray-400"
           >
             ✦ Pricing
           </motion.span>
@@ -108,7 +108,7 @@ export function MobilePricingPage() {
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-            className="mt-8 text-5xl font-bold tracking-tighter leading-[0.98]"
+            className="mobile-hero-title text-5xl font-bold tracking-tighter leading-[0.98]"
           >
             Simple, Transparent
             <span className="block text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-400">
@@ -120,7 +120,7 @@ export function MobilePricingPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="mt-6 max-w-md text-base font-light leading-relaxed text-gray-400"
+            className="mobile-hero-copy max-w-md text-base font-light leading-relaxed text-gray-400"
           >
             Choose the plan that works for your team. Both plans include a free trial.
           </motion.p>

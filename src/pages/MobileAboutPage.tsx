@@ -72,12 +72,12 @@ export function MobileAboutPage() {
         </div>
 
         <div className="relative mx-auto max-w-7xl px-4 md:px-8 lg:px-12">
-          <div className="flex flex-col items-center text-center">
+          <div className="mobile-hero-stack flex flex-col items-center text-center">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
-              className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-blue-400"
+              className="mobile-hero-eyebrow inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-blue-400"
             >
               ✦ About us
             </motion.div>
@@ -86,7 +86,7 @@ export function MobileAboutPage() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-              className="mt-8 text-[clamp(2.8rem,10vw,4.75rem)] font-bold tracking-tighter leading-[0.98]"
+              className="mobile-hero-title text-[clamp(2.8rem,10vw,4.75rem)] font-bold tracking-tighter leading-[0.98]"
             >
               Building the future
               <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">
@@ -98,7 +98,7 @@ export function MobileAboutPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="mt-8 max-w-md text-base font-light leading-relaxed text-gray-400"
+              className="mobile-hero-copy max-w-md text-base font-light leading-relaxed text-gray-400"
             >
               Talio is a venture of MW FutureTech, built to turn workforce operations into a more intelligent, measurable, and human-centered system.
             </motion.p>

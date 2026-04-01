@@ -180,7 +180,7 @@ export function DesktopPricingPage() {
                     initial={{ opacity: 0, scale: 0.8, y: -20 }}
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     transition={{ duration: 0.6, delay: 0.8, type: 'spring' }}
-                    className="absolute top-0 left-1/2 -translate-x-1/2 z-30"
+                    className="absolute top-2 left-1/2 -translate-x-1/2 z-30"
                   >
                     <motion.div
                       animate={{
@@ -197,12 +197,6 @@ export function DesktopPricingPage() {
                     </motion.div>
                   </motion.div>
                 )}
-
-                <motion.div
-                  className="pointer-events-none absolute inset-x-8 -bottom-8 h-20 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-                >
-                  <div className={`h-full w-full rounded-full bg-gradient-to-r ${plan.gradient} blur-3xl`} />
-                </motion.div>
 
                 <motion.div
                   whileHover={{ y: -8 }}
@@ -225,12 +219,6 @@ export function DesktopPricingPage() {
                     transition-shadow duration-500
                   `}
                 >
-                  <motion.div
-                    className={`pointer-events-none absolute top-3 right-3 h-24 w-24 rounded-full bg-gradient-to-br ${plan.gradient} blur-3xl`}
-                    animate={isHovered ? { scale: [1, 1.08, 1], opacity: [0.04, 0.08, 0.04] } : { opacity: 0.03 }}
-                    transition={{ duration: 3, repeat: Infinity, repeatType: 'reverse' }}
-                  />
-
                   <div className="relative z-10 flex flex-1 flex-col">
                     <div className="relative mb-6 flex justify-center">
                       <motion.div
@@ -348,18 +336,6 @@ export function DesktopPricingPage() {
                     </div>
                   </div>
 
-                  <motion.div
-                    className="absolute inset-0 pointer-events-none"
-                    animate={isHovered ? {
-                      background: [
-                        'linear-gradient(90deg, transparent 0%, transparent 40%, rgba(255,255,255,0.05) 50%, transparent 60%, transparent 100%)',
-                        'linear-gradient(90deg, transparent 0%, transparent 40%, rgba(255,255,255,0.05) 50%, transparent 60%, transparent 100%)',
-                      ],
-                      backgroundPosition: ['-200% 0', '200% 0'],
-                    } : {}}
-                    transition={{ duration: 1.5, repeat: Infinity }}
-                    style={{ backgroundSize: '200% 100%' }}
-                  />
                 </motion.div>
               </motion.div>
             );

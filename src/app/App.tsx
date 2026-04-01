@@ -31,7 +31,7 @@ const LeavesFeature = lazy(() => import('@/app/components/features/LeavesFeature
 const ProjectsFeature = lazy(() => import('@/app/components/features/ProjectsFeature').then((module) => ({ default: module.ProjectsFeature })));
 const GoalsFeature = lazy(() => import('@/app/components/features/GoalsFeature').then((module) => ({ default: module.GoalsFeature })));
 const WorkflowsFeature = lazy(() => import('@/app/components/features/WorkflowsFeature').then((module) => ({ default: module.WorkflowsFeature })));
-const MIRAAIFeature = lazy(() => import('@/app/components/features/MIRAAIFeature').then((module) => ({ default: module.MIRAAIFeature })));
+const MIRAAIFeature = lazy(() => import('@/app/components/features/MiraAIFeature').then((module) => ({ default: module.MIRAAIFeature })));
 const TeamChatFeature = lazy(() => import('@/app/components/features/TeamChatFeature').then((module) => ({ default: module.TeamChatFeature })));
 const NotificationsFeature = lazy(() => import('@/app/components/features/NotificationsFeature').then((module) => ({ default: module.NotificationsFeature })));
 const AdminDashboard = lazy(() => import('@/app/components/AdminDashboard').then((module) => ({ default: module.AdminDashboard })));

@@ -54,11 +54,11 @@ export function PricingChangeConfetti({
                 x: particle.x,
                 y: particle.y,
                 rotate: particle.rotate,
-                scale: [0, 1, 0.75],
-                opacity: [0, 1, 0],
+                scale: [0, 1, 0.8, 0.6],
+                opacity: [0, 1, 1, 0],
               }}
               transition={{
-                duration: 0.95,
+                duration: 1.8,
                 delay: particle.delay,
                 ease: [0.16, 1, 0.3, 1],
               }}

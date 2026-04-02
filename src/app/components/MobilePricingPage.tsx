@@ -116,7 +116,37 @@ export function MobilePricingPage() {
       return;
     }
 
-    setPriceCelebrationKey((current) => current + 1);
+    const waitForViewport = () => {
+      const el = plansSectionRef.current;
+      if (!el) {
+        setPriceCelebrationKey((current) => current + 1);
+        return;
+      }
+
+      const rect = el.getBoundingClientRect();
+      const inViewport = rect.top < window.innerHeight && rect.bottom > 0;
+
+      if (inViewport) {
+        setPriceCelebrationKey((current) => current + 1);
+        return;
+      }
+
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            observer.disconnect();
+            setPriceCelebrationKey((current) => current + 1);
+          }
+        },
+        { threshold: 0.1 },
+      );
+      observer.observe(el);
+
+      return () => observer.disconnect();
+    };
+
+    const timerId = setTimeout(waitForViewport, 120);
+    return () => clearTimeout(timerId);
   }, [billing]);
 
   const jumpToPlan = (index: number) => {
@@ -237,7 +267,7 @@ export function MobilePricingPage() {
                             initial={{ opacity: 0, y: 14, scale: 0.92, filter: 'blur(0.25rem)' }}
                             animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0rem)' }}
                             exit={{ opacity: 0, y: -14, scale: 0.92, filter: 'blur(0.25rem)' }}
-                            transition={{ duration: 0.36, ease: [0.16, 1, 0.3, 1] }}
+                            transition={{ duration: 0.5, delay: 0.35, ease: [0.16, 1, 0.3, 1] }}
                             className="block text-5xl font-bold tracking-tighter text-white"
                           >
                             {priceDisplay}
@@ -252,7 +282,7 @@ export function MobilePricingPage() {
                             initial={{ opacity: 0, y: 8 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: -8 }}
-                            transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
+                            transition={{ duration: 0.3, delay: 0.45, ease: [0.16, 1, 0.3, 1] }}
                             className="block"
                           >
                             {plan.period || '\u00A0'}

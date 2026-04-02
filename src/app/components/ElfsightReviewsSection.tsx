@@ -121,34 +121,22 @@ export function ElfsightReviewsSection({
             <span className="text-sm font-medium text-white/70">5.0 on Google</span>
           </div>
         </motion.div>
-
-        {/* ── Widget container with decorative frame ── */}
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.9, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
-          className="relative mt-12"
-        >
-          {/* Gradient border wrapper */}
-          <div className="rounded-[2rem] p-px bg-gradient-to-b from-white/[0.12] via-white/[0.04] to-transparent">
-            <div className="relative rounded-[calc(2rem-1px)] bg-[#0a0a0f]/80 backdrop-blur-xl p-5 md:p-8">
-              {/* Corner accent dots */}
-              <div className="absolute top-4 left-4 h-1.5 w-1.5 rounded-full bg-purple-400/40" />
-              <div className="absolute top-4 right-4 h-1.5 w-1.5 rounded-full bg-blue-400/40" />
-              <div className="absolute bottom-4 left-4 h-1.5 w-1.5 rounded-full bg-blue-400/40" />
-              <div className="absolute bottom-4 right-4 h-1.5 w-1.5 rounded-full bg-purple-400/40" />
-
-              {/* Inner glow at top */}
-              <div className="pointer-events-none absolute inset-x-12 top-0 h-px bg-gradient-to-r from-transparent via-purple-500/30 to-transparent" />
-
-              <div
-                className={ELFSIGHT_WIDGET_CLASS}
-                data-elfsight-app-lazy
-              />
-            </div>
-          </div>
-        </motion.div>
       </div>
+
+      {/* ── Widget — full width, directly under heading ── */}
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        animate={isInView ? { opacity: 1, y: 0 } : {}}
+        transition={{ duration: 0.9, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+        className="relative mt-12"
+      >
+        <div
+          className={ELFSIGHT_WIDGET_CLASS}
+          data-elfsight-app-lazy
+        />
+        {/* Patch over Elfsight branding badge */}
+        <div className="absolute bottom-[2.25rem] left-1/2 -translate-x-1/2 z-10 w-72 h-20 rounded-full bg-[#111]" />
+      </motion.div>
     </section>
   );
 }

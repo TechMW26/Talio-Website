@@ -191,7 +191,7 @@ export function PrivacySection() {
     <section
       ref={sectionRef}
       className="relative bg-black"
-      style={{ marginTop: '-21.875rem', paddingTop: '6.25rem' }}
+      style={{ marginTop: '-18.875rem', paddingTop: '6.25rem' }}
       onMouseMove={handleMouseMove}
     >
       {/* Neon flicker CSS */}

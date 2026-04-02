@@ -23,8 +23,8 @@ export function DesktopPricingPage() {
   const [showDemoPopup, setShowDemoPopup] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<PlanInfo | null>(null);
   const [priceCelebrationKey, setPriceCelebrationKey] = useState(0);
-  const hasWidePlansGrid = useCompensatedMinWidth(1500);
-  const hasMediumPlansGrid = useCompensatedMinWidth(980);
+  const hasWidePlansGrid = useCompensatedMinWidth(1024);
+  const hasMediumPlansGrid = useCompensatedMinWidth(768);
 
   const openDemoForPlan = (plan: typeof pricingPlans[number]) => {
     const priceDisplay = plan.priceLabel ?? `₹${billing === 'monthly' ? plan.price.monthly : plan.price.annual}${plan.period}`;

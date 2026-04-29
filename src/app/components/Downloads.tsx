@@ -7,7 +7,7 @@ import { usePageMeta } from '@/app/hooks/usePageMeta';
 import { useCompensatedMinWidth } from '@/app/hooks/useZoomCompensatedViewport';
 
 export function Downloads() {
-  usePageMeta('Downloads', 'Download Talio for macOS, Windows, and iOS. Android support is coming soon. Get productivity visibility, coordination, and connected HR workflows on every device.');
+  usePageMeta('Downloads', 'Download Talio for macOS, Windows, iOS, and Android. Get productivity visibility, coordination, and connected HR workflows on every device.');
   const hasDesktopPlatformGrid = useCompensatedMinWidth(1280);
   const hasTabletPlatformGrid = useCompensatedMinWidth(768);
   const hasDesktopRequirementsGrid = useCompensatedMinWidth(1120);
@@ -87,12 +87,14 @@ export function Downloads() {
       id: 'android',
       name: 'Android',
       icon: SiAndroid,
-      version: 'Coming Soon',
-      recommendedLabel: 'Android app coming soon',
-      recommendedMeta: 'Google Play release in progress',
-      recommendedUrl: undefined,
-      isAvailable: false,
-      downloads: [],
+      version: 'Google Play',
+      recommendedLabel: 'Download for Android',
+      recommendedMeta: 'Google Play • Live now',
+      recommendedUrl: 'https://play.google.com/store/apps/details?id=sbs.zenova.twa&hl=en_IN',
+      isAvailable: true,
+      downloads: [
+        { name: 'Talio Productivity', arch: 'Google Play', url: 'https://play.google.com/store/apps/details?id=sbs.zenova.twa&hl=en_IN' }
+      ],
       gradient: 'from-emerald-500 to-green-700',
       bgGradient: 'from-emerald-50 to-green-100'
     }
@@ -212,8 +214,8 @@ export function Downloads() {
                 {recommendedPlatform.isAvailable ? (
                   <motion.a
                     href={recommendedPlatform.recommendedUrl}
-                    target={recommendedPlatform.id === 'ios' ? '_blank' : undefined}
-                    rel={recommendedPlatform.id === 'ios' ? 'noopener noreferrer' : undefined}
+                    target={recommendedPlatform.id === 'ios' || recommendedPlatform.id === 'android' ? '_blank' : undefined}
+                    rel={recommendedPlatform.id === 'ios' || recommendedPlatform.id === 'android' ? 'noopener noreferrer' : undefined}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white px-8 py-6 rounded-2xl text-lg font-semibold shadow-xl shadow-purple-500/30 transition-all duration-300 flex items-center justify-between group"
@@ -295,8 +297,8 @@ export function Downloads() {
                           <motion.a
                             key={idx}
                             href={download.url}
-                            target={platform.id === 'ios' ? '_blank' : undefined}
-                            rel={platform.id === 'ios' ? 'noopener noreferrer' : undefined}
+                            target={platform.id === 'ios' || platform.id === 'android' ? '_blank' : undefined}
+                            rel={platform.id === 'ios' || platform.id === 'android' ? 'noopener noreferrer' : undefined}
                             whileHover={{ scale: 1.02, x: 4 }}
                             whileTap={{ scale: 0.98 }}
                             className="w-full px-6 py-4 rounded-xl text-left transition-all duration-300 flex items-center justify-between bg-gray-800/50 hover:bg-gray-800 text-white border border-gray-700/50 hover:border-gray-600 shadow-sm"
@@ -333,7 +335,7 @@ export function Downloads() {
                     {platform.id === 'android' && (
                       <div className="mt-4 flex items-center gap-2 text-emerald-400">
                         <SiAndroid className="w-4 h-4" />
-                        <span className="text-sm font-semibold">Google Play release coming soon</span>
+                        <span className="text-sm font-semibold">Available on Google Play</span>
                       </div>
                     )}
                   </div>

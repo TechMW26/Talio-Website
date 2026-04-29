@@ -6,6 +6,7 @@ import {
   ChevronDown,
   X,
   ArrowRight,
+  CheckCircle,
 } from "lucide-react";
 import { ElfsightReviewsSection } from '@/app/components/ElfsightReviewsSection';
 import { categories, faqs, resources, type CategoryData } from '@/app/content/helpCenterData';

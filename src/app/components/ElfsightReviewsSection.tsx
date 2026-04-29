@@ -134,8 +134,6 @@ export function ElfsightReviewsSection({
           className={ELFSIGHT_WIDGET_CLASS}
           data-elfsight-app-lazy
         />
-        {/* Patch over Elfsight branding badge */}
-        <div className="absolute bottom-[2.25rem] left-1/2 -translate-x-1/2 z-10 w-72 h-20 rounded-full bg-[#111]" />
       </motion.div>
     </section>
   );

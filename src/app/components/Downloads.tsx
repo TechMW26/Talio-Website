@@ -5,6 +5,28 @@ import { IoLogoMicrosoft } from 'react-icons/io5';
 import { SiAndroid, SiApple } from 'react-icons/si';
 import { usePageMeta } from '@/app/hooks/usePageMeta';
 import { useCompensatedMinWidth } from '@/app/hooks/useZoomCompensatedViewport';
+import { getLatestReleasePayload, type LatestReleasePayload } from '@/lib/latestReleaseClient';
+
+type DesktopDownloadKey = 'windows' | 'mac' | 'mac-arm64' | 'mac-intel';
+
+const STABLE_LATEST_DOWNLOAD_URL = 'https://app.talio.in/download/latest';
+
+function formatBytes(bytes?: number) {
+  if (!Number.isFinite(bytes) || !bytes || bytes <= 0) {
+    return '';
+  }
+
+  const units = ['B', 'KB', 'MB', 'GB'];
+  let size = bytes;
+  let unitIndex = 0;
+
+  while (size >= 1024 && unitIndex < units.length - 1) {
+    size /= 1024;
+    unitIndex += 1;
+  }
+
+  return `${size >= 10 || unitIndex === 0 ? Math.round(size) : size.toFixed(1)} ${units[unitIndex]}`;
+}
 
 export function Downloads() {
   usePageMeta('Downloads', 'Download Talio for macOS, Windows, iOS, and Android. Get productivity visibility, coordination, and connected HR workflows on every device.');
@@ -16,12 +38,14 @@ export function Downloads() {
   const heroRef = useRef(null);
   const platformsRef = useRef(null);
   const requirementsRef = useRef(null);
-  
+
   const heroInView = useInView(heroRef, { once: true, margin: '-10%' });
   const platformsInView = useInView(platformsRef, { once: true, margin: '-10%' });
   const requirementsInView = useInView(requirementsRef, { once: true, margin: '-10%' });
 
   const [detectedPlatform, setDetectedPlatform] = useState<'windows' | 'mac' | 'ios' | 'android'>('windows');
+  const [latestRelease, setLatestRelease] = useState<LatestReleasePayload | null>(null);
+  const [releaseStatus, setReleaseStatus] = useState<'loading' | 'ready' | 'unavailable'>('loading');
 
   useEffect(() => {
     const userAgent = window.navigator.userAgent.toLowerCase();
@@ -36,19 +60,107 @@ export function Downloads() {
     }
   }, []);
 
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadLatestDownloads() {
+      try {
+        const payload = await getLatestReleasePayload();
+
+        if (!isMounted) {
+          return;
+        }
+
+        setLatestRelease(payload);
+        setReleaseStatus(payload.download_url ? 'ready' : 'unavailable');
+      } catch {
+        if (isMounted) {
+          setLatestRelease(null);
+          setReleaseStatus('unavailable');
+        }
+      }
+    }
+
+    loadLatestDownloads();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const latestReleaseFileName = latestRelease?.file_name ?? '';
+  const normalizedLatestFileName = latestReleaseFileName.toLowerCase();
+  const latestReleaseSizeLabel = formatBytes(latestRelease?.asset_size);
+  const latestReleaseDownloadUrl = latestRelease?.download_url ?? STABLE_LATEST_DOWNLOAD_URL;
+  const hasLatestRelease = releaseStatus === 'ready' && Boolean(latestRelease?.download_url);
+  const hasMacInstaller = hasLatestRelease && /\.(dmg|pkg)$/i.test(normalizedLatestFileName);
+  const hasWindowsInstaller = hasLatestRelease && (/\.(exe|msi)$/i.test(normalizedLatestFileName) || /(^|[-_.\s])(win|windows)([-_.\s]|$)/i.test(normalizedLatestFileName));
+  const hasUniversalMacInstaller = hasMacInstaller && /(^|[-_.\s])universal([-_.\s]|$)/i.test(normalizedLatestFileName);
+  const hasArmMacInstaller = hasMacInstaller && (hasUniversalMacInstaller || /(^|[-_.\s])(arm64|aarch64|apple[-_.\s]?silicon|m[1-4])([-_.\s]|$)/i.test(normalizedLatestFileName));
+  const hasIntelMacInstaller = hasMacInstaller && (hasUniversalMacInstaller || /(^|[-_.\s])(x64|x86_64|amd64|intel)([-_.\s]|$)/i.test(normalizedLatestFileName));
+
+  const getDesktopDownloadUrl = (_key: DesktopDownloadKey) => latestReleaseDownloadUrl;
+  const isDesktopDownloadUnavailable = (key: DesktopDownloadKey) => {
+    if (!hasLatestRelease) {
+      return true;
+    }
+
+    if (key === 'windows') {
+      return !hasWindowsInstaller;
+    }
+
+    if (key === 'mac-intel') {
+      return !hasIntelMacInstaller;
+    }
+
+    if (key === 'mac-arm64') {
+      return !hasArmMacInstaller;
+    }
+
+    return !hasMacInstaller;
+  };
+  const getDesktopDownloadMeta = (key: DesktopDownloadKey, fallback: string) => {
+    if (releaseStatus === 'loading') {
+      return 'Checking latest release';
+    }
+
+    if (isDesktopDownloadUnavailable(key)) {
+      return 'Release unavailable';
+    }
+
+    return [fallback, latestReleaseSizeLabel].filter(Boolean).join(' • ');
+  };
+  const getRecommendedDesktopMeta = (key: DesktopDownloadKey, fallback: string) => {
+    if (releaseStatus === 'loading') {
+      return `${fallback} • Checking latest release`;
+    }
+
+    if (isDesktopDownloadUnavailable(key)) {
+      return `${fallback} • Release unavailable`;
+    }
+
+    return [fallback, latestRelease?.version, latestReleaseSizeLabel].filter(Boolean).join(' • ');
+  };
+  const desktopReleaseVersion = releaseStatus === 'loading'
+    ? 'Checking latest release'
+    : releaseStatus === 'unavailable'
+      ? 'Release unavailable'
+      : latestRelease?.version ?? latestRelease?.release_name ?? 'Latest release';
+
   const platforms = [
     {
       id: 'mac',
       name: 'macOS',
       icon: SiApple,
-      version: 'v3.2.0',
+      version: desktopReleaseVersion,
       recommendedLabel: 'Download for macOS',
-      recommendedMeta: 'Apple Silicon • v3.2.0',
-      recommendedUrl: 'https://app.talio.in/download/mac',
+      recommendedMeta: getRecommendedDesktopMeta('mac', 'Apple Silicon'),
+      recommendedUrl: getDesktopDownloadUrl('mac'),
+      isRecommendedDisabled: isDesktopDownloadUnavailable('mac'),
       isAvailable: true,
       downloads: [
-        { name: 'Apple Silicon (M-series)', arch: 'arm64', url: 'https://app.talio.in/download/mac-arm64' },
-        { name: 'Intel (x64)', arch: 'x64', url: 'https://app.talio.in/download/mac-intel' }
+        { name: 'Apple Silicon (M-series)', arch: getDesktopDownloadMeta('mac-arm64', 'arm64'), url: getDesktopDownloadUrl('mac-arm64'), isDisabled: isDesktopDownloadUnavailable('mac-arm64') },
+        { name: 'Intel (x64)', arch: getDesktopDownloadMeta('mac-intel', 'x64'), url: getDesktopDownloadUrl('mac-intel'), isDisabled: isDesktopDownloadUnavailable('mac-intel') }
       ],
       gradient: 'from-gray-500 to-gray-700',
       bgGradient: 'from-gray-50 to-gray-100'
@@ -57,13 +169,14 @@ export function Downloads() {
       id: 'windows',
       name: 'Windows',
       icon: IoLogoMicrosoft,
-      version: 'v3.2.0',
+      version: desktopReleaseVersion,
       recommendedLabel: 'Download for Windows',
-      recommendedMeta: 'Windows 10/11 • v3.2.0',
-      recommendedUrl: 'https://app.talio.in/download/windows',
+      recommendedMeta: getRecommendedDesktopMeta('windows', 'Windows 10/11'),
+      recommendedUrl: getDesktopDownloadUrl('windows'),
+      isRecommendedDisabled: isDesktopDownloadUnavailable('windows'),
       isAvailable: true,
       downloads: [
-        { name: 'Windows 10/11 (64-bit)', arch: 'x64', url: 'https://app.talio.in/download/windows' }
+        { name: 'Windows 10/11 (64-bit)', arch: getDesktopDownloadMeta('windows', 'x64'), url: getDesktopDownloadUrl('windows'), isDisabled: isDesktopDownloadUnavailable('windows') }
       ],
       gradient: 'from-blue-500 to-blue-700',
       bgGradient: 'from-blue-50 to-blue-100'
@@ -129,15 +242,15 @@ export function Downloads() {
   return (
     <div className="bg-black min-h-screen relative transition-colors duration-300">
       {/* Hero Section */}
-      <section 
-        ref={heroRef} 
+      <section
+        ref={heroRef}
         className="relative min-h-[90vh] flex items-center justify-center py-20 md:py-32 overflow-hidden bg-gradient-to-br from-gray-900 via-gray-950 to-purple-950/30"
         style={{ position: 'relative' }}
       >
         {/* Background Elements */}
         <div className="absolute inset-0">
           <motion.div
-            animate={{ 
+            animate={{
               scale: [1, 1.2, 1],
               opacity: [0.3, 0.5, 0.3]
             }}
@@ -145,7 +258,7 @@ export function Downloads() {
             className="absolute top-20 left-1/4 w-96 h-96 bg-gradient-to-br from-purple-900/20 to-blue-900/20 rounded-full blur-3xl"
           />
           <motion.div
-            animate={{ 
+            animate={{
               scale: [1.2, 1, 1.2],
               opacity: [0.2, 0.4, 0.2]
             }}
@@ -202,7 +315,7 @@ export function Downloads() {
                 transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
                 className="absolute inset-0 w-1/2 bg-gradient-to-r from-transparent via-white/5 to-transparent skew-x-12"
               />
-              
+
               <div className="relative">
                 <div className="flex items-center gap-2 mb-6">
                   <Star className="w-5 h-5 text-yellow-400 fill-yellow-400" />
@@ -211,7 +324,7 @@ export function Downloads() {
                   </span>
                 </div>
 
-                {recommendedPlatform.isAvailable ? (
+                {recommendedPlatform.isAvailable && !recommendedPlatform.isRecommendedDisabled ? (
                   <motion.a
                     href={recommendedPlatform.recommendedUrl}
                     target={recommendedPlatform.id === 'ios' || recommendedPlatform.id === 'android' ? '_blank' : undefined}
@@ -229,6 +342,19 @@ export function Downloads() {
                     </div>
                     <Download className="w-6 h-6 group-hover:translate-y-1 transition-transform" />
                   </motion.a>
+                ) : recommendedPlatform.isRecommendedDisabled ? (
+                  <div className="w-full bg-gradient-to-r from-gray-800 to-gray-700 text-white px-8 py-6 rounded-2xl text-lg font-semibold shadow-xl shadow-black/20 transition-all duration-300 flex items-center justify-between gap-6 opacity-70">
+                    <div className="flex items-center gap-4">
+                      <recommendedPlatform.icon className="w-6 h-6 shrink-0" />
+                      <div className="text-left">
+                        <div className="font-bold">{recommendedPlatform.recommendedLabel}</div>
+                        <div className="text-sm text-white/80 font-normal">{recommendedPlatform.recommendedMeta}</div>
+                      </div>
+                    </div>
+                    <span className="rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-semibold uppercase tracking-[0.14em] text-white/90">
+                      Unavailable
+                    </span>
+                  </div>
                 ) : (
                   <div className="w-full bg-gradient-to-r from-emerald-600 to-green-600 text-white px-8 py-6 rounded-2xl text-lg font-semibold shadow-xl shadow-emerald-500/20 transition-all duration-300 flex items-center justify-between gap-6">
                     <div className="flex items-center gap-4">
@@ -250,8 +376,8 @@ export function Downloads() {
       </section>
 
       {/* All Platforms Section */}
-      <section 
-        ref={platformsRef} 
+      <section
+        ref={platformsRef}
         className="py-20 md:py-32 relative overflow-hidden"
         style={{ position: 'relative' }}
       >
@@ -294,21 +420,36 @@ export function Downloads() {
                     {platform.isAvailable ? (
                       <div className="space-y-3 flex-grow">
                         {platform.downloads.map((download, idx) => (
-                          <motion.a
-                            key={idx}
-                            href={download.url}
-                            target={platform.id === 'ios' || platform.id === 'android' ? '_blank' : undefined}
-                            rel={platform.id === 'ios' || platform.id === 'android' ? 'noopener noreferrer' : undefined}
-                            whileHover={{ scale: 1.02, x: 4 }}
-                            whileTap={{ scale: 0.98 }}
-                            className="w-full px-6 py-4 rounded-xl text-left transition-all duration-300 flex items-center justify-between bg-gray-800/50 hover:bg-gray-800 text-white border border-gray-700/50 hover:border-gray-600 shadow-sm"
-                          >
-                            <div>
-                              <div className="font-semibold text-sm text-gray-200">{download.name}</div>
-                              {download.arch && <div className="text-xs text-gray-500 mt-1">{download.arch}</div>}
-                            </div>
-                            <Download className="w-5 h-5" />
-                          </motion.a>
+                          'isDisabled' in download && download.isDisabled ? (
+                            <motion.button
+                              key={idx}
+                              type="button"
+                              disabled
+                              className="w-full cursor-not-allowed px-6 py-4 rounded-xl text-left transition-all duration-300 flex items-center justify-between bg-gray-800/40 text-white border border-gray-700/40 shadow-sm opacity-60"
+                            >
+                              <div>
+                                <div className="font-semibold text-sm text-gray-200">{download.name}</div>
+                                {download.arch && <div className="text-xs text-gray-500 mt-1">{download.arch}</div>}
+                              </div>
+                              <Download className="w-5 h-5" />
+                            </motion.button>
+                          ) : (
+                            <motion.a
+                              key={idx}
+                              href={download.url}
+                              target={platform.id === 'ios' || platform.id === 'android' ? '_blank' : undefined}
+                              rel={platform.id === 'ios' || platform.id === 'android' ? 'noopener noreferrer' : undefined}
+                              whileHover={{ scale: 1.02, x: 4 }}
+                              whileTap={{ scale: 0.98 }}
+                              className="w-full px-6 py-4 rounded-xl text-left transition-all duration-300 flex items-center justify-between bg-gray-800/50 hover:bg-gray-800 text-white border border-gray-700/50 hover:border-gray-600 shadow-sm"
+                            >
+                              <div>
+                                <div className="font-semibold text-sm text-gray-200">{download.name}</div>
+                                {download.arch && <div className="text-xs text-gray-500 mt-1">{download.arch}</div>}
+                              </div>
+                              <Download className="w-5 h-5" />
+                            </motion.a>
+                          )
                         ))}
                       </div>
                     ) : (
@@ -347,8 +488,8 @@ export function Downloads() {
       </section>
 
       {/* System Requirements Section */}
-      <section 
-        ref={requirementsRef} 
+      <section
+        ref={requirementsRef}
         className="py-20 md:py-32 bg-gradient-to-b from-gray-950 to-gray-900 relative overflow-hidden"
         style={{ position: 'relative' }}
       >

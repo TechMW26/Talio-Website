@@ -8,4 +8,16 @@
   Run `npm i` to install the dependencies.
 
   Run `npm run dev` to start the development server.
+
+  ## Download releases
+
+  Desktop release metadata is resolved through `/api/latest-release`, which proxies the public Talio app endpoint at `https://app.talio.in/api/latest-release` for local and deployed browser compatibility.
+
+  The desktop installer link uses the `download_url` returned by that response, currently `https://app.talio.in/download/latest`.
+
+  Optional environment variables:
+
+  - `TALIO_LATEST_RELEASE_API_URL`: override the latest release metadata endpoint. Defaults to `https://app.talio.in/api/latest-release`.
+  - `TALIO_LATEST_DOWNLOAD_URL`: override the local dev redirect target for `/download/latest`. Defaults to `https://app.talio.in/download/latest`.
+
   

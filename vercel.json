@@ -1,5 +1,6 @@
 {
   "rewrites": [
+    { "source": "/api/latest-release", "destination": "https://app.talio.in/api/latest-release" },
     { "source": "/api/(.*)", "destination": "/api/$1" },
     { "source": "/((?!api|assets/|old-site/).*)", "destination": "/index.html" }
   ]

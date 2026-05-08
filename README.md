@@ -11,7 +11,7 @@
 
   ## Download releases
 
-  Desktop release metadata is resolved through `/api/latest-release`, which proxies the public Talio app endpoint at `https://app.talio.in/api/latest-release` for local and deployed browser compatibility.
+  Desktop release metadata is resolved through `/api/latest-release`, which rewrites to the public Talio app endpoint at `https://app.talio.in/api/latest-release` in production and is handled by Vite middleware in local development.
 
   The desktop installer link uses the `download_url` returned by that response, currently `https://app.talio.in/download/latest`.
 

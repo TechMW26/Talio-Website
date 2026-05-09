@@ -11,13 +11,16 @@
 
   ## Download releases
 
-  Desktop release metadata is resolved through `/api/latest-release`, which rewrites to the public Talio app endpoint at `https://app.talio.in/api/latest-release` in production and is handled by Vite middleware in local development.
+  Desktop release metadata is resolved through `/api/downloads/latest`, which reads the configured GitHub release and returns availability entries for Windows, macOS Apple Silicon, macOS Intel, and Linux.
 
-  The desktop installer link uses the `download_url` returned by that response, currently `https://app.talio.in/download/latest`.
+  If GitHub release asset listing is unavailable, the endpoint falls back to `/api/latest-release` and marks platforms that are missing from that fallback as unavailable instead of mapping them to the wrong installer.
+
+  Desktop installer links use `/api/downloads/file?platform=<platform>`, where `<platform>` is one of `windows`, `mac`, `mac-arm64`, `mac-intel`, or `linux`.
 
   Optional environment variables:
 
-  - `TALIO_LATEST_RELEASE_API_URL`: override the latest release metadata endpoint. Defaults to `https://app.talio.in/api/latest-release`.
-  - `TALIO_LATEST_DOWNLOAD_URL`: override the local dev redirect target for `/download/latest`. Defaults to `https://app.talio.in/download/latest`.
+  - `TALIO_RELEASE_REPO` or `GITHUB_RELEASE_REPO`: override the GitHub release repository. Defaults to `https://github.com/avirajsharma-ops/Talio.git`.
+  - `TALIO_RELEASE_TAG` or `GITHUB_RELEASE_TAG`: use a specific release tag instead of the latest release.
+  - `GITHUB_RELEASE_TOKEN` or `GITHUB_TOKEN`: provide read access for private GitHub release assets.
 
   

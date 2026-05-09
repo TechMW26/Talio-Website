@@ -2,34 +2,41 @@ import { motion, useInView } from 'motion/react';
 import { useRef, useState, useEffect } from 'react';
 import { Download, Star, CheckCircle2 } from 'lucide-react';
 import { IoLogoMicrosoft } from 'react-icons/io5';
-import { SiAndroid, SiApple } from 'react-icons/si';
+import { SiAndroid, SiApple, SiLinux } from 'react-icons/si';
 import { usePageMeta } from '@/app/hooks/usePageMeta';
 import { useCompensatedMinWidth } from '@/app/hooks/useZoomCompensatedViewport';
-import { getLatestReleasePayload, type LatestReleasePayload } from '@/lib/latestReleaseClient';
+import {
+  getLatestReleasePayload,
+  STABLE_LATEST_DOWNLOAD_URL,
+  STABLE_PLATFORM_DOWNLOAD_URLS,
+  type LatestReleasePayload,
+} from '@/lib/latestReleaseClient';
 
-type DesktopDownloadKey = 'windows' | 'mac' | 'mac-arm64' | 'mac-intel';
+type DesktopDownloadKey = 'windows' | 'mac-arm64' | 'mac-intel' | 'linux';
+type DetectedPlatformKey = DesktopDownloadKey | 'unknown';
 
-const STABLE_LATEST_DOWNLOAD_URL = 'https://app.talio.in/download/latest';
+function detectPlatformKey(): DetectedPlatformKey {
+  const ua = window.navigator.userAgent || '';
+  const uaLower = ua.toLowerCase();
 
-function formatBytes(bytes?: number) {
-  if (!Number.isFinite(bytes) || !bytes || bytes <= 0) {
-    return '';
+  if (uaLower.includes('windows')) {
+    return 'windows';
   }
 
-  const units = ['B', 'KB', 'MB', 'GB'];
-  let size = bytes;
-  let unitIndex = 0;
-
-  while (size >= 1024 && unitIndex < units.length - 1) {
-    size /= 1024;
-    unitIndex += 1;
+  if (uaLower.includes('mac')) {
+    const hasIntelMarkers = uaLower.includes('intel') || uaLower.includes('x86_64') || uaLower.includes('x86') || uaLower.includes('i386');
+    return hasIntelMarkers ? 'mac-intel' : 'mac-arm64';
   }
 
-  return `${size >= 10 || unitIndex === 0 ? Math.round(size) : size.toFixed(1)} ${units[unitIndex]}`;
+  if (uaLower.includes('linux')) {
+    return 'linux';
+  }
+
+  return 'unknown';
 }
 
 export function Downloads() {
-  usePageMeta('Downloads', 'Download Talio for macOS, Windows, iOS, and Android. Get productivity visibility, coordination, and connected HR workflows on every device.');
+  usePageMeta('Downloads', 'Download Talio for macOS, Windows, Linux, iOS, and Android. Get productivity visibility, coordination, and connected HR workflows on every device.');
   const hasDesktopPlatformGrid = useCompensatedMinWidth(1280);
   const hasTabletPlatformGrid = useCompensatedMinWidth(768);
   const hasDesktopRequirementsGrid = useCompensatedMinWidth(1120);
@@ -43,21 +50,15 @@ export function Downloads() {
   const platformsInView = useInView(platformsRef, { once: true, margin: '-10%' });
   const requirementsInView = useInView(requirementsRef, { once: true, margin: '-10%' });
 
-  const [detectedPlatform, setDetectedPlatform] = useState<'windows' | 'mac' | 'ios' | 'android'>('windows');
+  const [detectedPlatform, setDetectedPlatform] = useState<DetectedPlatformKey>('unknown');
   const [latestRelease, setLatestRelease] = useState<LatestReleasePayload | null>(null);
   const [releaseStatus, setReleaseStatus] = useState<'loading' | 'ready' | 'unavailable'>('loading');
+  const [smartDownloadState, setSmartDownloadState] = useState<'idle' | 'resolving' | 'unavailable'>('idle');
+  const [smartDownloadMessage, setSmartDownloadMessage] = useState<string>('');
+  const [fallbackDesktopDownloads, setFallbackDesktopDownloads] = useState<Array<{ key: DesktopDownloadKey; label: string; url: string }>>([]);
 
   useEffect(() => {
-    const userAgent = window.navigator.userAgent.toLowerCase();
-    if (userAgent.includes('android')) {
-      setDetectedPlatform('android');
-    } else if (userAgent.includes('iphone') || userAgent.includes('ipad')) {
-      setDetectedPlatform('ios');
-    } else if (userAgent.includes('mac')) {
-      setDetectedPlatform('mac');
-    } else if (userAgent.includes('win')) {
-      setDetectedPlatform('windows');
-    }
+    setDetectedPlatform(detectPlatformKey());
   }, []);
 
   useEffect(() => {
@@ -72,7 +73,7 @@ export function Downloads() {
         }
 
         setLatestRelease(payload);
-        setReleaseStatus(payload.download_url ? 'ready' : 'unavailable');
+        setReleaseStatus(Object.keys(payload.downloads ?? {}).length > 0 ? 'ready' : 'unavailable');
       } catch {
         if (isMounted) {
           setLatestRelease(null);
@@ -88,64 +89,118 @@ export function Downloads() {
     };
   }, []);
 
-  const latestReleaseFileName = latestRelease?.file_name ?? '';
-  const normalizedLatestFileName = latestReleaseFileName.toLowerCase();
-  const latestReleaseSizeLabel = formatBytes(latestRelease?.asset_size);
-  const latestReleaseDownloadUrl = latestRelease?.download_url ?? STABLE_LATEST_DOWNLOAD_URL;
-  const hasLatestRelease = releaseStatus === 'ready' && Boolean(latestRelease?.download_url);
-  const hasMacInstaller = hasLatestRelease && /\.(dmg|pkg)$/i.test(normalizedLatestFileName);
-  const hasWindowsInstaller = hasLatestRelease && (/\.(exe|msi)$/i.test(normalizedLatestFileName) || /(^|[-_.\s])(win|windows)([-_.\s]|$)/i.test(normalizedLatestFileName));
-  const hasUniversalMacInstaller = hasMacInstaller && /(^|[-_.\s])universal([-_.\s]|$)/i.test(normalizedLatestFileName);
-  const hasArmMacInstaller = hasMacInstaller && (hasUniversalMacInstaller || /(^|[-_.\s])(arm64|aarch64|apple[-_.\s]?silicon|m[1-4])([-_.\s]|$)/i.test(normalizedLatestFileName));
-  const hasIntelMacInstaller = hasMacInstaller && (hasUniversalMacInstaller || /(^|[-_.\s])(x64|x86_64|amd64|intel)([-_.\s]|$)/i.test(normalizedLatestFileName));
-
-  const getDesktopDownloadUrl = (_key: DesktopDownloadKey) => latestReleaseDownloadUrl;
+  const getDesktopDownloadAsset = (key: DesktopDownloadKey) => latestRelease?.downloads?.[key];
+  const getDesktopDownloadUrl = (key: DesktopDownloadKey) => getDesktopDownloadAsset(key)?.downloadUrl ?? STABLE_PLATFORM_DOWNLOAD_URLS[key];
   const isDesktopDownloadUnavailable = (key: DesktopDownloadKey) => {
-    if (!hasLatestRelease) {
+    if (releaseStatus === 'loading') {
       return true;
     }
 
-    if (key === 'windows') {
-      return !hasWindowsInstaller;
+    if (releaseStatus === 'unavailable') {
+      return false;
     }
 
-    if (key === 'mac-intel') {
-      return !hasIntelMacInstaller;
-    }
-
-    if (key === 'mac-arm64') {
-      return !hasArmMacInstaller;
-    }
-
-    return !hasMacInstaller;
+    const download = getDesktopDownloadAsset(key);
+    return !download?.isAvailable || !download.downloadUrl;
   };
   const getDesktopDownloadMeta = (key: DesktopDownloadKey, fallback: string) => {
     if (releaseStatus === 'loading') {
       return 'Checking latest release';
     }
 
-    if (isDesktopDownloadUnavailable(key)) {
-      return 'Release unavailable';
+    if (releaseStatus === 'unavailable') {
+      return [fallback, 'Using stable link'].filter(Boolean).join(' • ');
     }
 
-    return [fallback, latestReleaseSizeLabel].filter(Boolean).join(' • ');
+    const download = getDesktopDownloadAsset(key);
+
+    if (!download?.isAvailable || !download.downloadUrl) {
+      return download?.unavailableReason ?? 'Release unavailable';
+    }
+
+    return [fallback, download.sizeLabel].filter(Boolean).join(' • ');
   };
   const getRecommendedDesktopMeta = (key: DesktopDownloadKey, fallback: string) => {
     if (releaseStatus === 'loading') {
       return `${fallback} • Checking latest release`;
     }
 
-    if (isDesktopDownloadUnavailable(key)) {
-      return `${fallback} • Release unavailable`;
+    if (releaseStatus === 'unavailable') {
+      return `${fallback} • Using stable link`;
     }
 
-    return [fallback, latestRelease?.version, latestReleaseSizeLabel].filter(Boolean).join(' • ');
+    const download = getDesktopDownloadAsset(key);
+
+    if (!download?.isAvailable || !download.downloadUrl) {
+      return [fallback, download?.unavailableReason ?? 'Release unavailable'].filter(Boolean).join(' • ');
+    }
+
+    return [fallback, latestRelease?.release_version ?? latestRelease?.version ?? latestRelease?.tagName, download.sizeLabel].filter(Boolean).join(' • ');
   };
   const desktopReleaseVersion = releaseStatus === 'loading'
     ? 'Checking latest release'
     : releaseStatus === 'unavailable'
       ? 'Release unavailable'
-      : latestRelease?.version ?? latestRelease?.release_name ?? 'Latest release';
+      : latestRelease?.release_version ?? latestRelease?.version ?? latestRelease?.tagName ?? 'Latest release';
+
+  const getFallbackDesktopDownloads = (payload: LatestReleasePayload) => {
+    const desktopKeys: DesktopDownloadKey[] = ['windows', 'mac-arm64', 'mac-intel', 'linux'];
+
+    return desktopKeys
+      .map((key) => {
+        const download = payload.downloads?.[key];
+
+        if (!download?.isAvailable) {
+          return null;
+        }
+
+        return {
+          key,
+          label: download.label || key,
+          url: download.downloadUrl || STABLE_PLATFORM_DOWNLOAD_URLS[key],
+        };
+      })
+      .filter((download): download is { key: DesktopDownloadKey; label: string; url: string } => Boolean(download));
+  };
+
+  const handleSmartDesktopDownload = async () => {
+    setSmartDownloadState('resolving');
+    setSmartDownloadMessage('');
+    setFallbackDesktopDownloads([]);
+
+    try {
+      const payload = latestRelease ?? await getLatestReleasePayload();
+      const platformKey = detectedPlatform;
+
+      if (!latestRelease) {
+        setLatestRelease(payload);
+        setReleaseStatus(Object.keys(payload.downloads ?? {}).length > 0 ? 'ready' : 'unavailable');
+      }
+
+      if (platformKey === 'unknown') {
+        setSmartDownloadState('unavailable');
+        setSmartDownloadMessage('We could not detect your platform. Please choose one of the available downloads below.');
+        setFallbackDesktopDownloads(getFallbackDesktopDownloads(payload));
+        return;
+      }
+
+      const selectedDownload = payload.downloads?.[platformKey];
+
+      if (selectedDownload?.isAvailable && selectedDownload.downloadUrl) {
+        window.location.assign(selectedDownload.downloadUrl);
+        return;
+      }
+
+      setSmartDownloadState('unavailable');
+      setSmartDownloadMessage(selectedDownload?.unavailableReason || 'Not published in latest release.');
+      setFallbackDesktopDownloads(getFallbackDesktopDownloads(payload));
+    } catch {
+      window.location.assign(STABLE_LATEST_DOWNLOAD_URL);
+    }
+  };
+
+  const macRecommendedKey: DesktopDownloadKey = detectedPlatform === 'mac-intel' ? 'mac-intel' : 'mac-arm64';
+  const macRecommendedMetaLabel = macRecommendedKey === 'mac-intel' ? 'Intel (x64)' : 'Apple Silicon (M-series)';
 
   const platforms = [
     {
@@ -154,9 +209,9 @@ export function Downloads() {
       icon: SiApple,
       version: desktopReleaseVersion,
       recommendedLabel: 'Download for macOS',
-      recommendedMeta: getRecommendedDesktopMeta('mac', 'Apple Silicon'),
-      recommendedUrl: getDesktopDownloadUrl('mac'),
-      isRecommendedDisabled: isDesktopDownloadUnavailable('mac'),
+      recommendedMeta: getRecommendedDesktopMeta(macRecommendedKey, macRecommendedMetaLabel),
+      recommendedUrl: getDesktopDownloadUrl(macRecommendedKey),
+      isRecommendedDisabled: isDesktopDownloadUnavailable(macRecommendedKey),
       isAvailable: true,
       downloads: [
         { name: 'Apple Silicon (M-series)', arch: getDesktopDownloadMeta('mac-arm64', 'arm64'), url: getDesktopDownloadUrl('mac-arm64'), isDisabled: isDesktopDownloadUnavailable('mac-arm64') },
@@ -180,6 +235,22 @@ export function Downloads() {
       ],
       gradient: 'from-blue-500 to-blue-700',
       bgGradient: 'from-blue-50 to-blue-100'
+    },
+    {
+      id: 'linux',
+      name: 'Linux',
+      icon: SiLinux,
+      version: desktopReleaseVersion,
+      recommendedLabel: 'Download for Linux',
+      recommendedMeta: getRecommendedDesktopMeta('linux', 'AppImage, DEB, or RPM'),
+      recommendedUrl: getDesktopDownloadUrl('linux'),
+      isRecommendedDisabled: isDesktopDownloadUnavailable('linux'),
+      isAvailable: true,
+      downloads: [
+        { name: 'Linux desktop installer', arch: getDesktopDownloadMeta('linux', 'AppImage / DEB / RPM'), url: getDesktopDownloadUrl('linux'), isDisabled: isDesktopDownloadUnavailable('linux') }
+      ],
+      gradient: 'from-amber-500 to-rose-600',
+      bgGradient: 'from-amber-50 to-rose-100'
     },
     {
       id: 'ios',
@@ -213,7 +284,15 @@ export function Downloads() {
     }
   ];
 
-  const recommendedPlatform = platforms.find((platform) => platform.id === detectedPlatform) ?? platforms[1];
+  const detectedPlatformLabel = detectedPlatform === 'windows'
+    ? 'Windows'
+    : detectedPlatform === 'mac-arm64'
+      ? 'macOS (Apple Silicon)'
+      : detectedPlatform === 'mac-intel'
+        ? 'macOS (Intel)'
+        : detectedPlatform === 'linux'
+          ? 'Linux'
+          : 'Unknown system';
 
   const requirements = {
     macOS: {
@@ -228,6 +307,13 @@ export function Downloads() {
         'Windows 10 or Windows 11',
         '64-bit processor',
         '200 MB available disk space'
+      ]
+    },
+    Linux: {
+      items: [
+        'Ubuntu 20.04 or compatible distribution',
+        '64-bit processor',
+        'AppImage, DEB, or RPM installation support'
       ]
     },
     iOS: {
@@ -320,53 +406,54 @@ export function Downloads() {
                 <div className="flex items-center gap-2 mb-6">
                   <Star className="w-5 h-5 text-yellow-400 fill-yellow-400" />
                   <span className="text-sm font-semibold text-gray-300 uppercase tracking-wider">
-                    Recommended for your device
+                    Smart desktop installer
                   </span>
                 </div>
 
-                {recommendedPlatform.isAvailable && !recommendedPlatform.isRecommendedDisabled ? (
-                  <motion.a
-                    href={recommendedPlatform.recommendedUrl}
-                    target={recommendedPlatform.id === 'ios' || recommendedPlatform.id === 'android' ? '_blank' : undefined}
-                    rel={recommendedPlatform.id === 'ios' || recommendedPlatform.id === 'android' ? 'noopener noreferrer' : undefined}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white px-8 py-6 rounded-2xl text-lg font-semibold shadow-xl shadow-purple-500/30 transition-all duration-300 flex items-center justify-between group"
-                  >
-                    <div className="flex items-center gap-4">
-                      <recommendedPlatform.icon className="w-6 h-6 shrink-0" />
-                      <div className="text-left">
-                        <div className="font-bold">{recommendedPlatform.recommendedLabel}</div>
-                        <div className="text-sm text-white/80 font-normal">{recommendedPlatform.recommendedMeta}</div>
+                <motion.button
+                  type="button"
+                  onClick={handleSmartDesktopDownload}
+                  disabled={smartDownloadState === 'resolving'}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white px-8 py-6 rounded-2xl text-lg font-semibold shadow-xl shadow-purple-500/30 transition-all duration-300 flex items-center justify-between group disabled:cursor-wait disabled:opacity-80"
+                >
+                  <div className="flex items-center gap-4">
+                    {detectedPlatform === 'windows' ? (
+                      <IoLogoMicrosoft className="w-6 h-6 shrink-0" />
+                    ) : detectedPlatform === 'linux' ? (
+                      <SiLinux className="w-6 h-6 shrink-0" />
+                    ) : (
+                      <SiApple className="w-6 h-6 shrink-0" />
+                    )}
+                    <div className="text-left">
+                      <div className="font-bold">
+                        {smartDownloadState === 'resolving' ? 'Resolving latest installer...' : 'Download for my system'}
                       </div>
+                      <div className="text-sm text-white/80 font-normal">{detectedPlatformLabel}</div>
                     </div>
-                    <Download className="w-6 h-6 group-hover:translate-y-1 transition-transform" />
-                  </motion.a>
-                ) : recommendedPlatform.isRecommendedDisabled ? (
-                  <div className="w-full bg-gradient-to-r from-gray-800 to-gray-700 text-white px-8 py-6 rounded-2xl text-lg font-semibold shadow-xl shadow-black/20 transition-all duration-300 flex items-center justify-between gap-6 opacity-70">
-                    <div className="flex items-center gap-4">
-                      <recommendedPlatform.icon className="w-6 h-6 shrink-0" />
-                      <div className="text-left">
-                        <div className="font-bold">{recommendedPlatform.recommendedLabel}</div>
-                        <div className="text-sm text-white/80 font-normal">{recommendedPlatform.recommendedMeta}</div>
-                      </div>
-                    </div>
-                    <span className="rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-semibold uppercase tracking-[0.14em] text-white/90">
-                      Unavailable
-                    </span>
                   </div>
-                ) : (
-                  <div className="w-full bg-gradient-to-r from-emerald-600 to-green-600 text-white px-8 py-6 rounded-2xl text-lg font-semibold shadow-xl shadow-emerald-500/20 transition-all duration-300 flex items-center justify-between gap-6">
-                    <div className="flex items-center gap-4">
-                      <recommendedPlatform.icon className="w-6 h-6 shrink-0" />
-                      <div className="text-left">
-                        <div className="font-bold">{recommendedPlatform.recommendedLabel}</div>
-                        <div className="text-sm text-white/80 font-normal">{recommendedPlatform.recommendedMeta}</div>
+                  <Download className="w-6 h-6 group-hover:translate-y-1 transition-transform" />
+                </motion.button>
+
+                {smartDownloadState === 'unavailable' && (
+                  <div className="mt-5 rounded-2xl border border-amber-300/40 bg-amber-300/10 px-5 py-4 text-left">
+                    <p className="text-sm font-semibold uppercase tracking-[0.14em] text-amber-200">Installer unavailable</p>
+                    <p className="mt-2 text-sm text-gray-200">{smartDownloadMessage}</p>
+
+                    {fallbackDesktopDownloads.length > 0 && (
+                      <div className="mt-4 grid gap-3 md:grid-cols-2">
+                        {fallbackDesktopDownloads.map((download) => (
+                          <a
+                            key={download.key}
+                            href={download.url}
+                            className="rounded-xl border border-gray-600/70 bg-gray-900/60 px-4 py-3 text-sm font-semibold text-gray-100 transition-colors hover:border-gray-500 hover:bg-gray-800/70"
+                          >
+                            {download.label}
+                          </a>
+                        ))}
                       </div>
-                    </div>
-                    <span className="rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-semibold uppercase tracking-[0.14em] text-white/90">
-                      Coming Soon
-                    </span>
+                    )}
                   </div>
                 )}
               </div>
@@ -391,7 +478,7 @@ export function Downloads() {
             All Platforms
           </motion.h2>
 
-          <div className={`grid gap-8 ${hasDesktopPlatformGrid ? 'grid-cols-4' : hasTabletPlatformGrid ? 'grid-cols-2' : 'grid-cols-1'}`}>
+          <div className={`grid gap-8 ${hasDesktopPlatformGrid ? 'grid-cols-5' : hasTabletPlatformGrid ? 'grid-cols-2' : 'grid-cols-1'}`}>
             {platforms.map((platform, index) => {
               const Icon = platform.icon;
 

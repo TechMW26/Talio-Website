@@ -1,10 +1,6 @@
 {
   "rewrites": [
     {
-      "source": "/api/latest-release",
-      "destination": "https://app.talio.in/api/latest-release"
-    },
-    {
       "source": "/api/(.*)",
       "destination": "/api/$1"
     },

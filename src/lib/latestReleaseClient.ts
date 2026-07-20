@@ -26,15 +26,13 @@ export type LatestReleasePayload = {
     error?: string;
 };
 
-export const LATEST_RELEASE_ENDPOINT = '/api/latest-release';
-export const REMOTE_LATEST_RELEASE_ENDPOINT = 'https://app.talio.in/api/latest-release';
-export const STABLE_LATEST_DOWNLOAD_URL = 'https://app.talio.in/download/latest';
+export const LATEST_RELEASE_ENDPOINT = '/api/downloads/latest';
 export const STABLE_PLATFORM_DOWNLOAD_URLS: Record<LatestDownloadPlatform, string> = {
-    windows: 'https://app.talio.in/download/windows',
-    mac: 'https://app.talio.in/download/mac',
-    'mac-arm64': 'https://app.talio.in/download/mac-arm64',
-    'mac-intel': 'https://app.talio.in/download/mac-intel',
-    linux: 'https://app.talio.in/download/latest',
+    windows: '/api/downloads/file?platform=windows',
+    mac: '/api/downloads/file?platform=mac',
+    'mac-arm64': '/api/downloads/file?platform=mac-arm64',
+    'mac-intel': '/api/downloads/file?platform=mac-intel',
+    linux: '/api/downloads/file?platform=linux',
 };
 
 let latestReleasePromise: Promise<LatestReleasePayload> | null = null;
@@ -61,7 +59,6 @@ export async function getLatestReleasePayload() {
 
     if (!latestReleasePromise) {
         latestReleasePromise = fetchLatestReleaseFrom(LATEST_RELEASE_ENDPOINT)
-            .catch(() => fetchLatestReleaseFrom(REMOTE_LATEST_RELEASE_ENDPOINT))
             .then((payload) => {
                 latestReleasePayload = payload;
                 return payload;

@@ -1,11 +1,11 @@
 import type { IncomingMessage, ServerResponse } from 'node:http'
+import { Readable } from 'node:stream'
 import { defineConfig, loadEnv } from 'vite'
 import path from 'path'
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
 import { handleDemoBookingEmailRequest } from './server/demoBookingEmailService'
-import { getDownloadCacheHeader, getDownloadErrorResponse, getDownloadRedirect, getLatestDownloadsPayload } from './server/downloadReleaseService'
-import { getLatestDownloadUrl, getLatestReleaseErrorResponse, getLatestReleaseMetadata } from './server/latestReleaseApiService'
+import { getDownload, getDownloadCacheHeader, getDownloadErrorResponse, getLatestDownloadsPayload, type DownloadResult } from './server/downloadReleaseService'
 
 function sendJsonResponse(res: ServerResponse, status: number, payload: unknown) {
   res.statusCode = status
@@ -18,6 +18,29 @@ function sendRedirectResponse(res: ServerResponse, location: string) {
   res.setHeader('Cache-Control', 'no-store')
   res.setHeader('Location', location)
   res.end()
+}
+
+function sendDownloadResponse(res: ServerResponse, download: DownloadResult) {
+  res.setHeader('Cache-Control', 'no-store')
+
+  if (download.kind === 'redirect') {
+    sendRedirectResponse(res, download.location)
+    return
+  }
+
+  const contentType = download.response.headers.get('content-type') || download.contentType
+  const contentLength = download.response.headers.get('content-length')
+
+  if (contentType) res.setHeader('Content-Type', contentType)
+  if (contentLength) res.setHeader('Content-Length', contentLength)
+  res.setHeader('Content-Disposition', `attachment; filename*=UTF-8''${encodeURIComponent(download.fileName)}`)
+
+  if (!download.response.body) {
+    sendJsonResponse(res, 502, { error: 'The installer response was empty.' })
+    return
+  }
+
+  Readable.fromWeb(download.response.body as any).pipe(res)
 }
 
 async function readJsonBody(req: IncomingMessage) {
@@ -71,23 +94,13 @@ function demoBookingEmailDevPlugin() {
         }
 
         try {
-          const payload = await getLatestReleaseMetadata()
-          res.setHeader('Cache-Control', 'no-store')
+          const payload = await getLatestDownloadsPayload()
+          res.setHeader('Cache-Control', getDownloadCacheHeader())
           sendJsonResponse(res, 200, payload)
         } catch (error) {
-          const response = getLatestReleaseErrorResponse(error)
-          res.setHeader('Cache-Control', 'no-store')
+          const response = getDownloadErrorResponse(error)
           sendJsonResponse(res, response.status, response.body)
         }
-      })
-
-      server.middlewares.use('/download/latest', async (req, res) => {
-        if (req.method !== 'GET' && req.method !== 'HEAD') {
-          sendJsonResponse(res, 405, { error: 'Method not allowed' })
-          return
-        }
-
-        sendRedirectResponse(res, getLatestDownloadUrl())
       })
 
       server.middlewares.use('/api/downloads/latest', async (req, res) => {
@@ -114,8 +127,8 @@ function demoBookingEmailDevPlugin() {
 
         try {
           const requestUrl = new URL(req.url || '/', 'http://localhost')
-          const redirect = await getDownloadRedirect(requestUrl.searchParams.get('platform'))
-          sendRedirectResponse(res, redirect.location)
+          const download = await getDownload(requestUrl.searchParams.get('platform'))
+          sendDownloadResponse(res, download)
         } catch (error) {
           const response = getDownloadErrorResponse(error)
           sendJsonResponse(res, response.status, response.body)

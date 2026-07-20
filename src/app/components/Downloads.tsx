@@ -7,7 +7,6 @@ import { usePageMeta } from '@/app/hooks/usePageMeta';
 import { useCompensatedMinWidth } from '@/app/hooks/useZoomCompensatedViewport';
 import {
   getLatestReleasePayload,
-  STABLE_LATEST_DOWNLOAD_URL,
   STABLE_PLATFORM_DOWNLOAD_URLS,
   type LatestReleasePayload,
 } from '@/lib/latestReleaseClient';
@@ -97,7 +96,7 @@ export function Downloads() {
     }
 
     if (releaseStatus === 'unavailable') {
-      return false;
+      return true;
     }
 
     const download = getDesktopDownloadAsset(key);
@@ -109,7 +108,7 @@ export function Downloads() {
     }
 
     if (releaseStatus === 'unavailable') {
-      return [fallback, 'Using stable link'].filter(Boolean).join(' • ');
+      return [fallback, 'Downloads temporarily unavailable'].filter(Boolean).join(' • ');
     }
 
     const download = getDesktopDownloadAsset(key);
@@ -126,7 +125,7 @@ export function Downloads() {
     }
 
     if (releaseStatus === 'unavailable') {
-      return `${fallback} • Using stable link`;
+      return `${fallback} • Downloads temporarily unavailable`;
     }
 
     const download = getDesktopDownloadAsset(key);
@@ -195,7 +194,8 @@ export function Downloads() {
       setSmartDownloadMessage(selectedDownload?.unavailableReason || 'Not published in latest release.');
       setFallbackDesktopDownloads(getFallbackDesktopDownloads(payload));
     } catch {
-      window.location.assign(STABLE_LATEST_DOWNLOAD_URL);
+      setSmartDownloadState('unavailable');
+      setSmartDownloadMessage('Downloads are temporarily unavailable. Please try again in a moment.');
     }
   };
 

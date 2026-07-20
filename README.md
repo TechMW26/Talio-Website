@@ -11,16 +11,19 @@
 
   ## Download releases
 
-  Desktop release metadata is resolved through `/api/downloads/latest`, which reads the configured GitHub release and returns availability entries for Windows, macOS Apple Silicon, macOS Intel, and Linux.
-
-  If GitHub release asset listing is unavailable, the endpoint falls back to `/api/latest-release` and marks platforms that are missing from that fallback as unavailable instead of mapping them to the wrong installer.
+  Desktop release metadata is resolved through `/api/downloads/latest`. The server reads the configured private GitHub release and returns availability entries for Windows, macOS Apple Silicon, macOS Intel, and Linux. The GitHub token is only used by the server and is never sent to the browser.
 
   Desktop installer links use `/api/downloads/file?platform=<platform>`, where `<platform>` is one of `windows`, `mac`, `mac-arm64`, `mac-intel`, or `linux`.
 
+  Required production environment variables (configure these in Vercel, not in client-side `VITE_*` variables):
+
+  - `GITHUB_RELEASE_TOKEN`: a fine-grained GitHub token with access to the release repository and read-only **Contents** permission. A classic token can use the `repo` scope instead.
+  - `TALIO_RELEASE_REPO`: the repository in `owner/repository` format or as a GitHub URL.
+
   Optional environment variables:
 
-  - `TALIO_RELEASE_REPO` or `GITHUB_RELEASE_REPO`: override the GitHub release repository. Defaults to `https://github.com/avirajsharma-ops/Talio.git`.
+  - `GITHUB_RELEASE_REPO`: alias for `TALIO_RELEASE_REPO`. If neither is set, the repository defaults to `https://github.com/avirajsharma-ops/Talio.git`.
   - `TALIO_RELEASE_TAG` or `GITHUB_RELEASE_TAG`: use a specific release tag instead of the latest release.
-  - `GITHUB_RELEASE_TOKEN` or `GITHUB_TOKEN`: provide read access for private GitHub release assets.
+  - `GITHUB_TOKEN`: alias for `GITHUB_RELEASE_TOKEN`.
 
-  
+  After adding or changing environment variables in Vercel, redeploy the project. Do not commit the token to this repository and do not prefix it with `VITE_`.

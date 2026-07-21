@@ -1,4 +1,4 @@
-import { getDownload, getDownloadErrorResponse } from '../../server/downloadReleaseService';
+import { getDownload, getDownloadErrorResponse } from '../../server/downloadReleaseService.js';
 
 function jsonResponse(body: unknown, status: number, headers?: HeadersInit) {
     return Response.json(body, { status, headers });

@@ -35,7 +35,6 @@ export type DownloadResult = {
   | { kind: 'proxy'; response: Response }
 );
 
-const DEFAULT_RELEASE_REPO = 'https://github.com/avirajsharma-ops/Talio.git';
 const GITHUB_API_VERSION = '2026-03-10';
 const CACHE_HEADER = 's-maxage=120, stale-while-revalidate=300';
 
@@ -93,18 +92,21 @@ function normalizeReleaseRepository(repositoryValue: string) {
 function getReleaseRepository() {
   const configuredRepository = process.env.TALIO_RELEASE_REPO
     || process.env.GITHUB_RELEASE_REPO
-    || DEFAULT_RELEASE_REPO;
+    || '';
   const repository = normalizeReleaseRepository(configuredRepository);
 
   if (!repository) {
-    throw new DownloadReleaseError(500, 'Release repository is not configured correctly.');
+    throw new DownloadReleaseError(
+      500,
+      'TALIO_RELEASE_REPO is missing or invalid in the production environment.',
+    );
   }
 
   return repository;
 }
 
 function getGithubToken() {
-  return process.env.GITHUB_RELEASE_TOKEN || process.env.GITHUB_TOKEN || '';
+  return (process.env.GITHUB_RELEASE_TOKEN || process.env.GITHUB_TOKEN || '').trim();
 }
 
 function getGithubHeaders(accept = 'application/vnd.github+json') {
@@ -247,6 +249,15 @@ function toDownloadAssetPayload(platform: DownloadPlatform, asset?: GithubReleas
 
 async function fetchLatestRelease(): Promise<GithubRelease> {
   const repository = getReleaseRepository();
+  const token = getGithubToken();
+
+  if (!token) {
+    throw new DownloadReleaseError(
+      500,
+      'GITHUB_RELEASE_TOKEN is missing in the production environment.',
+    );
+  }
+
   const releaseTag = process.env.TALIO_RELEASE_TAG || process.env.GITHUB_RELEASE_TAG;
   const releasePath = releaseTag ? `releases/tags/${encodeURIComponent(releaseTag)}` : 'releases/latest';
   let response: Response;
@@ -262,10 +273,6 @@ async function fetchLatestRelease(): Promise<GithubRelease> {
   if (!response.ok) {
     if (response.status === 401 || response.status === 403) {
       throw new DownloadReleaseError(502, 'The GitHub release token is invalid or does not have access to this repository.');
-    }
-
-    if (response.status === 404 && !getGithubToken()) {
-      throw new DownloadReleaseError(502, 'The release repository is private. Configure GITHUB_RELEASE_TOKEN on the server.');
     }
 
     if (response.status === 404) {

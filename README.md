@@ -22,7 +22,7 @@
 
   Optional environment variables:
 
-  - `GITHUB_RELEASE_REPO`: alias for `TALIO_RELEASE_REPO`. If neither is set, the repository defaults to `https://github.com/avirajsharma-ops/Talio.git`.
+  - `GITHUB_RELEASE_REPO`: alias for `TALIO_RELEASE_REPO`.
   - `TALIO_RELEASE_TAG` or `GITHUB_RELEASE_TAG`: use a specific release tag instead of the latest release.
   - `GITHUB_TOKEN`: alias for `GITHUB_RELEASE_TOKEN`.
 

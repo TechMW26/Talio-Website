@@ -35,6 +35,7 @@ export type DownloadResult = {
   | { kind: 'proxy'; response: Response }
 );
 
+const DEFAULT_RELEASE_REPOSITORY = 'TechMW26/Talio';
 const GITHUB_API_VERSION = '2026-03-10';
 const CACHE_HEADER = 's-maxage=120, stale-while-revalidate=300';
 
@@ -92,13 +93,13 @@ function normalizeReleaseRepository(repositoryValue: string) {
 function getReleaseRepository() {
   const configuredRepository = process.env.TALIO_RELEASE_REPO
     || process.env.GITHUB_RELEASE_REPO
-    || '';
+    || DEFAULT_RELEASE_REPOSITORY;
   const repository = normalizeReleaseRepository(configuredRepository);
 
   if (!repository) {
     throw new DownloadReleaseError(
       500,
-      'TALIO_RELEASE_REPO is missing or invalid in the production environment.',
+      'The GitHub release repository is invalid.',
     );
   }
 
@@ -164,9 +165,11 @@ function scoreAsset(asset: GithubReleaseAsset, platform: DownloadPlatform) {
   }
 
   if (platform === 'windows') {
-    if (traits.isMac || traits.isLinux || traits.hasArm) return Number.NEGATIVE_INFINITY;
+    if (!traits.isWindows || traits.isMac || traits.isLinux || traits.hasArm) {
+      return Number.NEGATIVE_INFINITY;
+    }
 
-    let score = traits.isWindows ? 100 : 0;
+    let score = 100;
     if (/\.exe$/i.test(traits.name)) score += 30;
     if (/\.msi$/i.test(traits.name)) score += 25;
     if (traits.hasIntel) score += 10;
@@ -174,9 +177,11 @@ function scoreAsset(asset: GithubReleaseAsset, platform: DownloadPlatform) {
   }
 
   if (platform === 'linux') {
-    if (traits.isWindows || traits.isMac) return Number.NEGATIVE_INFINITY;
+    if (!traits.isLinux || traits.isWindows || traits.isMac) {
+      return Number.NEGATIVE_INFINITY;
+    }
 
-    let score = traits.isLinux ? 100 : 0;
+    let score = 100;
     if (/\.appimage$/i.test(traits.name)) score += 35;
     if (/\.deb$/i.test(traits.name)) score += 30;
     if (/\.rpm$/i.test(traits.name)) score += 25;
@@ -185,7 +190,7 @@ function scoreAsset(asset: GithubReleaseAsset, platform: DownloadPlatform) {
     return score;
   }
 
-  if (traits.isWindows || traits.isLinux) return Number.NEGATIVE_INFINITY;
+  if (!traits.isMac || traits.isWindows || traits.isLinux) return Number.NEGATIVE_INFINITY;
   if (platform === 'mac-arm64' && traits.hasIntel) return Number.NEGATIVE_INFINITY;
   if (platform === 'mac-intel' && traits.hasArm) return Number.NEGATIVE_INFINITY;
 
@@ -249,14 +254,6 @@ function toDownloadAssetPayload(platform: DownloadPlatform, asset?: GithubReleas
 
 async function fetchLatestRelease(): Promise<GithubRelease> {
   const repository = getReleaseRepository();
-  const token = getGithubToken();
-
-  if (!token) {
-    throw new DownloadReleaseError(
-      500,
-      'GITHUB_RELEASE_TOKEN is missing in the production environment.',
-    );
-  }
 
   const releaseTag = process.env.TALIO_RELEASE_TAG || process.env.GITHUB_RELEASE_TAG;
   const releasePath = releaseTag ? `releases/tags/${encodeURIComponent(releaseTag)}` : 'releases/latest';

@@ -1,5 +1,3 @@
-export const DOWNLOAD_ORIGIN = 'https://app.talio.in';
-
 export function detectPlatform(navigator) {
   const ua = navigator.userAgent.toLowerCase();
   if (/android/.test(ua)) return 'android';
@@ -23,7 +21,7 @@ export function releaseDownload(release, key, name, arch) {
     name,
     arch: [arch, asset?.sizeLabel].filter(Boolean).join(' • '),
     // Stable routes resolve the latest release when clicked, even on an old tab.
-    url: `${DOWNLOAD_ORIGIN}/download/${key}`,
+    url: `/api/downloads/file?platform=${encodeURIComponent(key)}`,
     isAvailable: asset?.isAvailable === true,
   };
 }

@@ -12,7 +12,7 @@ for (const [userAgent, maxTouchPoints, expected] of [
 
 test('missing assets stay unavailable without invented sizes', () => {
   assert.deepEqual(releaseDownload(null, 'mac-intel', 'Intel', 'x64'), {
-    name: 'Intel', arch: 'x64', url: 'https://app.talio.in/download/mac-intel', isAvailable: false,
+    name: 'Intel', arch: 'x64', url: '/api/downloads/file?platform=mac-intel', isAvailable: false,
   });
 });
 test('new releases update metadata while download routes remain stable', () => {
@@ -20,7 +20,7 @@ test('new releases update metadata while download routes remain stable', () => {
     const release = parseRelease({tagName, downloads: { windows: {isAvailable: true, sizeLabel: '83 MB', downloadUrl: 'https://untrusted.example'} }});
     const download = releaseDownload(release, 'windows', 'Windows', 'x64');
     assert.equal(release.tagName, tagName);
-    assert.equal(download.url, 'https://app.talio.in/download/windows');
+    assert.equal(download.url, '/api/downloads/file?platform=windows');
     assert.equal(download.arch, 'x64 • 83 MB');
     assert.equal(download.isAvailable, true);
   }

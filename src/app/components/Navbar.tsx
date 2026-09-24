@@ -8,6 +8,7 @@ import logoImage from '@/assets/2090cd551224404a5a02329a4590597a32d19a1f.png';
 import { BookDemoPopup } from './BookDemoPopup';
 import { useIsMobileViewport } from '@/app/hooks/useIsMobileViewport';
 import { useCompensatedMinWidth } from '@/app/hooks/useZoomCompensatedViewport';
+import { prefetchLatestReleasePayload } from '@/lib/latestReleaseClient';
 
 type NavItem = {
   name: string;
@@ -123,6 +124,11 @@ const FEATURE_GROUPS: FeatureGroup[] = [
 
 const FEATURE_COUNT = FEATURE_GROUPS.reduce((count, group) => count + group.items.length, 0);
 
+function prefetchDownloadsExperience() {
+  void import('@/app/components/Downloads');
+  prefetchLatestReleasePayload();
+}
+
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -151,7 +157,7 @@ export function Navbar() {
 
   const handleNavigation = (href: string) => {
     closeMobilePanels();
-    
+
     if (href.startsWith('#')) {
       // It's a section scroll
       if (location.pathname !== '/') {
@@ -241,11 +247,10 @@ export function Navbar() {
       {shouldUseMobileNav ? (
         <>
           <motion.div
-            className={`relative z-[60] w-full transition-all duration-500 ${
-              mobileHeaderElevated
+            className={`relative z-[60] w-full transition-all duration-500 ${mobileHeaderElevated
                 ? 'border-b border-white/10 bg-black/70 backdrop-blur-2xl shadow-[0_1.125rem_2.75rem_-2.125rem_rgba(0,0,0,0.92)]'
                 : 'border-b border-white/[0.04] bg-gradient-to-b from-black/45 via-black/20 to-transparent backdrop-blur-xl'
-            }`}
+              }`}
           >
             <div className="flex items-center justify-between px-4 py-3.5">
               <motion.div
@@ -268,11 +273,10 @@ export function Navbar() {
               <motion.button
                 whileTap={{ scale: 0.9 }}
                 onClick={toggleMobileMenu}
-                className={`flex h-11 w-11 items-center justify-center rounded-full border text-white transition-all duration-300 ${
-                  isAnyMobilePanelOpen
+                className={`flex h-11 w-11 items-center justify-center rounded-full border text-white transition-all duration-300 ${isAnyMobilePanelOpen
                     ? 'border-white/18 bg-white/[0.08]'
                     : 'border-white/10 bg-white/[0.04] hover:bg-white/[0.08]'
-                }`}
+                  }`}
                 aria-label={isAnyMobilePanelOpen ? 'Close menu' : 'Open menu'}
               >
                 <AnimatePresence mode="wait">
@@ -360,13 +364,14 @@ export function Navbar() {
                                 to={item.href}
                                 reloadDocument={Boolean(item.reloadDocument)}
                                 onClick={closeMobilePanels}
+                                onPointerEnter={item.href === '/downloads' ? prefetchDownloadsExperience : undefined}
+                                onFocus={item.href === '/downloads' ? prefetchDownloadsExperience : undefined}
                                 className="group flex items-center gap-3 rounded-2xl px-3 py-3 transition-colors duration-200 hover:bg-white/[0.06]"
                               >
-                                <div className={`flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl text-white ${
-                                  item.gradient
+                                <div className={`flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl text-white ${item.gradient
                                     ? 'bg-gradient-to-br from-purple-500/20 via-fuchsia-500/10 to-blue-500/12'
                                     : 'bg-white/[0.06]'
-                                }`}>
+                                  }`}>
                                   <Icon className="h-[1.125rem] w-[1.125rem]" />
                                 </div>
                                 <span className={`text-[0.9375rem] font-medium ${item.gradient ? 'bg-gradient-to-r from-purple-300 via-pink-300 to-blue-300 bg-clip-text text-transparent' : 'text-white'}`}>
@@ -494,15 +499,13 @@ export function Navbar() {
           </AnimatePresence>
         </>
       ) : (
-        <div className={`mx-auto max-w-[88rem] px-6 transition-all duration-500 md:px-8 lg:px-12 ${
-          isScrolled ? 'pt-3 md:pt-4' : 'pt-4 md:pt-6'
-        }`}>
+        <div className={`mx-auto max-w-[88rem] px-6 transition-all duration-500 md:px-8 lg:px-12 ${isScrolled ? 'pt-3 md:pt-4' : 'pt-4 md:pt-6'
+          }`}>
           <motion.div
-            className={`relative rounded-full transition-all duration-500 ${
-              isScrolled
+            className={`relative rounded-full transition-all duration-500 ${isScrolled
                 ? 'bg-black/80 backdrop-blur-2xl shadow-lg shadow-black/5 border border-gray-800/50'
                 : 'bg-transparent'
-            }`}
+              }`}
           >
             <div className="px-8 py-4 flex items-center justify-between">
               <motion.div
@@ -614,16 +617,21 @@ export function Navbar() {
                   }
 
                   return (
-                    <Link key={item.name} to={item.href} reloadDocument={Boolean(item.reloadDocument)}>
+                    <Link
+                      key={item.name}
+                      to={item.href}
+                      reloadDocument={Boolean(item.reloadDocument)}
+                      onPointerEnter={item.href === '/downloads' ? prefetchDownloadsExperience : undefined}
+                      onFocus={item.href === '/downloads' ? prefetchDownloadsExperience : undefined}
+                    >
                       <motion.div
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5, delay: 0.1 + index * 0.05 }}
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
-                        className={`px-6 py-2.5 text-base transition-colors duration-300 rounded-full hover:bg-gray-800 relative group cursor-pointer ${
-                          item.gradient ? '' : 'text-gray-300 hover:text-white'
-                        }`}
+                        className={`px-6 py-2.5 text-base transition-colors duration-300 rounded-full hover:bg-gray-800 relative group cursor-pointer ${item.gradient ? '' : 'text-gray-300 hover:text-white'
+                          }`}
                       >
                         {item.gradient ? (
                           <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent font-semibold">
@@ -633,9 +641,8 @@ export function Navbar() {
                           item.name
                         )}
                         <motion.div
-                          className={`absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 rounded-full group-hover:w-1/2 transition-all duration-300 ${
-                            item.gradient ? 'bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400' : 'bg-white'
-                          }`}
+                          className={`absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 rounded-full group-hover:w-1/2 transition-all duration-300 ${item.gradient ? 'bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400' : 'bg-white'
+                            }`}
                         />
                       </motion.div>
                     </Link>
@@ -701,11 +708,11 @@ function MagneticButton({ children }: { children: React.ReactNode }) {
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!buttonRef.current) return;
-    
+
     const rect = buttonRef.current.getBoundingClientRect();
     const x = e.clientX - rect.left - rect.width / 2;
     const y = e.clientY - rect.top - rect.height / 2;
-    
+
     setPosition({ x: x * 0.3, y: y * 0.3 });
   };
 
@@ -732,15 +739,15 @@ function MagneticButton({ children }: { children: React.ReactNode }) {
 
 // Accent color config for FeatureItem
 const ACCENT_COLORS: Record<string, { icon: string; bg: string; glow: string; ring: string }> = {
-  purple:  { icon: 'text-purple-400',  bg: 'bg-purple-500/10',  glow: 'shadow-purple-500/20',  ring: 'ring-purple-500/20' },
-  blue:    { icon: 'text-blue-400',    bg: 'bg-blue-500/10',    glow: 'shadow-blue-500/20',    ring: 'ring-blue-500/20' },
+  purple: { icon: 'text-purple-400', bg: 'bg-purple-500/10', glow: 'shadow-purple-500/20', ring: 'ring-purple-500/20' },
+  blue: { icon: 'text-blue-400', bg: 'bg-blue-500/10', glow: 'shadow-blue-500/20', ring: 'ring-blue-500/20' },
   emerald: { icon: 'text-emerald-400', bg: 'bg-emerald-500/10', glow: 'shadow-emerald-500/20', ring: 'ring-emerald-500/20' },
-  indigo:  { icon: 'text-indigo-400',  bg: 'bg-indigo-500/10',  glow: 'shadow-indigo-500/20',  ring: 'ring-indigo-500/20' },
-  cyan:    { icon: 'text-cyan-400',    bg: 'bg-cyan-500/10',    glow: 'shadow-cyan-500/20',    ring: 'ring-cyan-500/20' },
-  amber:   { icon: 'text-amber-400',   bg: 'bg-amber-500/10',   glow: 'shadow-amber-500/20',   ring: 'ring-amber-500/20' },
-  violet:  { icon: 'text-violet-400',  bg: 'bg-violet-500/10',  glow: 'shadow-violet-500/20',  ring: 'ring-violet-500/20' },
-  pink:    { icon: 'text-pink-400',    bg: 'bg-pink-500/10',    glow: 'shadow-pink-500/20',    ring: 'ring-pink-500/20' },
-  orange:  { icon: 'text-orange-400',  bg: 'bg-orange-500/10',  glow: 'shadow-orange-500/20',  ring: 'ring-orange-500/20' },
+  indigo: { icon: 'text-indigo-400', bg: 'bg-indigo-500/10', glow: 'shadow-indigo-500/20', ring: 'ring-indigo-500/20' },
+  cyan: { icon: 'text-cyan-400', bg: 'bg-cyan-500/10', glow: 'shadow-cyan-500/20', ring: 'ring-cyan-500/20' },
+  amber: { icon: 'text-amber-400', bg: 'bg-amber-500/10', glow: 'shadow-amber-500/20', ring: 'ring-amber-500/20' },
+  violet: { icon: 'text-violet-400', bg: 'bg-violet-500/10', glow: 'shadow-violet-500/20', ring: 'ring-violet-500/20' },
+  pink: { icon: 'text-pink-400', bg: 'bg-pink-500/10', glow: 'shadow-pink-500/20', ring: 'ring-pink-500/20' },
+  orange: { icon: 'text-orange-400', bg: 'bg-orange-500/10', glow: 'shadow-orange-500/20', ring: 'ring-orange-500/20' },
 };
 
 // FeatureItem Component

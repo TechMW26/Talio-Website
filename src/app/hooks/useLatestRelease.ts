@@ -18,7 +18,7 @@ export function useLatestRelease() {
       controller = request;
       const timeout = window.setTimeout(() => request.abort(), 15000);
       try {
-        const response = await fetch('/api/latest-release', { cache: 'no-store', signal: request.signal });
+        const response = await fetch('/api/downloads/latest', { cache: 'no-store', signal: request.signal });
         if (!response.ok) throw new Error('Release lookup failed');
         const next = parseRelease(await response.json());
         if (active && controller === request) { setRelease(next); setStatus('ready'); }

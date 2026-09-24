@@ -2,53 +2,45 @@ import { motion, useInView } from 'motion/react';
 import { useRef, useState, useEffect } from 'react';
 import { Download, Star, CheckCircle2 } from 'lucide-react';
 import { IoLogoMicrosoft } from 'react-icons/io5';
-import { SiAndroid, SiApple } from 'react-icons/si';
+import { SiAndroid, SiApple, SiLinux } from 'react-icons/si';
 import { usePageMeta } from '@/app/hooks/usePageMeta';
 import { useCompensatedMinWidth } from '@/app/hooks/useZoomCompensatedViewport';
 
+import { useLatestRelease } from '@/app/hooks/useLatestRelease';
+import { detectPlatform, releaseDownload } from '@/app/lib/downloads';
+
 export function Downloads() {
-  usePageMeta('Downloads', 'Download Talio for macOS, Windows, iOS, and Android. Get productivity visibility, coordination, and connected HR workflows on every device.');
-  const hasDesktopPlatformGrid = useCompensatedMinWidth(1280);
-  const hasTabletPlatformGrid = useCompensatedMinWidth(768);
+  usePageMeta('Downloads', 'Download Talio for macOS, Windows, Linux, iOS, and Android. Get productivity visibility, coordination, and connected HR workflows on every device.');
+  const { release, status, retry } = useLatestRelease();
+  const version = release?.tagName ?? (status === 'loading' ? 'Checking version…' : 'Version unavailable');
   const hasDesktopRequirementsGrid = useCompensatedMinWidth(1120);
   const hasTabletRequirementsGrid = useCompensatedMinWidth(768);
 
   const heroRef = useRef(null);
-  const platformsRef = useRef(null);
+  const platformsRef = useRef<HTMLElement | null>(null);
   const requirementsRef = useRef(null);
   
   const heroInView = useInView(heroRef, { once: true, margin: '-10%' });
   const platformsInView = useInView(platformsRef, { once: true, margin: '-10%' });
   const requirementsInView = useInView(requirementsRef, { once: true, margin: '-10%' });
 
-  const [detectedPlatform, setDetectedPlatform] = useState<'windows' | 'mac' | 'ios' | 'android'>('windows');
+  const [detectedPlatform, setDetectedPlatform] = useState<string | null>(null);
 
-  useEffect(() => {
-    const userAgent = window.navigator.userAgent.toLowerCase();
-    if (userAgent.includes('android')) {
-      setDetectedPlatform('android');
-    } else if (userAgent.includes('iphone') || userAgent.includes('ipad')) {
-      setDetectedPlatform('ios');
-    } else if (userAgent.includes('mac')) {
-      setDetectedPlatform('mac');
-    } else if (userAgent.includes('win')) {
-      setDetectedPlatform('windows');
-    }
-  }, []);
+  useEffect(() => { setDetectedPlatform(detectPlatform(window.navigator)); }, []);
 
   const platforms = [
     {
       id: 'mac',
       name: 'macOS',
       icon: SiApple,
-      version: 'v3.2.0',
+      version,
       recommendedLabel: 'Download for macOS',
-      recommendedMeta: 'Apple Silicon • v3.2.0',
+      recommendedMeta: version,
       recommendedUrl: 'https://app.talio.in/download/mac',
       isAvailable: true,
       downloads: [
-        { name: 'Apple Silicon (M-series)', arch: 'arm64', url: 'https://app.talio.in/download/mac-arm64' },
-        { name: 'Intel (x64)', arch: 'x64', url: 'https://app.talio.in/download/mac-intel' }
+        releaseDownload(release, 'mac-arm64', 'Apple Silicon (M-series)', 'arm64'),
+        releaseDownload(release, 'mac-intel', 'Intel (x64)', 'x64')
       ],
       gradient: 'from-gray-500 to-gray-700',
       bgGradient: 'from-gray-50 to-gray-100'
@@ -57,16 +49,24 @@ export function Downloads() {
       id: 'windows',
       name: 'Windows',
       icon: IoLogoMicrosoft,
-      version: 'v3.2.0',
+      version,
       recommendedLabel: 'Download for Windows',
-      recommendedMeta: 'Windows 10/11 • v3.2.0',
+      recommendedMeta: version,
       recommendedUrl: 'https://app.talio.in/download/windows',
       isAvailable: true,
       downloads: [
-        { name: 'Windows 10/11 (64-bit)', arch: 'x64', url: 'https://app.talio.in/download/windows' }
+        releaseDownload(release, 'windows', 'Windows 10/11 (64-bit)', 'x64')
       ],
       gradient: 'from-blue-500 to-blue-700',
       bgGradient: 'from-blue-50 to-blue-100'
+    },
+    {
+      id: 'linux',
+      name: 'Linux', icon: SiLinux, version,
+      recommendedLabel: 'Download for Linux', recommendedMeta: version,
+      recommendedUrl: 'https://app.talio.in/download/linux', isAvailable: true,
+      downloads: [releaseDownload(release, 'linux', 'Linux desktop installer', '')],
+      gradient: 'from-orange-500 to-red-600',
     },
     {
       id: 'ios',
@@ -78,7 +78,7 @@ export function Downloads() {
       recommendedUrl: 'https://apps.apple.com/in/app/talio-productivity/id6758448703',
       isAvailable: true,
       downloads: [
-        { name: 'Talio Productivity', arch: 'App Store', url: 'https://apps.apple.com/in/app/talio-productivity/id6758448703' }
+        { name: 'Talio Productivity', isAvailable: true, arch: 'App Store', url: 'https://apps.apple.com/in/app/talio-productivity/id6758448703' }
       ],
       gradient: 'from-purple-500 to-purple-700',
       bgGradient: 'from-purple-50 to-purple-100'
@@ -93,14 +93,17 @@ export function Downloads() {
       recommendedUrl: 'https://play.google.com/store/apps/details?id=sbs.zenova.twa&hl=en_IN',
       isAvailable: true,
       downloads: [
-        { name: 'Talio Productivity', arch: 'Google Play', url: 'https://play.google.com/store/apps/details?id=sbs.zenova.twa&hl=en_IN' }
+        { name: 'Talio Productivity', isAvailable: true, arch: 'Google Play', url: 'https://play.google.com/store/apps/details?id=sbs.zenova.twa&hl=en_IN' }
       ],
       gradient: 'from-emerald-500 to-green-700',
       bgGradient: 'from-emerald-50 to-green-100'
     }
   ];
 
-  const recommendedPlatform = platforms.find((platform) => platform.id === detectedPlatform) ?? platforms[1];
+  // macOS browsers cannot reliably distinguish Intel from Apple Silicon.
+  const recommendedPlatform = platforms.find((platform) => platform.id === detectedPlatform);
+  const recommendation = recommendedPlatform?.downloads.find(download => download.isAvailable);
+  const releaseMessage = status === 'loading' ? 'Checking latest release…' : status === 'error' ? 'Unable to check the latest release.' : 'Not published in the latest release.';
 
   const requirements = {
     macOS: {
@@ -163,7 +166,7 @@ export function Downloads() {
             className="mb-10"
           >
             <span className="inline-flex items-center gap-2 text-xs md:text-sm font-semibold text-purple-400 uppercase tracking-widest">
-              <Download className="w-4 h-4" />
+              <Download className="w-4 h-4 shrink-0" />
               ✦ DOWNLOADS
             </span>
           </motion.div>
@@ -211,37 +214,29 @@ export function Downloads() {
                   </span>
                 </div>
 
-                {recommendedPlatform.isAvailable ? (
-                  <motion.a
-                    href={recommendedPlatform.recommendedUrl}
-                    target={recommendedPlatform.id === 'ios' || recommendedPlatform.id === 'android' ? '_blank' : undefined}
-                    rel={recommendedPlatform.id === 'ios' || recommendedPlatform.id === 'android' ? 'noopener noreferrer' : undefined}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white px-8 py-6 rounded-2xl text-lg font-semibold shadow-xl shadow-purple-500/30 transition-all duration-300 flex items-center justify-between group"
-                  >
-                    <div className="flex items-center gap-4">
-                      <recommendedPlatform.icon className="w-6 h-6 shrink-0" />
-                      <div className="text-left">
-                        <div className="font-bold">{recommendedPlatform.recommendedLabel}</div>
-                        <div className="text-sm text-white/80 font-normal">{recommendedPlatform.recommendedMeta}</div>
-                      </div>
-                    </div>
-                    <Download className="w-6 h-6 group-hover:translate-y-1 transition-transform" />
-                  </motion.a>
-                ) : (
-                  <div className="w-full bg-gradient-to-r from-emerald-600 to-green-600 text-white px-8 py-6 rounded-2xl text-lg font-semibold shadow-xl shadow-emerald-500/20 transition-all duration-300 flex items-center justify-between gap-6">
-                    <div className="flex items-center gap-4">
-                      <recommendedPlatform.icon className="w-6 h-6 shrink-0" />
-                      <div className="text-left">
-                        <div className="font-bold">{recommendedPlatform.recommendedLabel}</div>
-                        <div className="text-sm text-white/80 font-normal">{recommendedPlatform.recommendedMeta}</div>
-                      </div>
-                    </div>
-                    <span className="rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-semibold uppercase tracking-[0.14em] text-white/90">
-                      Coming Soon
-                    </span>
+                {recommendation && detectedPlatform !== 'mac' ? (
+                  <a href={recommendation.url} className="flex items-center justify-between gap-4 rounded-2xl bg-purple-600 px-6 py-5 text-white">
+                    <span><strong className="block">{recommendedPlatform?.recommendedLabel}</strong><span className="text-sm">{recommendedPlatform?.recommendedMeta}</span></span>
+                    <Download className="h-6 w-6 shrink-0" />
+                  </a>
+                ) : detectedPlatform === 'mac' && recommendation ? (
+                  <div className="space-y-3">
+                    {recommendedPlatform?.downloads.filter(download => download.isAvailable).map(download => (
+                      <a key={download.url} href={download.url} className="flex items-center justify-between gap-4 rounded-2xl bg-purple-600 px-6 py-4 text-white">
+                        <span className="text-left"><strong className="block">{download.name}</strong><span className="text-sm">{version} • {download.arch}</span></span>
+                        <Download className="h-5 w-5 shrink-0" />
+                      </a>
+                    ))}
                   </div>
+                ) : (
+                  <a onClick={event => { event.preventDefault(); platformsRef.current?.scrollIntoView({ behavior: 'instant', block: 'start' }); }} href="#platforms" className="block rounded-2xl bg-purple-600 px-6 py-5 font-semibold text-white">
+                    {detectedPlatform === 'mac' ? 'Choose your Mac: Apple Silicon or Intel' : 'Choose your platform below'}
+                  </a>
+                )}
+                {status !== 'ready' && (
+                  <p role="status" className="mt-4 text-sm text-gray-300">
+                    {releaseMessage} {status === 'error' && <button onClick={retry} className="underline">Retry</button>}
+                  </p>
                 )}
               </div>
             </div>
@@ -251,6 +246,7 @@ export function Downloads() {
 
       {/* All Platforms Section */}
       <section 
+        id="platforms"
         ref={platformsRef} 
         className="py-20 md:py-32 relative overflow-hidden"
         style={{ position: 'relative' }}
@@ -265,7 +261,7 @@ export function Downloads() {
             All Platforms
           </motion.h2>
 
-          <div className={`grid gap-8 ${hasDesktopPlatformGrid ? 'grid-cols-4' : hasTabletPlatformGrid ? 'grid-cols-2' : 'grid-cols-1'}`}>
+          <div className="grid gap-6" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))' }}>
             {platforms.map((platform, index) => {
               const Icon = platform.icon;
 
@@ -276,12 +272,12 @@ export function Downloads() {
                   animate={platformsInView ? { opacity: 1, y: 0 } : {}}
                   transition={{ duration: 0.6, delay: index * 0.1 }}
                   whileHover={{ y: -8 }}
-                  className="relative"
+                  className="relative min-w-0"
                 >
-                  <div className="bg-gray-900/60 rounded-3xl p-8 border border-gray-800/60 hover:border-gray-700/80 hover:bg-gray-900/80 transition-all duration-500 h-full flex flex-col">
+                  <div className="bg-gray-900/60 rounded-3xl p-6 border border-gray-800/60 hover:border-gray-700/80 hover:bg-gray-900/80 transition-all duration-500 h-full flex flex-col">
                     {/* Platform Icon & Name */}
                     <div className="flex items-center gap-4 mb-6">
-                      <div className={`w-16 h-16 bg-gradient-to-br ${platform.gradient} rounded-2xl flex items-center justify-center shadow-lg`}>
+                      <div className={`w-14 h-14 shrink-0 bg-gradient-to-br ${platform.gradient} rounded-2xl flex items-center justify-center shadow-lg`}>
                         <Icon className="w-8 h-8 text-white" />
                       </div>
                       <div>
@@ -291,50 +287,36 @@ export function Downloads() {
                     </div>
 
                     {/* Download Options */}
-                    {platform.isAvailable ? (
-                      <div className="space-y-3 flex-grow">
-                        {platform.downloads.map((download, idx) => (
-                          <motion.a
-                            key={idx}
-                            href={download.url}
-                            target={platform.id === 'ios' || platform.id === 'android' ? '_blank' : undefined}
-                            rel={platform.id === 'ios' || platform.id === 'android' ? 'noopener noreferrer' : undefined}
-                            whileHover={{ scale: 1.02, x: 4 }}
-                            whileTap={{ scale: 0.98 }}
-                            className="w-full px-6 py-4 rounded-xl text-left transition-all duration-300 flex items-center justify-between bg-gray-800/50 hover:bg-gray-800 text-white border border-gray-700/50 hover:border-gray-600 shadow-sm"
-                          >
-                            <div>
-                              <div className="font-semibold text-sm text-gray-200">{download.name}</div>
-                              {download.arch && <div className="text-xs text-gray-500 mt-1">{download.arch}</div>}
-                            </div>
-                            <Download className="w-5 h-5" />
-                          </motion.a>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="flex flex-grow flex-col justify-center rounded-2xl border border-emerald-500/20 bg-emerald-500/10 p-5">
-                        <div className="flex items-start gap-3">
-                          <Icon className="mt-0.5 w-5 h-5 shrink-0 text-emerald-400" />
-                          <div>
-                            <div className="text-sm font-semibold uppercase tracking-[0.14em] text-emerald-300">Coming Soon</div>
-                            <div className="mt-2 text-sm leading-relaxed text-gray-300">
-                              Native Android support is in development and will launch on Google Play soon.
-                            </div>
+                    <div className="space-y-3 flex-grow">
+                      {platform.downloads.map((download, idx) => download.isAvailable ? (
+                        <a key={idx} href={download.url}
+                          target={platform.id === 'ios' || platform.id === 'android' ? '_blank' : undefined}
+                          rel={platform.id === 'ios' || platform.id === 'android' ? 'noopener noreferrer' : undefined}
+                          className="w-full px-4 py-4 rounded-xl flex items-center justify-between gap-4 bg-gray-800/50 hover:bg-gray-800 text-white border border-gray-700/50">
+                          <div className="min-w-0">
+                            <div className="font-semibold text-sm text-gray-200">{download.name}</div>
+                            <div className="text-xs text-gray-400 mt-1">{download.arch}</div>
                           </div>
+                          <Download className="w-5 h-5 shrink-0" />
+                        </a>
+                      ) : (
+                        <div key={idx} className="rounded-xl border border-gray-800 px-4 py-4 text-sm text-gray-400">
+                          <div className="font-semibold text-gray-300">{download.name}</div>
+                          <p className="mt-1">{releaseMessage}</p>
                         </div>
-                      </div>
-                    )}
+                      ))}
+                    </div>
 
                     {platform.id === 'ios' && (
                       <div className="mt-4 flex items-center gap-2 text-purple-600">
-                        <SiApple className="w-4 h-4" />
+                        <SiApple className="w-4 h-4 shrink-0" />
                         <span className="text-sm font-semibold">Available on App Store</span>
                       </div>
                     )}
 
                     {platform.id === 'android' && (
                       <div className="mt-4 flex items-center gap-2 text-emerald-400">
-                        <SiAndroid className="w-4 h-4" />
+                        <SiAndroid className="w-4 h-4 shrink-0" />
                         <span className="text-sm font-semibold">Available on Google Play</span>
                       </div>
                     )}

@@ -70,6 +70,9 @@ export default defineConfig(({ mode }) => {
       tailwindcss(),
       demoBookingEmailDevPlugin(),
     ],
+    server: {
+      proxy: { '/api/latest-release': { target: 'https://app.talio.in', changeOrigin: true } },
+    },
     resolve: {
       alias: {
         // Alias @ to the src directory

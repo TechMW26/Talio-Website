@@ -80,7 +80,7 @@ export const pricingPlans: PricingPlan[] = [
       { name: 'GPS & geofencing', included: true },
       { name: 'Auto payroll', included: true },
       { name: 'Projects & task coordination', included: true },
-      { name: 'Goals & OKRs', included: true },
+      { name: 'Goals & performance', included: true },
       { name: 'MIRA workflow assistance', included: true },
       { name: 'Priority support', included: true },
     ],

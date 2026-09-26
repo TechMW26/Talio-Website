@@ -8,6 +8,7 @@ import logoImage from '@/assets/2090cd551224404a5a02329a4590597a32d19a1f.png';
 import { BookDemoPopup } from './BookDemoPopup';
 import { useIsMobileViewport } from '@/app/hooks/useIsMobileViewport';
 import { useCompensatedMinWidth } from '@/app/hooks/useZoomCompensatedViewport';
+import { productFeatures } from '@/app/content/productFeatures';
 import { prefetchLatestReleasePayload } from '@/lib/latestReleaseClient';
 
 type NavItem = {
@@ -91,9 +92,9 @@ const FEATURE_GROUPS: FeatureGroup[] = [
     mobileBorderClassName: 'border-blue-500/20',
     mobileAuraClassName: 'from-blue-500/18 via-blue-400/6 to-transparent',
     items: [
-      { icon: LayoutGrid, title: 'Talio Projects', description: 'Kanban-style project management', accentColor: 'indigo', href: '/features/projects' },
-      { icon: Target, title: 'Goals & OKRs', description: 'Set and track company objectives', accentColor: 'cyan', href: '/features/goals' },
-      { icon: Sparkles, title: 'AI Workflows', description: 'Automate repetitive tasks', accentColor: 'amber', href: '/features/workflows' },
+      { icon: LayoutGrid, title: 'Talio Projects', description: 'Projects, tasks and shared progress', accentColor: 'indigo', href: '/features/projects' },
+      { icon: Target, title: 'Goals & performance', description: 'Set and track company objectives', accentColor: 'cyan', href: '/features/goals' },
+      { icon: Sparkles, title: 'Requests & approvals', description: 'Keep requests moving through review', accentColor: 'amber', href: '/features/workflows' },
     ],
   },
   {
@@ -103,8 +104,8 @@ const FEATURE_GROUPS: FeatureGroup[] = [
     mobileBorderClassName: 'border-pink-500/20',
     mobileAuraClassName: 'from-pink-500/18 via-fuchsia-400/6 to-transparent',
     items: [
-      { icon: Bot, title: 'MIRA', description: 'Embedded intelligence for daily workflows', accentColor: 'violet', href: '/features/MIRA-ai', badge: 'New' },
-      { icon: MessageSquare, title: 'Team Chat', description: 'Real-time messaging and channels', accentColor: 'pink', href: '/features/team-chat' },
+      { icon: Bot, title: 'MIRA', description: 'Ask questions and take action in Talio', accentColor: 'violet', href: '/features/MIRA-ai', badge: 'New' },
+      { icon: MessageSquare, title: 'Team Chat', description: 'Private and group conversations', accentColor: 'pink', href: '/features/team-chat' },
       { icon: Bell, title: 'Notifications', description: 'Stay updated with real-time alerts', accentColor: 'orange', href: '/features/notifications' },
     ],
   },
@@ -116,13 +117,13 @@ const FEATURE_GROUPS: FeatureGroup[] = [
     mobileAuraClassName: 'from-purple-500/18 via-violet-400/6 to-transparent',
     items: [
       { icon: Clock, title: 'Smart Attendance', description: 'GPS-enabled check-ins with geofencing', accentColor: 'purple', href: '/features/attendance' },
-      { icon: DollarSign, title: 'Automated Payroll', description: 'Calculate salaries and generate payslips', accentColor: 'blue', href: '/features/payroll' },
+      { icon: DollarSign, title: 'Payroll & payslips', description: 'Calculate salaries and generate payslips', accentColor: 'blue', href: '/features/payroll' },
       { icon: Calendar, title: 'Leave Management', description: 'Smart leave tracking and approvals', accentColor: 'emerald', href: '/features/leaves' },
     ],
   },
 ];
 
-const FEATURE_COUNT = FEATURE_GROUPS.reduce((count, group) => count + group.items.length, 0);
+const FEATURE_COUNT = productFeatures.length;
 
 function prefetchDownloadsExperience() {
   void import('@/app/components/Downloads');

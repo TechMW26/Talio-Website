@@ -226,7 +226,7 @@ export const faqs = [
   },
   {
     q: 'How secure is my data?',
-    a: 'Talio uses 256-bit SSL/TLS encryption in transit and AES-256 at rest. We\'re SOC2 compliant and GDPR ready. Role-based access control ensures only authorized personnel see your data.',
+    a: 'Talio uses role-based access to control who can view and manage workspace information. Contact our team for current security documentation and to discuss your organisation’s requirements.',
   },
 ];
 

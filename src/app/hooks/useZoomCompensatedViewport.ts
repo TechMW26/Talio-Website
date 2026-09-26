@@ -31,8 +31,8 @@ function getViewportSnapshot(): ViewportSnapshot {
   }
 
   return {
-    width: Math.round(window.innerWidth * zoomFactor),
-    height: Math.round(window.innerHeight * zoomFactor),
+    width: window.innerWidth,
+    height: window.innerHeight,
     zoomFactor,
   };
 }

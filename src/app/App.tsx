@@ -18,6 +18,7 @@ const FeaturesPage = lazy(() => import('@/pages/FeaturesPage').then((module) => 
 const SolutionsPage = lazy(() => import('@/pages/SolutionsPage').then((module) => ({ default: module.SolutionsPage })));
 const HelpPage = lazy(() => import('@/pages/HelpPage').then((module) => ({ default: module.HelpPage })));
 const PricingPage = lazy(() => import('@/app/components/PricingPage').then((module) => ({ default: module.PricingPage })));
+const FeatureDetail = lazy(() => import('@/app/components/FeatureDetailPage').then(module => ({ default: module.FeatureDetailPage })));
 const Downloads = lazy(() => import('@/app/components/Downloads').then((module) => ({ default: module.Downloads })));
 const Documents = lazy(() => import('@/app/components/Documents').then((module) => ({ default: module.Documents })));
 const Contact = lazy(() => import('@/app/components/Contact').then((module) => ({ default: module.Contact })));
@@ -72,10 +73,11 @@ function AppLayout() {
   const isMobileViewport = useIsMobileViewport();
   const lenisRef = useRef<Lenis | null>(null);
 
-  useDesktopScaleCompensation(isMobileViewport || isAdmin);
+  const isProductPage = pathname.startsWith('/features') || pathname === '/downloads' || pathname === '/MIRA-ai';
+  useDesktopScaleCompensation(isMobileViewport || isAdmin || isProductPage);
 
   useEffect(() => {
-    if (isMobileViewport) {
+    if (isMobileViewport || isProductPage) {
       lenisRef.current?.destroy();
       lenisRef.current = null;
       document.documentElement.classList.remove('lenis', 'lenis-smooth', 'lenis-stopped');
@@ -106,13 +108,14 @@ function AppLayout() {
       lenis.destroy();
       lenisRef.current = null;
     };
-  }, [isMobileViewport]);
+  }, [isMobileViewport, isProductPage]);
 
   return (
-    <div className={`${!isAdmin ? 'app-site-shell ' : ''}min-h-screen bg-black transition-colors duration-300 relative ${isMobileViewport ? '' : 'cursor-none'}`} style={{ position: 'relative' }}>
+    <div className={`${!isAdmin ? 'app-site-shell ' : ''}${isProductPage ? 'product-site-shell ' : ''}min-h-screen bg-black transition-colors duration-300 relative ${isMobileViewport || isProductPage ? '' : 'cursor-none'}`} style={{ position: 'relative' }}>
       <ScrollToTop lenisRef={lenisRef} />
-      {!isMobileViewport && <CustomCursor />}
-      {!isMobileViewport && <MouseFollower />}
+      {!isMobileViewport && !isProductPage && !isAdmin && <SoundDisclaimer />}
+      {!isMobileViewport && !isProductPage && <CustomCursor />}
+      {!isMobileViewport && !isProductPage && <MouseFollower />}
       {!isAdmin && <AnalyticsTracker />}
       {!isAdmin && <Navbar />}
       <Suspense fallback={<RouteFallback />}>
@@ -123,6 +126,7 @@ function AppLayout() {
           <Route path="/documents" element={<Documents />} />
           <Route path="/MIRA-ai" element={<MIRAAIFeature />} />
           <Route path="/features" element={<FeaturesPage />} />
+          <Route path="/features/:slug" element={<FeatureDetail />} />
           <Route path="/features/attendance" element={<AttendanceFeature />} />
           <Route path="/features/payroll" element={<PayrollFeature />} />
           <Route path="/features/leaves" element={<LeavesFeature />} />
@@ -145,7 +149,7 @@ function AppLayout() {
           <Route path="/admin" element={<AdminDashboard />} />
         </Routes>
       </Suspense>
-      {!isAdmin && !shouldRenderInlineReviews && (
+      {!isAdmin && !isProductPage && !shouldRenderInlineReviews && (
         <ElfsightReviewsSection />
       )}
       {!isAdmin && <Footer />}
@@ -154,12 +158,10 @@ function AppLayout() {
 }
 
 export default function App() {
-  const isMobileViewport = useIsMobileViewport();
 
   return (
     <SoundProvider>
       <BrowserRouter>
-        {!isMobileViewport && <SoundDisclaimer />}
         <AppLayout />
       </BrowserRouter>
     </SoundProvider>

@@ -1,6 +1,5 @@
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router';
-import { useScroll } from 'motion/react';
 import { ArrowDown, ArrowRight, Search, X } from 'lucide-react';
 import { categories, featureHref, productFeatures } from '@/app/content/productFeatures';
 import { workspaceScrollChapters } from '@/app/content/workspaceScrollChapters';
@@ -8,17 +7,19 @@ import { featureFaqs } from '@/app/content/featureFaqs';
 import { usePageMeta } from '@/app/hooks/usePageMeta';
 import { LandingFaq } from './LandingFaq';
 import { ParticleChapters } from './ParticleChapters';
-import { ParticleIllustration, type ParticleShape } from './ParticleIllustration';
+import { FeatureHero } from './FeatureHero';
 import '@/styles/product.css';
 
-const workspaceShapes: readonly ParticleShape[] = ['workspace', 'project', 'team', 'spark'];
+const workspaceChapters = workspaceScrollChapters.map((chapter, index) => ({
+  ...chapter,
+  id: index < 7 ? `working-day-${index + 1}` : `team-scenes-${index - 6}`,
+  aliases: index === 7 ? ['team-scenes'] : undefined,
+}));
 
 export function FeaturesOverview() {
   usePageMeta('Features', 'Explore projects, team chat, people operations and MIRA Super Intelligence in Talio.');
   const [category, setCategory] = useState<(typeof categories)[number]>('All features');
   const [query, setQuery] = useState('');
-  const stage = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({ target: stage, offset: ['start 10%', 'end 45%'] });
   const search = query.toLowerCase().trim();
   const filtered = productFeatures.filter(feature =>
     (category === 'All features' || feature.category === category)
@@ -27,27 +28,19 @@ export function FeaturesOverview() {
 
   return (
     <main className="product-page feature-index">
-      <div className="product-wrap overview-story" ref={stage}>
-        <div className="overview-graphic">
-          <ParticleIllustration shapes={workspaceShapes} progress={scrollYProgress} label="A workspace forms into a project, a team, and MIRA" />
-        </div>
-        <div className="overview-story-copy">
-          <section className="overview-intro" aria-labelledby="overview-title">
-            <span className="product-eyebrow">The Talio workspace</span>
-            <h1 id="overview-title">Keep work <em>moving.</em></h1>
-            <p className="product-lead">
-              Run a project, coordinate the team, and hand the next step to MIRA. See how it fits together in one working day.
-            </p>
-            <div className="product-actions">
-              <a href="#working-day" className="product-button">Follow the day <ArrowDown /></a>
-              <a href="#explore" className="product-text-link">Browse features <ArrowRight /></a>
-            </div>
-          </section>
-        </div>
-      </div>
-
-      <ParticleChapters chapters={workspaceScrollChapters.slice(0, 7)} heading="Take a launch from brief to review" id="working-day" />
-      <ParticleChapters chapters={workspaceScrollChapters.slice(7)} heading="Keep the team moving around the work" id="team-scenes" className="particle-chapters-reverse" />
+      <FeatureHero
+        slug="overview"
+        label="The Talio workspace"
+        title="Keep work moving."
+        description="Run projects, coordinate the team, and turn the next decision into work with MIRA."
+        actions={
+          <>
+            <a href="#working-day" className="product-button">Follow the day <ArrowDown /></a>
+            <a href="#explore" className="product-text-link">Browse features <ArrowRight /></a>
+          </>
+        }
+      />
+      <ParticleChapters chapters={workspaceChapters} heading="A working day in Talio" id="working-day" flight="wave" />
 
       <section id="explore" className="product-wrap product-section" aria-labelledby="explore-heading">
         <div className="product-section-heading"><h2 id="explore-heading">Find the tool you need.</h2></div>

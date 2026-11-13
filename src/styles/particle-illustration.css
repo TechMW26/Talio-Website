@@ -1,60 +1,10 @@
 .particle-illustration {
   position: relative;
-  isolation: isolate;
   inline-size: 100%;
   min-inline-size: 0;
   aspect-ratio: 1.32;
   overflow: hidden;
-  background: radial-gradient(ellipse at 39% 44%, #7327ba35, transparent 62%),
-    radial-gradient(ellipse at 62% 62%, #2358bd31, transparent 63%);
-}
-
-.particle-orbit {
-  position: absolute;
-  inset: 13% 17%;
-  pointer-events: none;
-  opacity: .65;
-  transition: opacity .28s ease;
-}
-
-.particle-orbit::before, .particle-orbit::after {
-  content: '';
-  position: absolute;
-  inset: 13% 0;
-  border: 1px solid #a78bfa42;
-  border-radius: 50%;
-  transform: rotate(-21deg);
-}
-
-.particle-orbit::after {
-  inset: 5% 8%;
-  border: 1px dashed #60a5fa45;
-  transform: rotate(23deg);
-}
-
-.particle-orbit i {
-  position: absolute;
-  inset: 14% 4%;
-  border-radius: 50%;
-  border: 1px solid transparent;
-  border-top-color: #c4b5fdba;
-  transform: rotate(-16deg);
-  animation: particle-orbit-drift 14s linear infinite paused;
-}
-
-.particle-orbit i + i {
-  inset: 10% 10%;
-  border-top-color: transparent;
-  border-right-color: #93c5fdae;
-  animation-duration: 19s;
-  animation-direction: reverse;
-}
-
-.particle-illustration[data-particle-visible='true'] .particle-orbit i { animation-play-state: running; }
-.particle-illustration[data-particle-pointer='true'] .particle-orbit { opacity: 1; }
-
-@keyframes particle-orbit-drift {
-  to { transform: rotate(344deg); }
+  background: transparent;
 }
 
 .particle-illustration canvas {
@@ -67,7 +17,3 @@
 }
 
 .particle-illustration canvas[hidden] { display: none; }
-
-@media (prefers-reduced-motion: reduce) {
-  .particle-orbit, .particle-orbit i { animation: none; transition: none; }
-}

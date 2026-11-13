@@ -43,10 +43,12 @@ const shapes = {
 
 export type ParticleShape = keyof typeof shapes;
 
-export const PARTICLE_OUTLINE_SHARE = 0.84;
+export function particleShapePath(shape: ParticleShape): string {
+  return shapes[shape];
+}
 
 const svgNs = 'http://www.w3.org/2000/svg';
-const cache = new Map<string, Float32Array>();
+const cache = new Map<string, { points: Float32Array; bottom: number }>();
 
 function random(index: number) {
   const x = Math.sin(index * 78.233 + 11.21) * 43758.5453;
@@ -59,25 +61,21 @@ export function particleTargets(shape: ParticleShape, count: number) {
   if (existing) return existing;
 
   const path = document.createElementNS(svgNs, 'path');
-  path.setAttribute('d', shapes[shape]);
+  path.setAttribute('d', particleShapePath(shape));
   const length = path.getTotalLength();
   const points = new Float32Array(count * 2);
-  const traceCount = Math.floor(count * PARTICLE_OUTLINE_SHARE);
+  let bottom = -Infinity;
 
   for (let i = 0; i < count; i++) {
-    if (i < traceCount) {
-      const point = path.getPointAtLength(length * (i + 0.5) / traceCount);
-      const spread = i % 17 === 0 ? 1.1 : 0.56;
-      points[i * 2] = (point.x - 12 + (random(i * 2) - 0.5) * spread) / 12;
-      points[i * 2 + 1] = (point.y - 12 + (random(i * 2 + 1) - 0.5) * spread) / 12;
-    } else {
-      // Sparse, shared halo behind the foreground formation.
-      const angle = i * 2.39996323;
-      const radius = 0.91 + random(i) * 0.36;
-      points[i * 2] = Math.cos(angle) * radius;
-      points[i * 2 + 1] = Math.sin(angle) * radius * 0.87;
-    }
+    const point = path.getPointAtLength(length * (i + 0.5) / count);
+    const spread = i % 13 === 0 ? 0.88 : 0.41;
+    points[i * 2] = (point.x - 12 + (random(i * 2) - 0.5) * spread) / 12;
+    const y = (point.y - 12 + (random(i * 2 + 1) - 0.5) * spread) / 12;
+    points[i * 2 + 1] = y;
+    bottom = Math.max(bottom, y);
   }
-  cache.set(key, points);
-  return points;
+
+  const result = { points, bottom };
+  cache.set(key, result);
+  return result;
 }

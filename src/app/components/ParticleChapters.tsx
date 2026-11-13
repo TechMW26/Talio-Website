@@ -1,6 +1,6 @@
-import { useEffect, useId, useRef, useState } from 'react';
-import { useMotionValue } from 'motion/react';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { useId, useRef, useState } from 'react';
+import { motion, useMotionValueEvent, useReducedMotion, useScroll, useTransform } from 'motion/react';
+import { ArrowDown, ArrowLeft, ArrowRight } from 'lucide-react';
 import { ParticleIllustration, type ParticleShape } from './ParticleIllustration';
 import '@/styles/particle-chapters.css';
 
@@ -9,119 +9,104 @@ export type ScrollChapter = {
   body: string;
   detail: string;
   shape: ParticleShape;
+  id?: string;
+  aliases?: readonly string[];
 };
 
-export function ParticleChapters({ chapters, heading, id, className }: {
+type StoryFlight = 'rise' | 'sweep' | 'wave' | 'fold';
+
+export function ParticleChapters({ chapters, heading, id, flight = 'rise' }: {
   chapters: readonly ScrollChapter[];
   heading: string;
   id: string;
-  className?: string;
+  flight?: StoryFlight;
 }) {
   const titleId = useId();
   const track = useRef<HTMLDivElement>(null);
-  const steps = useRef<(HTMLElement | null)[]>([]);
-  const phase = useMotionValue(0);
   const [active, setActive] = useState(0);
+  const reducedMotion = useReducedMotion();
   const last = Math.max(0, chapters.length - 1);
-  const shapes = chapters.map(chapter => chapter.shape);
+  const { scrollYProgress } = useScroll({ target: track, offset: ['start start', 'end end'] });
+  const scene = useTransform(scrollYProgress, value => value * last);
 
-  useEffect(() => {
-    const root = track.current;
-    if (!root) return;
-    let frame = 0;
-    let current = -1;
-    let readingLine = 0;
-
-    function update() {
-      frame = 0;
-      // The current chapter changes at the reading position, independent of its height.
-      const first = steps.current[0];
-      if (!first) return;
-      const visible = steps.current.findIndex(step => step && step.getBoundingClientRect().bottom > readingLine);
-      const next = visible < 0 ? last : Math.min(visible, last);
-      if (next === current) return;
-      current = next;
-      phase.set(last ? next / last : 0);
-      setActive(next);
-    }
-
-    function schedule() {
-      if (!frame) frame = requestAnimationFrame(update);
-    }
-
-    function measure() {
-      const first = steps.current[0];
-      if (!first) return;
-      readingLine = (parseFloat(getComputedStyle(first).scrollMarginTop) || 0) + 2;
-      schedule();
-    }
-
-    const observer = new ResizeObserver(measure);
-    observer.observe(root);
-    window.addEventListener('scroll', schedule, { passive: true });
-    window.addEventListener('resize', measure);
-    measure();
-    return () => {
-      observer.disconnect();
-      window.removeEventListener('scroll', schedule);
-      window.removeEventListener('resize', measure);
-      cancelAnimationFrame(frame);
-    };
-  }, [last, phase]);
+  useMotionValueEvent(scene, 'change', value => setActive(Math.min(last, Math.max(0, Math.round(value)))));
+  const textOpacity = useTransform(scene, value => {
+    const distance = Math.abs(value - Math.round(value));
+    return distance < .24 ? 1 : 1 - ((distance - .24) / .26) * .26;
+  });
+  const textY = useTransform(scene, value => {
+    const offset = value - Math.round(value);
+    return `${-offset * 1.15}rem`;
+  });
 
   function goTo(index: number) {
-    steps.current[index]?.scrollIntoView({ block: 'start' });
+    const bounds = track.current?.getBoundingClientRect();
+    if (!bounds || !last) return;
+    const distance = Math.max(0, bounds.height - window.innerHeight);
+    window.scrollTo({ top: window.scrollY + bounds.top + distance * index / last, behavior: 'instant' });
   }
 
   const selected = chapters[active] ?? chapters[0];
   if (!selected) return null;
-  return (
-    <section id={id} className={`particle-chapters${className ? ` ${className}` : ''}`} aria-labelledby={titleId}>
-      <h2 id={titleId}>{heading}</h2>
-      <div className="particle-chapters-track" ref={track}>
-        <figure className="particle-chapters-stage">
-          <div className="particle-chapters-visual">
-            <ParticleIllustration shapes={shapes} progress={phase} label={`Particle illustration: ${selected.title}`} />
-          </div>
-          <div className="particle-chapters-meter" aria-hidden="true">
-            {chapters.map((chapter, index) => <span key={chapter.title} data-reached={index <= active} />)}
-          </div>
-          <figcaption className="particle-chapters-caption">
-            <span className="particle-chapters-count">{active + 1} / {chapters.length}</span>
-            <span className="particle-chapters-current">{selected.title}</span>
-            <div className="particle-chapters-controls">
-              <button type="button" aria-label="Previous scene" disabled={active === 0} onClick={() => goTo(active - 1)}>
-                <ArrowLeft size="1em" aria-hidden="true" />
-              </button>
-              <button type="button" aria-label="Next scene" disabled={active === last} onClick={() => goTo(active + 1)}>
-                <ArrowRight size="1em" aria-hidden="true" />
-              </button>
-            </div>
-          </figcaption>
-        </figure>
+  const statement = /[.!?]$/.test(selected.title) ? selected.title : `${selected.title}.`;
 
-        <div className="particle-chapters-copy">
+  return (
+    <section id={id} className="particle-chapters" aria-labelledby={titleId} data-flight={flight}>
+      <h2 id={titleId} className="sr-only">{heading}</h2>
+      <div className="particle-story-track" ref={track}>
+        <div className="particle-story-stage" data-scene={active + 1}>
+          <motion.p className="particle-story-statement" aria-hidden="true" style={reducedMotion ? undefined : { opacity: textOpacity, y: textY }}>
+            {statement}
+          </motion.p>
+          <ParticleIllustration
+            shapes={chapters.map(chapter => chapter.shape)}
+            progress={scrollYProgress}
+            label={`Particle illustration: ${selected.title}`}
+            flight={flight}
+            align="bottom"
+            className="particle-story-art"
+          />
+          <nav className="particle-story-controls" aria-label={`${heading} scene navigation`}>
+            <button type="button" aria-label="Previous scene" aria-disabled={active === 0} onClick={() => active > 0 && goTo(active - 1)}>
+              <ArrowLeft size="1.05em" aria-hidden="true" />
+            </button>
+            <span aria-live="off" aria-label={`Scene ${active + 1} of ${chapters.length}`}>{active + 1} / {chapters.length}</span>
+            <button type="button" aria-label="Next scene" aria-disabled={active === last} onClick={() => active < last && goTo(active + 1)}>
+              <ArrowRight size="1.05em" aria-hidden="true" />
+            </button>
+          </nav>
+        </div>
+
+        <div className="particle-story-stops">
           {chapters.map((chapter, index) => {
-            const chapterId = `${id}-${index + 1}`;
+            const chapterId = chapter.id ?? `${id}-${index + 1}`;
             return (
               <section
                 id={chapterId}
-                key={chapter.title}
-                ref={element => { steps.current[index] = element; }}
+                key={chapterId}
                 className="particle-chapter"
                 aria-labelledby={`${chapterId}-title`}
-                data-active={index === active}
               >
-                <div>
-                  <h3 id={`${chapterId}-title`}>{chapter.title}</h3>
-                  <p>{chapter.body}</p>
-                  <p className="particle-chapter-detail">{chapter.detail}</p>
-                </div>
+                {chapter.aliases?.map(alias => <span id={alias} key={alias} className="particle-story-anchor" aria-hidden="true" />)}
+                <h3 id={`${chapterId}-title`} className="sr-only">{chapter.title}</h3>
               </section>
             );
           })}
         </div>
       </div>
+
+      <details className="particle-story-transcript">
+        <summary>Read the walkthrough <ArrowDown size="1em" aria-hidden="true" /></summary>
+        <ol>
+          {chapters.map((chapter, index) => (
+            <li key={chapter.id ?? index}>
+              <h3>{chapter.title}</h3>
+              <p>{chapter.body}</p>
+              {chapter.detail && <p className="particle-transcript-detail">{chapter.detail}</p>}
+            </li>
+          ))}
+        </ol>
+      </details>
     </section>
   );
 }

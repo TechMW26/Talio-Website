@@ -1,19 +1,36 @@
 import { Link, useParams } from 'react-router';
-import { ArrowDown, ArrowLeft, ArrowRight } from 'lucide-react';
+import { ArrowDown, ArrowRight } from 'lucide-react';
 import { featureHref, getProductFeature, productFeatures } from '@/app/content/productFeatures';
 import { featureScrollChapters } from '@/app/content/featureScrollChapters';
 import { featureFaqs } from '@/app/content/featureFaqs';
 import { usePageMeta } from '@/app/hooks/usePageMeta';
-import { FeatureNarrative, featureScenes } from './FeatureNarrative';
+import { FeatureHero } from './FeatureHero';
 import { LandingFaq } from './LandingFaq';
-import { ParticleChapters } from './ParticleChapters';
-import { ParticleIllustration } from './ParticleIllustration';
+import { ParticleChapters, type ScrollChapter } from './ParticleChapters';
 import '@/styles/product.css';
+
+const featureMotion = {
+  projects: { flight: 'rise', shapes: ['project', 'tasks', 'chart'] },
+  productivity: { flight: 'wave', shapes: ['clock', 'laptop', 'chart'] },
+  attendance: { flight: 'rise', shapes: ['pin', 'clock', 'check'] },
+  leaves: { flight: 'fold', shapes: ['calendar', 'file', 'check'] },
+  payroll: { flight: 'fold', shapes: ['calendar', 'wallet', 'file'] },
+  goals: { flight: 'wave', shapes: ['target', 'chart', 'team'] },
+  workflows: { flight: 'sweep', shapes: ['file', 'workflow', 'check'] },
+  'team-chat': { flight: 'sweep', shapes: ['chat', 'file', 'laptop'] },
+  meetings: { flight: 'rise', shapes: ['calendar', 'video', 'file'] },
+  whiteboard: { flight: 'wave', shapes: ['board', 'workflow', 'team'] },
+  people: { flight: 'rise', shapes: ['person', 'team', 'check'] },
+  recruitment: { flight: 'sweep', shapes: ['briefcase', 'person', 'team'] },
+  operations: { flight: 'fold', shapes: ['laptop', 'headset', 'check'] },
+  documents: { flight: 'fold', shapes: ['file', 'shield', 'team'] },
+  notifications: { flight: 'wave', shapes: ['bell', 'clock', 'tasks'] },
+} as const satisfies Record<string, { flight: 'rise' | 'sweep' | 'wave' | 'fold'; shapes: readonly ScrollChapter['shape'][] }>;
 
 export function FeatureDetailPage({ slug }: { slug?: string }) {
   const params = useParams();
   const feature = getProductFeature(slug || params.slug || '');
-  const scene = feature && featureScenes[feature.slug];
+  const scene = feature && featureMotion[feature.slug as keyof typeof featureMotion];
   usePageMeta(feature ? `${feature.name} — Features` : 'Feature not found', feature?.description || 'Explore what is available in Talio.');
   if (!feature || !scene) {
     return (
@@ -26,45 +43,42 @@ export function FeatureDetailPage({ slug }: { slug?: string }) {
     );
   }
 
-  const chapters = featureScrollChapters[feature.slug];
+  const introChapters = feature.story.map((chapter, index): ScrollChapter => ({
+    id: `step-${index + 1}`,
+    title: chapter.title,
+    body: chapter.description,
+    detail: chapter.signals.map(([label, value]) => `${label}: ${value}`).join(' · '),
+    shape: scene.shapes[index % scene.shapes.length],
+  }));
+  const chapters = [
+    ...introChapters,
+    ...featureScrollChapters[feature.slug].map((chapter, index) => ({
+      ...chapter,
+      id: index < 6 ? `in-practice-${index + 1}` : `follow-through-${index - 5}`,
+      aliases: index === 0 ? ['in-practice'] : index === 6 ? ['follow-through'] : undefined,
+    })),
+  ];
   const related = productFeatures
     .filter(item => item.category === feature.category && item.slug !== feature.slug)
     .slice(0, 3);
 
   return (
-    <main className={`product-page feature-detail feature-${scene.mode}`} data-feature={feature.slug}>
-      <section className="product-wrap feature-intro" aria-labelledby="feature-title">
-        <div className="feature-intro-copy">
-          <Link className="product-back" to="/features"><ArrowLeft /> All features</Link>
-          <span className="product-eyebrow"><feature.icon aria-hidden="true" /> {feature.name}</span>
-          <h1 id="feature-title">{feature.headline.replace('\n', ' ')}</h1>
-          <p className="product-lead">{feature.description}</p>
-          <div className="product-actions">
+    <main className="product-page feature-detail" data-feature={feature.slug}>
+      <FeatureHero
+        slug={feature.slug}
+        label={feature.name}
+        title={feature.headline}
+        description={feature.description}
+        actions={
+          <>
             <a href="#workflow" className="product-button">See how it works <ArrowDown /></a>
-            <a href="#in-practice" className="product-text-link">Jump to scenes <ArrowRight /></a>
-          </div>
-        </div>
-        <div className="feature-intro-art">
-          <ParticleIllustration shapes={[scene.shapes[0]]} label={`${feature.name} particle illustration`} />
-        </div>
-      </section>
-
-      <section className="product-wrap feature-workflow" id="workflow" aria-labelledby="workflow-heading">
-        <div className="feature-workflow-heading">
-          <h2 id="workflow-heading">{scene.hook}</h2>
-          <nav aria-label={`${feature.name} chapters`}>
-            {feature.story.map((chapter, index) => <a key={chapter.label} href={`#step-${index + 1}`}>{chapter.label}</a>)}
-          </nav>
-        </div>
-        <FeatureNarrative key={feature.slug} chapters={feature.story} scene={scene} />
-        <p className="feature-setup-note">{feature.note}</p>
-      </section>
-
-      <ParticleChapters chapters={chapters.slice(0, 6)} heading={`${feature.name} in practice`} id="in-practice" className={`particle-chapters-${scene.mode}`} />
-      <ParticleChapters chapters={chapters.slice(6)} heading="Follow the work through" id="follow-through" className={`particle-chapters-reverse particle-chapters-${scene.mode}`} />
-
+            <a href="#feature-questions" className="product-text-link">FAQ <ArrowRight /></a>
+          </>
+        }
+      />
+      <ParticleChapters key={feature.slug} chapters={chapters} heading={`${feature.name} in practice`} id="workflow" flight={scene.flight} />
+      <div className="product-wrap feature-setup-note" id="feature-questions"><p>{feature.note}</p></div>
       <LandingFaq title={`${feature.name} FAQ`} items={featureFaqs[feature.slug]} />
-
       <section className="product-wrap product-section" aria-labelledby="related-features-heading">
         <div className="product-section-heading product-heading-inline">
           <h2 id="related-features-heading">Continue exploring</h2>

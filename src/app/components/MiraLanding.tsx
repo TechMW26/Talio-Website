@@ -1,10 +1,11 @@
 import { lazy, Suspense, useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { Link } from 'react-router';
 import { motion, useInView } from 'motion/react';
-import { ArrowDown, ArrowLeft, ArrowRight, ArrowUpRight, CircleHelp, Pause, Play, Search, ShieldCheck, Sparkles } from 'lucide-react';
+import { ArrowDown, ArrowLeft, ArrowRight, ArrowUpRight, CalendarDays, Check, Folder, ListTodo, Pause, Play, ShieldCheck, UserRound } from 'lucide-react';
 import { miraUseCases } from '@/app/content/miraUseCases';
 import { usePageMeta } from '@/app/hooks/usePageMeta';
 import appIcon from '@/assets/mira/mira-app-icon.webp';
+import { StoryPath, type StoryChapter } from './StoryPath';
 import '@/styles/mira-landing.css';
 
 const RobotHead = lazy(() => import('robot-heads').then(({ RobotHead }) => ({ default: RobotHead })));
@@ -24,21 +25,48 @@ function useReducedMotion() {
   );
 }
 
-const principles = [
+const launchChapters: StoryChapter[] = [
   {
-    title: 'Understands the request',
-    icon: CircleHelp,
-    description: 'Talk or type in your own words. MIRA can ask for a project name, a time or another detail it needs to continue.',
+    id: 'mira-request',
+    label: 'The request',
+    title: 'Start with the outcome.',
+    description: 'You need a project for the partner launch and a checklist for Priya. Say both in one request. Give MIRA the dates, the owner and the due date, or let it ask for the detail it needs.',
+    visual: (
+      <figure className="mira-request-example">
+        <figcaption>Example request</figcaption>
+        <blockquote>“Set up Partner Launch for the first two weeks of next month. Add Priya and assign her the checklist by day three.”</blockquote>
+        <ul aria-label="Details in the request">
+          <li><CalendarDays size="1em" aria-hidden="true" /> Launch dates</li>
+          <li><UserRound size="1em" aria-hidden="true" /> Priya</li>
+          <li><ListTodo size="1em" aria-hidden="true" /> Checklist due day three</li>
+        </ul>
+      </figure>
+    ),
   },
   {
-    title: 'Uses your workspace',
-    icon: Search,
-    description: 'MIRA can look up the people, projects and tasks your Talio account can access.',
+    id: 'mira-context',
+    label: 'The context',
+    title: 'Match the request to your workspace.',
+    description: 'MIRA looks up Priya in Talio and checks which actions your role allows. If two people share the name, you can choose the right one before the task is assigned.',
+    visual: (
+      <dl className="mira-context-example" aria-label="Context for the launch">
+        <div><dt><UserRound size="1.1em" aria-hidden="true" /> Collaborator</dt><dd>Priya · Launch team</dd></div>
+        <div><dt><ShieldCheck size="1.1em" aria-hidden="true" /> Your access</dt><dd>Create projects and tasks</dd></div>
+        <div><dt><ListTodo size="1.1em" aria-hidden="true" /> Task owner</dt><dd>Priya, once added to the project</dd></div>
+      </dl>
+    ),
   },
   {
-    title: 'Acts within your access',
-    icon: ShieldCheck,
-    description: 'For supported requests, MIRA can take a step inside Talio and tell you what happened. Your role still determines what it can do.',
+    id: 'mira-action',
+    label: 'The result',
+    title: 'Turn a plan into assigned work.',
+    description: 'MIRA creates the project first, then uses that confirmed project to add the checklist. If an earlier action fails, dependent steps wait. You can review what changed and what still needs attention.',
+    visual: (
+      <ol className="mira-action-example" aria-label="Sample workflow results">
+        <li><Folder size="1.1em" aria-hidden="true" /><div><strong>Partner Launch</strong><span>Project created · Priya added</span></div><Check size="1em" aria-hidden="true" /></li>
+        <li><ListTodo size="1.1em" aria-hidden="true" /><div><strong>Partner checklist</strong><span>Assigned to Priya · Due day three</span></div><Check size="1em" aria-hidden="true" /></li>
+      </ol>
+    ),
   },
 ];
 
@@ -73,7 +101,6 @@ function MiraMascot({ reduceMotion }: { reduceMotion: boolean }) {
       <div className="mira-stage-grid" aria-hidden="true" />
       <div className="mira-orbit mira-orbit-outer" aria-hidden="true" />
       <div className="mira-orbit mira-orbit-inner" aria-hidden="true" />
-      <div className="mira-stage-identity"><img src={appIcon} alt="" width="36" height="36" /> MIRA</div>
       {!reduceMotion && (
         <button
           className="mira-pause"
@@ -126,42 +153,37 @@ export function MiraLanding() {
       <section className="mira-wrap mira-hero" aria-labelledby="mira-heading">
         <motion.div className="mira-hero-copy" {...reveal}>
           <Link className="mira-back" to="/features"><ArrowLeft size="1em" /> All features</Link>
-          <h1 id="mira-heading">Super Intelligence<br />inside <em>Talio.</em></h1>
-          <p>Meet MIRA. Turn a request into assigned work, bring the right people into a review, and get the context you need to make a decision.</p>
+          <h1 id="mira-heading">One request.<br /><em>Work in motion.</em></h1>
+          <p>MIRA is the Super Intelligence (SI) assistant in Talio. Ask it to set up a project, assign the next step, or bring the right people into a review.</p>
           <div className="mira-actions">
-            <a className="mira-primary" href="#mira-demo">Explore use cases <ArrowDown size="1em" /></a>
-            <Link className="mira-secondary" to="/get-started">Get started <ArrowUpRight size="1em" /></Link>
+            <a className="mira-primary" href="#mira-explainer">Follow a request <ArrowDown size="1em" /></a>
+            <a className="mira-secondary" href="#mira-demo">Explore use cases <ArrowRight size="1em" /></a>
           </div>
         </motion.div>
         <motion.div className="mira-hero-graphic" {...reveal}><MiraMascot reduceMotion={reduceMotion} /></motion.div>
       </section>
 
-      <section className="mira-wrap mira-section" aria-labelledby="mira-explainer">
+      <section className="mira-wrap mira-section mira-story" id="mira-explainer" aria-labelledby="mira-story-heading">
         <motion.div className="mira-explainer" {...reveal}>
-          <h2 id="mira-explainer">What is Super Intelligence?</h2>
-          <p>Super Intelligence (SI) is Talio’s name for the capabilities behind MIRA. It connects what you ask in conversation with the work you can see and do in Talio.</p>
+          <h2 id="mira-story-heading">How Super Intelligence works in Talio</h2>
+          <p>SI connects a conversation to the work you can see and do in Talio. Follow a sample request from a launch brief to a project with an owner, a due date and an assigned task.</p>
         </motion.div>
-        <div className="mira-principles">
-          {principles.map(({ title, icon: Icon, description }, index) => (
-            <motion.article
-              key={title}
-              className="mira-principle"
-              {...reveal}
-              transition={{ ...reveal.transition, delay: reduceMotion ? 0 : index * 0.08 }}
-            >
-              <span className="mira-principle-icon"><Icon size="1.35em" aria-hidden="true" /></span>
-              <h3>{title}</h3>
-              <p>{description}</p>
-            </motion.article>
-          ))}
-        </div>
+        <StoryPath chapters={launchChapters} ariaLabel="Follow a MIRA request" />
       </section>
 
       <section className="mira-wrap mira-section mira-demo" id="mira-demo" aria-labelledby="mira-demo-heading">
         <motion.div className="mira-demo-intro" {...reveal}>
           <h2 id="mira-demo-heading">What would you ask MIRA?</h2>
-          <p>Explore ten sample conversations, from automating a launch to spotting delivery risk.</p>
+          <p>Choose a situation to see the request, the response and what you can verify afterward.</p>
         </motion.div>
+        <label className="mira-scenario-select">
+          Choose a use case
+          <select value={selected} onChange={event => setSelected(Number(event.target.value))} aria-controls="mira-sample">
+            {miraUseCases.map(({ id, title, type }, index) => (
+              <option key={id} value={index}>{title}{type === 'Concept' ? ' · Concept' : ''}</option>
+            ))}
+          </select>
+        </label>
         <motion.div className="mira-options" role="group" aria-label="MIRA use cases" {...reveal}>
           {miraUseCases.map(({ id, title, icon: Icon, type }, index) => (
             <button
@@ -172,7 +194,7 @@ export function MiraLanding() {
               onClick={() => setSelected(index)}
             >
               <Icon size="1.1em" aria-hidden="true" />
-              <span>{title}{type === 'Concept' && <small>Concept</small>}</span>
+              <span>{title}{type === 'Concept' && <> <small>Concept</small></>}</span>
             </button>
           ))}
         </motion.div>
@@ -193,8 +215,10 @@ export function MiraLanding() {
                 <h3>{example.title}</h3>
                 <span data-concept={example.type === 'Concept'}>{example.type}</span>
               </div>
-              <div className="mira-prompt"><span>You</span><p>{example.prompt}</p></div>
-              <div className="mira-reply"><span>MIRA</span><p>{example.response}</p></div>
+              <div className="mira-transcript">
+                <div className="mira-prompt"><span>You</span><p>{example.prompt}</p></div>
+                <div className="mira-reply"><span>MIRA</span><p>{example.response}</p></div>
+              </div>
               <ul className="mira-results" aria-label="Sample outcomes">
                 {example.details.map(detail => <li key={detail}>{detail}</li>)}
               </ul>
@@ -206,9 +230,10 @@ export function MiraLanding() {
 
       <section className="mira-wrap mira-section" aria-labelledby="mira-cta-heading">
         <motion.div className="mira-cta" {...reveal}>
-          <Sparkles size="1.6em" aria-hidden="true" />
-          <h2 id="mira-cta-heading">Meet MIRA in your workspace.</h2>
-          <p>Sign in to Talio to use the MIRA tools your organisation has enabled. Voice and screen tools depend on your device and settings.</p>
+          <div>
+            <h2 id="mira-cta-heading">Try MIRA in your workspace.</h2>
+            <p>Sign in to Talio to use the MIRA tools your organisation has enabled. Voice and screen tools depend on your device and settings.</p>
+          </div>
           <div className="mira-actions">
             <Link className="mira-primary" to="/get-started">Get started <ArrowRight size="1em" /></Link>
             <Link className="mira-secondary" to="/downloads">Download Talio <ArrowUpRight size="1em" /></Link>

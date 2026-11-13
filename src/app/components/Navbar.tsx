@@ -8,7 +8,6 @@ import logoImage from '@/assets/2090cd551224404a5a02329a4590597a32d19a1f.png';
 import { BookDemoPopup } from './BookDemoPopup';
 import { useIsMobileViewport } from '@/app/hooks/useIsMobileViewport';
 import { useCompensatedMinWidth } from '@/app/hooks/useZoomCompensatedViewport';
-import { productFeatures } from '@/app/content/productFeatures';
 import { prefetchLatestReleasePayload } from '@/lib/latestReleaseClient';
 
 type NavItem = {
@@ -122,8 +121,6 @@ const FEATURE_GROUPS: FeatureGroup[] = [
     ],
   },
 ];
-
-const FEATURE_COUNT = productFeatures.length;
 
 function prefetchDownloadsExperience() {
   void import('@/app/components/Downloads');
@@ -486,7 +483,6 @@ export function Navbar() {
                           >
                             <span className="text-sm font-semibold">View all features</span>
                             <div className="flex items-center gap-2 text-sm text-black/55">
-                              <span>{FEATURE_COUNT}</span>
                               <ArrowRight className="h-4 w-4" />
                             </div>
                           </Link>
@@ -605,7 +601,7 @@ export function Navbar() {
                                     </Link>
                                     <div className="flex items-center gap-1.5 text-[0.6875rem] text-gray-600">
                                       <div className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" />
-                                      {FEATURE_COUNT} features available
+                                      Browse by category
                                     </div>
                                   </div>
                                 </div>

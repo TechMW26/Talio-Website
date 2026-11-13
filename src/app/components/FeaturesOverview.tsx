@@ -1,13 +1,41 @@
 import { useState } from 'react';
 import { Link } from 'react-router';
-import { ArrowDown, ArrowRight, CalendarDays, Layers3, Search, Sparkles, X } from 'lucide-react';
+import { ArrowDown, ArrowRight, Search, X } from 'lucide-react';
 import { categories, featureHref, productFeatures } from '@/app/content/productFeatures';
 import { usePageMeta } from '@/app/hooks/usePageMeta';
-import { FeatureArtwork, FeatureReveal } from './FeatureMotion';
+import { FeatureArtwork } from './FeatureMotion';
+import { StoryPath, StorySignals, type StoryChapter } from './StoryPath';
 import '@/styles/product.css';
 
+const dayInTalio: StoryChapter[] = [
+  {
+    id: 'plan-the-work',
+    label: 'Plan the work',
+    title: 'Give the next step an owner.',
+    description: 'A website launch starts with a brief. Put it in a project, assign the first draft, and set a due date. When the team asks what needs review, the answer sits alongside the task and its conversation.',
+    visual: <StorySignals signals={[[ 'Project', 'Website refresh' ], [ 'Next up', 'Review the first draft' ], [ 'Owner', 'Design lead' ]]} />,
+    children: <Link to="/features/projects" className="product-text-link">Explore projects & tasks <ArrowRight /></Link>,
+  },
+  {
+    id: 'coordinate-the-team',
+    label: 'Coordinate the team',
+    title: 'Make room for changes in the day.',
+    description: 'A teammate requests Friday off. They can see their available balance before submitting, and the person responsible can review the request in Talio. The decision is recorded where the teammate can find it.',
+    visual: <StorySignals variation={1} signals={[[ 'Request', 'Friday annual leave' ], [ 'Decision', 'Approved by manager' ]]} />,
+    children: <Link to="/features/leaves" className="product-text-link">Explore leave & availability <ArrowRight /></Link>,
+  },
+  {
+    id: 'act-with-mira',
+    label: 'Act with MIRA',
+    title: 'Turn the follow-up into work.',
+    description: 'After the launch review, ask MIRA to create the agreed checklist task, assign it to the project member you name, and set a reminder for the sign-off. Talio applies your permissions to each action.',
+    visual: <StorySignals variation={2} signals={[[ 'Task', 'Review launch checklist' ], [ 'Follow-up', 'Personal reminder for sign-off' ]]} />,
+    children: <Link to="/mira#mira-demo" className="product-text-link">Try a MIRA example <ArrowRight /></Link>,
+  },
+];
+
 export function FeaturesOverview() {
-  usePageMeta('Features', 'Explore projects, team chat, attendance, payroll and MIRA Super Intelligence in Talio.');
+  usePageMeta('Features', 'See how a working day fits together in Talio, from projects and team chat to people operations and MIRA Super Intelligence.');
   const [category, setCategory] = useState<(typeof categories)[number]>('All features');
   const [query, setQuery] = useState('');
   const search = query.toLowerCase().trim();
@@ -20,34 +48,31 @@ export function FeaturesOverview() {
     <main className="product-page feature-index">
       <section className="product-wrap product-hero feature-hero">
         <div className="product-hero-copy feature-hero-enter">
-          <span className="product-eyebrow"><i /> The Talio workspace</span>
-          <h1>Good work <em>fits together.</em></h1>
+          <span className="product-eyebrow">The Talio workspace</span>
+          <h1>A working day.<em>One workspace.</em></h1>
           <p className="product-lead">
-            Plan the work, take care of your team, and ask MIRA for help along the way.
-            Everything has a place in Talio.
+            Follow a launch from its first brief to the team’s next decision.
+            See where projects, people operations, and MIRA fit into the day.
           </p>
           <div className="product-actions">
-            <a href="#explore" className="product-button">Explore features <ArrowDown /></a>
-            <Link to="/mira" className="product-text-link">Meet MIRA <ArrowRight /></Link>
+            <a href="#working-day" className="product-button">Follow the story <ArrowDown /></a>
+            <a href="#explore" className="product-text-link">Browse all features <ArrowRight /></a>
           </div>
         </div>
-        <FeatureArtwork priority>
-          <div className="feature-art-label feature-art-label-work"><Layers3 /> Projects & tasks</div>
-          <div className="feature-art-label feature-art-label-people"><CalendarDays /> People & HR</div>
-          <div className="feature-art-label feature-art-label-si"><Sparkles /> MIRA Super Intelligence</div>
-        </FeatureArtwork>
+        <FeatureArtwork />
+      </section>
+
+      <section className="product-wrap product-section" id="working-day" aria-labelledby="working-day-heading">
+        <div className="product-section-heading"><h2 id="working-day-heading">From a plan to the next decision</h2></div>
+        <StoryPath chapters={dayInTalio} ariaLabel="A working day in Talio" />
       </section>
 
       <section id="explore" className="product-wrap product-section" aria-labelledby="explore-heading">
-        <FeatureReveal className="product-section-heading">
-          <h2 id="explore-heading">Find the tools your team needs.</h2>
-        </FeatureReveal>
+        <div className="product-section-heading"><h2 id="explore-heading">Browse the workspace</h2></div>
         <div className="product-tools">
           <div className="product-filters" role="group" aria-label="Filter features">
             {categories.map(item => (
-              <button key={item} aria-pressed={category === item} onClick={() => setCategory(item)}>
-                {item}
-              </button>
+              <button key={item} aria-pressed={category === item} onClick={() => setCategory(item)}>{item}</button>
             ))}
           </div>
           <div className="product-search">
@@ -59,21 +84,17 @@ export function FeaturesOverview() {
         <p className="product-count" aria-live="polite">
           {filtered.length} {filtered.length === 1 ? 'feature' : 'features'}
         </p>
-        <div className="product-feature-grid">
+        <ul className="feature-directory">
           {filtered.map(feature => (
-            <FeatureReveal key={feature.slug}>
-              <Link className="product-feature-card" to={featureHref(feature.slug)} data-category={feature.category}>
-                <div className="product-card-top">
-                  <span className="product-icon"><feature.icon strokeWidth={1.6} /></span>
-                  <ArrowRight className="product-card-arrow" aria-hidden="true" />
-                </div>
-                <span className="product-card-category">{feature.category}</span>
-                <h3>{feature.name}</h3>
-                <p>{feature.description}</p>
+            <li key={feature.slug}>
+              <Link to={featureHref(feature.slug)}>
+                <feature.icon strokeWidth={1.5} aria-hidden="true" />
+                <div><h3>{feature.name}</h3><p>{feature.description}</p></div>
+                <ArrowRight className="feature-directory-arrow" aria-hidden="true" />
               </Link>
-            </FeatureReveal>
+            </li>
           ))}
-        </div>
+        </ul>
         {!filtered.length && (
           <div className="product-empty">
             <h3>No features match your search.</h3>
@@ -82,20 +103,7 @@ export function FeaturesOverview() {
             </button>
           </div>
         )}
-        <p className="product-footnote">
-          Your role and your company’s enabled modules determine what you can access.
-        </p>
-      </section>
-
-      <section className="product-wrap product-section">
-        <FeatureReveal className="feature-si-banner">
-          <span className="product-icon"><Sparkles /></span>
-          <div>
-            <h2>What is Super Intelligence?</h2>
-            <p>It’s how MIRA connects a request to your work in Talio. Ask it to find a project, summarize available notes, or create a task you have permission to add.</p>
-          </div>
-          <Link className="product-button" to="/mira">Try a MIRA example <ArrowRight /></Link>
-        </FeatureReveal>
+        <p className="product-footnote">Your role and your company’s enabled modules determine what you can access.</p>
       </section>
     </main>
   );

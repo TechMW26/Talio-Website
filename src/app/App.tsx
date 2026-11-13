@@ -44,25 +44,45 @@ function RouteFallback() {
 }
 
 function ScrollToTop({ lenisRef }: { lenisRef?: React.RefObject<Lenis | null> }) {
-  const { pathname } = useLocation();
+  const { pathname, hash } = useLocation();
   useEffect(() => {
-    // Force Lenis to scroll to top immediately, bypassing smooth interpolation
-    if (lenisRef?.current) {
-      lenisRef.current.scrollTo(0, { immediate: true });
+    if (!hash) {
+      const reset = () => {
+        lenisRef?.current?.scrollTo(0, { immediate: true });
+        window.scrollTo({ top: 0, behavior: 'instant' });
+      };
+      reset();
+      const frame = requestAnimationFrame(reset);
+      return () => cancelAnimationFrame(frame);
     }
-    // Also reset native scroll position as fallback
-    window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
-    document.documentElement.scrollTop = 0;
-    document.body.scrollTop = 0;
 
-    // Double-tap after a frame to guarantee it sticks even if Lenis re-renders
-    requestAnimationFrame(() => {
-      if (lenisRef?.current) {
-        lenisRef.current.scrollTo(0, { immediate: true });
-      }
-      window.scrollTo(0, 0);
+    let id: string;
+    try {
+      id = decodeURIComponent(hash.slice(1));
+    } catch {
+      return;
+    }
+
+    const scrollToChapter = () => {
+      const chapter = document.getElementById(id);
+      if (!chapter) return false;
+      chapter.scrollIntoView({ block: 'start', behavior: 'instant' });
+      return true;
+    };
+
+    if (scrollToChapter()) return;
+
+    // A chapter on a lazy route might not exist until its page has loaded.
+    const observer = new MutationObserver(() => {
+      if (scrollToChapter()) observer.disconnect();
     });
-  }, [pathname]);
+    observer.observe(document.getElementById('root') ?? document.body, { subtree: true, childList: true });
+    const timeout = window.setTimeout(() => observer.disconnect(), 5000);
+    return () => {
+      observer.disconnect();
+      window.clearTimeout(timeout);
+    };
+  }, [pathname, hash, lenisRef]);
   return null;
 }
 

@@ -28,9 +28,22 @@ const shapes = {
   download: 'M12 2v13 M7 10l5 5 5-5 M3 15v6h18v-6',
   spark: 'M12 2l2.7 7.3L22 12l-7.3 2.7L12 22l-2.7-7.3L2 12l7.3-2.7z M19 2v4 M17 4h4 M5 17v5 M2.5 19.5h5',
   headset: 'M3 14v-3a9 9 0 0 1 18 0v4 M3 12h4v7H3z M17 12h4v7h-4z M20 19q0 3-4 3h-4',
+  compass: 'M2 12a10 10 0 1 0 20 0a10 10 0 1 0-20 0 M16 7l-2.5 6.5L7 16l2.5-6.5z M12 2v2 M22 12h-2 M12 22v-2 M2 12h2',
+  layers: 'M2 8l10-5 10 5-10 5z M2 12l10 5 10-5 M2 16l10 5 10-5',
+  bolt: 'M13 2L3 14h8l-1 8L21 10h-8z M4 5l-2 2 M22 16l-2 2',
+  inbox: 'M4 4h16l3 12v4H1v-4z M1 16h6l2 2h6l2-2h6 M12 7v7 M9 11l3 3 3-3',
+  lock: 'M6 10h12q2 0 2 2v8q0 2-2 2H6q-2 0-2-2v-8q0-2 2-2z M7 10V7a5 5 0 0 1 10 0v3 M12 14a1.4 1.4 0 1 0 0 2.8v2',
+  fingerprint: 'M4 11a8 8 0 0 1 16 0v4 M7 11a5 5 0 0 1 10 0v5q0 3-1 5 M10 12a2 2 0 0 1 4 0v5q0 4-2 6 M7 14v2q0 3-2 5 M10 15q0 4-2 7 M20 17v3 M4 14v2',
+  sliders: 'M6 2v4 M6 11v11 M12 2v12 M12 19v3 M18 2v6 M18 13v9 M3 6h6v5H3z M9 14h6v5H9z M15 8h6v5h-6z',
+  route: 'M5 2a3 3 0 1 0 0 6a3 3 0 1 0 0-6 M19 16a3 3 0 1 0 0 6a3 3 0 1 0 0-6 M8 5h8q4 0 4 4t-4 4H7q-4 0-4 3t4 3h9 M9 10l3 3-3 3',
+  database: 'M3 6c0-2.3 4-4 9-4s9 1.7 9 4-4 4-9 4-9-1.7-9-4z M3 6v12c0 2.3 4 4 9 4s9-1.7 9-4V6 M3 12c0 2.3 4 4 9 4s9-1.7 9-4',
+  flag: 'M5 22V3 M5 4q4-3 8-1t7 0v11q-3 2-7 0t-8 1 M2 22h8',
+  sun: 'M7 12a5 5 0 1 0 10 0a5 5 0 1 0-10 0 M12 1v3 M12 20v3 M1 12h3 M20 12h3 M4 4l2 2 M18 18l2 2 M20 4l-2 2 M6 18l-2 2',
 } as const;
 
 export type ParticleShape = keyof typeof shapes;
+
+export const PARTICLE_OUTLINE_SHARE = 0.84;
 
 const svgNs = 'http://www.w3.org/2000/svg';
 const cache = new Map<string, Float32Array>();
@@ -49,12 +62,12 @@ export function particleTargets(shape: ParticleShape, count: number) {
   path.setAttribute('d', shapes[shape]);
   const length = path.getTotalLength();
   const points = new Float32Array(count * 2);
-  const traceCount = Math.floor(count * 0.87);
+  const traceCount = Math.floor(count * PARTICLE_OUTLINE_SHARE);
 
   for (let i = 0; i < count; i++) {
     if (i < traceCount) {
       const point = path.getPointAtLength(length * (i + 0.5) / traceCount);
-      const spread = i % 11 === 0 ? 1.45 : 0.47;
+      const spread = i % 17 === 0 ? 1.1 : 0.56;
       points[i * 2] = (point.x - 12 + (random(i * 2) - 0.5) * spread) / 12;
       points[i * 2 + 1] = (point.y - 12 + (random(i * 2 + 1) - 0.5) * spread) / 12;
     } else {

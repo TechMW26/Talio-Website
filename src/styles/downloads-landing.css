@@ -155,23 +155,26 @@
   min-height: 19rem;
 }
 
-.dl-hero-visual > p {
+.dl-visual-switch {
   display: flex;
-  align-items: center;
   justify-content: center;
-  gap: 0.6rem;
-  margin: 0 !important;
-  color: var(--dl-muted);
-  font-size: 0.76rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  gap: clamp(0.4rem, 1.6cqi, 1.2rem);
+  margin-block-start: 0.2rem;
 }
 
-.dl-hero-visual > p span {
-  width: 0.28rem;
-  height: 0.28rem;
-  border-radius: 50%;
-  background: var(--dl-accent);
+.dl-visual-switch > button {
+  min-height: 2.75rem;
+  padding: 0.35rem 0.55rem;
+  border-block-end: 2px solid transparent;
+  color: var(--dl-muted);
+  font-size: 0.88rem;
+  font-weight: 550;
+}
+
+.dl-visual-switch > button:hover { color: var(--dl-text); }
+.dl-visual-switch > button[aria-pressed='true'] {
+  border-block-end-color: var(--dl-accent);
+  color: var(--dl-text);
 }
 
 .dl-device-particles { width: 100%; }
@@ -363,6 +366,7 @@ a.dl-option:hover {
 .dl-setup-steps > li > svg { width: 1.5rem; height: 1.5rem; color: var(--dl-accent); }
 .dl-setup-steps h3 { margin-block: 0.75rem 0.3rem !important; font-size: 1.3rem; font-weight: 550; }
 .dl-setup-steps > li > p { margin: 0 !important; color: var(--dl-muted); font-size: 0.92rem; }
+.dl-guide-nav { display: flex; flex-wrap: wrap; gap: 0.45rem 1.45rem; margin-block-start: 1.75rem; }
 .dl-faq { padding-block: 1.5rem 3rem; }
 
 .dl-disclosure {

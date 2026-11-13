@@ -1,0 +1,138 @@
+.app-site-shell .particle-chapters {
+  --scene-header: 6.25rem;
+  --scene-color: #a78bfa;
+  width: min(76rem, calc(100% - 4rem));
+  margin-inline: auto;
+  padding-block: clamp(2.2rem, 5cqi, 4rem);
+  border-top: 1px solid var(--landing-line);
+  scroll-margin-top: var(--scene-header);
+  background: transparent !important;
+}
+.app-site-shell .particle-chapters h2 {
+  font-size: clamp(1.9rem, 3.8cqi, 3.35rem);
+  font-weight: 600;
+  letter-spacing: -.055em;
+  line-height: 1.08;
+  margin: 0 0 1.7rem !important;
+}
+.particle-chapters-track {
+  display: grid;
+  grid-template-columns: minmax(0,1.16fr) minmax(0,.84fr);
+  gap: clamp(1.5rem, 5cqi, 4.5rem);
+  align-items: start;
+}
+.particle-chapters-stage {
+  position: sticky;
+  top: var(--scene-header);
+  min-width: 0;
+  margin: 0;
+  background: #000;
+}
+.particle-chapters-visual {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid #ffffff21;
+  background: radial-gradient(ellipse at 45% 52%, #2e10656b, transparent 72%),
+    repeating-linear-gradient(0deg, transparent 0 31px, #94a3b811 31px 32px),
+    repeating-linear-gradient(90deg, transparent 0 31px, #94a3b811 31px 32px);
+}
+.particle-chapters-visual .particle-illustration {
+  aspect-ratio: auto;
+  height: clamp(14rem, 42vh, 29rem);
+}
+.particle-chapters-meter { display: flex; gap: .25rem; margin-top: .3rem; }
+.particle-chapters-meter span { height: 2px; flex: 1; background: var(--landing-line); }
+.particle-chapters-meter span[data-reached="true"] { background: var(--scene-color); }
+.particle-chapters-caption {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  min-height: 3.35rem;
+  padding: .5rem .25rem;
+  border-bottom: 1px solid var(--landing-line);
+  font-size: .86rem;
+}
+.particle-chapters-count { flex: none; color: #a5b4fc; font-variant-numeric: tabular-nums; }
+.particle-chapters-current { color: #e4e4e7; line-height: 1.2; }
+.particle-chapters-controls { display: flex; gap: .35rem; margin-inline-start: auto; flex: none; }
+.particle-chapters-controls button {
+  display: grid;
+  place-items: center;
+  width: 2.65rem;
+  height: 2.65rem;
+  border: 1px solid var(--landing-line);
+  border-radius: 50%;
+  color: #fff;
+  background: #080811;
+}
+.particle-chapters-controls button:hover:not(:disabled) { border-color: #93c5fd; background: #172554; }
+.particle-chapters-controls button:disabled { opacity: .35; cursor: default !important; }
+.particle-chapters-copy { min-width: 0; }
+.app-site-shell .particle-chapters .particle-chapter {
+  display: grid;
+  align-items: center;
+  min-height: clamp(15rem, 44vh, 24rem);
+  padding: 2rem 0 2rem 1.25rem;
+  border-left: 2px solid var(--landing-line);
+  border-bottom: 1px solid var(--landing-line);
+  scroll-margin-top: calc(var(--scene-header) + 1rem);
+  transition: border-color .25s ease;
+  background: transparent !important;
+}
+.app-site-shell .particle-chapters .particle-chapter[data-active="true"] { border-left-color: var(--scene-color); }
+.app-site-shell .particle-chapters .particle-chapter h3 {
+  font-size: clamp(1.45rem, 2.75cqi, 2.45rem);
+  font-weight: 620;
+  letter-spacing: -.042em;
+  line-height: 1.1;
+  margin: 0 !important;
+  text-wrap: balance;
+}
+.app-site-shell .particle-chapters .particle-chapter p {
+  margin: .78rem 0 0 !important;
+  color: #c6cbd5;
+  font-size: .95rem;
+  line-height: 1.62;
+}
+.app-site-shell .particle-chapters .particle-chapter .particle-chapter-detail {
+  color: #a5b4fc;
+  font-size: .84rem;
+}
+.app-site-shell .particle-chapters-reverse { --scene-color: #60a5fa; }
+.particle-chapters-reverse .particle-chapters-track { grid-template-columns: minmax(0,.84fr) minmax(0,1.16fr); }
+.particle-chapters-reverse .particle-chapters-stage { grid-column: 2; grid-row: 1; }
+.particle-chapters-reverse .particle-chapters-copy { grid-column: 1; grid-row: 1; }
+
+.app-site-shell .particle-chapters-ledger .particle-chapter { border-left: 0; padding-inline-start: 0; }
+.app-site-shell .particle-chapters-ledger .particle-chapter[data-active="true"] { border-bottom-color: #60a5fa; }
+.particle-chapters-ledger .particle-chapter-detail { font-family: ui-monospace, monospace; }
+.app-site-shell .particle-chapters-studio { --scene-color: #e879f9; }
+.particle-chapters-studio .particle-chapters-visual { border-color: #e879f93f; }
+.app-site-shell .particle-chapters-pipeline .particle-chapter { border-left-style: dashed; }
+.app-site-shell .particle-chapters-insights { --scene-color: #60a5fa; }
+
+@container (max-width: 47em) {
+  .app-site-shell .particle-chapters { --scene-header: 4.9rem; width: calc(100% - 2rem); }
+  .particle-chapters .particle-chapters-track { grid-template-columns: minmax(0,1fr); gap: .7rem; }
+  .particle-chapters .particle-chapters-stage {
+    grid-column: 1;
+    grid-row: auto;
+    z-index: 1;
+    margin-inline: -.15rem;
+    padding: .15rem;
+  }
+  .particle-chapters .particle-chapters-copy { grid-column: 1; grid-row: auto; }
+  .particle-chapters-visual .particle-illustration { height: clamp(7rem, 24svh, 11.5rem); }
+  .particle-chapters-caption { gap: .45rem; font-size: .75rem; }
+  .particle-chapters-controls button { width: 2.75rem; height: 2.75rem; }
+  .app-site-shell .particle-chapters .particle-chapter {
+    min-height: clamp(12rem, 39svh, 20rem);
+    scroll-margin-top: calc(var(--scene-header) + clamp(7rem, 24svh, 11.5rem) + 4rem);
+  }
+}
+@media (max-height: 480px) {
+  .particle-chapters-stage { position: relative; top: auto; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .app-site-shell .particle-chapters .particle-chapter { transition: none; }
+}

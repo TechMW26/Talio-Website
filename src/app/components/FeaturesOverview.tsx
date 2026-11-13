@@ -1,47 +1,24 @@
 import { useRef, useState } from 'react';
 import { Link } from 'react-router';
-import { motion, useReducedMotion, useScroll, useTransform } from 'motion/react';
+import { useScroll } from 'motion/react';
 import { ArrowDown, ArrowRight, Search, X } from 'lucide-react';
 import { categories, featureHref, productFeatures } from '@/app/content/productFeatures';
+import { workspaceScrollChapters } from '@/app/content/workspaceScrollChapters';
 import { featureFaqs } from '@/app/content/featureFaqs';
 import { usePageMeta } from '@/app/hooks/usePageMeta';
 import { LandingFaq } from './LandingFaq';
+import { ParticleChapters } from './ParticleChapters';
 import { ParticleIllustration, type ParticleShape } from './ParticleIllustration';
 import '@/styles/product.css';
 
 const workspaceShapes: readonly ParticleShape[] = ['workspace', 'project', 'team', 'spark'];
-
-const workspaceStory = [
-  {
-    title: 'Give the work an owner.',
-    description: 'Put the brief in a project. Assign the first draft, add a due date, and keep feedback with the task.',
-    href: '/features/projects',
-    action: 'Explore projects',
-  },
-  {
-    title: 'Know who’s available.',
-    description: 'Check leave balances, submit a request, and see the decision in the same place.',
-    href: '/features/leaves',
-    action: 'Explore leave & availability',
-  },
-  {
-    title: 'Turn the next step into a task.',
-    description: 'Ask MIRA to create the checklist you just agreed on and set a reminder to follow up. Talio checks access for each action.',
-    href: '/mira#mira-demo',
-    action: 'Try a MIRA scenario',
-  },
-];
 
 export function FeaturesOverview() {
   usePageMeta('Features', 'Explore projects, team chat, people operations and MIRA Super Intelligence in Talio.');
   const [category, setCategory] = useState<(typeof categories)[number]>('All features');
   const [query, setQuery] = useState('');
   const stage = useRef<HTMLDivElement>(null);
-  const art = useRef<HTMLDivElement>(null);
-  const reduced = useReducedMotion();
-  const { scrollYProgress } = useScroll({ target: stage, offset: ['start start', 'end 70%'] });
-  const { scrollYProgress: artProgress } = useScroll({ target: art, offset: ['start 75%', 'end 30%'] });
-  const morph = useTransform([scrollYProgress, artProgress], ([story, visual]: number[]) => Math.max(story, visual));
+  const { scrollYProgress } = useScroll({ target: stage, offset: ['start 10%', 'end 45%'] });
   const search = query.toLowerCase().trim();
   const filtered = productFeatures.filter(feature =>
     (category === 'All features' || feature.category === category)
@@ -51,8 +28,8 @@ export function FeaturesOverview() {
   return (
     <main className="product-page feature-index">
       <div className="product-wrap overview-story" ref={stage}>
-        <div className="overview-graphic" ref={art}>
-          <ParticleIllustration shapes={workspaceShapes} progress={morph} label="A workspace forms into a project, a team, and MIRA" />
+        <div className="overview-graphic">
+          <ParticleIllustration shapes={workspaceShapes} progress={scrollYProgress} label="A workspace forms into a project, a team, and MIRA" />
         </div>
         <div className="overview-story-copy">
           <section className="overview-intro" aria-labelledby="overview-title">
@@ -66,18 +43,11 @@ export function FeaturesOverview() {
               <a href="#explore" className="product-text-link">Browse features <ArrowRight /></a>
             </div>
           </section>
-          <div className="overview-chapters" id="working-day">
-            <motion.div className="overview-progress" aria-hidden="true" style={{ scaleY: reduced ? 1 : scrollYProgress }} />
-            {workspaceStory.map(chapter => (
-              <article key={chapter.title}>
-                <h2>{chapter.title}</h2>
-                <p>{chapter.description}</p>
-                <Link to={chapter.href} className="product-text-link">{chapter.action} <ArrowRight /></Link>
-              </article>
-            ))}
-          </div>
         </div>
       </div>
+
+      <ParticleChapters chapters={workspaceScrollChapters.slice(0, 7)} heading="Take a launch from brief to review" id="working-day" />
+      <ParticleChapters chapters={workspaceScrollChapters.slice(7)} heading="Keep the team moving around the work" id="team-scenes" className="particle-chapters-reverse" />
 
       <section id="explore" className="product-wrap product-section" aria-labelledby="explore-heading">
         <div className="product-section-heading"><h2 id="explore-heading">Find the tool you need.</h2></div>

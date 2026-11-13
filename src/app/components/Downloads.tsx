@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router';
-import { useScroll } from 'motion/react';
+import { useMotionValue, useMotionValueEvent, useScroll } from 'motion/react';
 import {
   ArrowDown, ArrowUpRight, Check, Download, Laptop, PackageCheck, Plus, RefreshCw, UserRound,
 } from 'lucide-react';
@@ -10,7 +10,9 @@ import { usePageMeta } from '@/app/hooks/usePageMeta';
 import { useLatestRelease } from '@/app/hooks/useLatestRelease';
 import { detectPlatform, releaseDownload } from '@/app/lib/downloads';
 import { downloadFaq } from '@/app/content/downloadFaq';
+import { deviceChapters, setupChapters } from '@/app/content/downloadScrollChapters';
 import { LandingFaq } from './LandingFaq';
+import { ParticleChapters } from './ParticleChapters';
 import { ParticleIllustration, type ParticleShape } from './ParticleIllustration';
 import '@/styles/downloads-landing.css';
 
@@ -29,6 +31,7 @@ const iosStore = 'https://apps.apple.com/in/app/talio-productivity/id6758448703'
 const playStore = 'https://play.google.com/store/apps/details?id=sbs.zenova.twa&hl=en_IN';
 const browserApp = 'https://app.talio.in';
 const downloadShapes = ['laptop', 'phone', 'globe'] as const satisfies readonly ParticleShape[];
+const deviceViews = ['Desktop', 'Mobile', 'Browser'] as const;
 
 export function Downloads() {
   usePageMeta(
@@ -39,7 +42,22 @@ export function Downloads() {
   const [device, setDevice] = useState<PlatformId | null>(null);
   const macHelp = useRef<HTMLDetailsElement>(null);
   const heroRef = useRef<HTMLElement>(null);
+  const lastScrollView = useRef(0);
+  const [deviceView, setDeviceView] = useState(0);
+  const deviceMorph = useMotionValue(0);
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ['start 12%', 'end 55%'] });
+
+  function showDeviceView(index: number) {
+    setDeviceView(index);
+    deviceMorph.set(index / (deviceViews.length - 1));
+  }
+
+  useMotionValueEvent(scrollYProgress, 'change', (value) => {
+    const index = Math.round(value * (deviceViews.length - 1));
+    if (index === lastScrollView.current) return;
+    lastScrollView.current = index;
+    showDeviceView(index);
+  });
 
   useEffect(() => setDevice(detectPlatform(navigator)), []);
 
@@ -111,10 +129,21 @@ export function Downloads() {
             <ParticleIllustration
               className="dl-device-particles"
               shapes={downloadShapes}
-              progress={scrollYProgress}
+              progress={deviceMorph}
               label="A particle laptop becomes a phone, then a globe for browser access"
             />
-            <p>Desktop <span /> Mobile <span /> Browser</p>
+            <div className="dl-visual-switch" role="group" aria-label="Preview Talio on another device">
+              {deviceViews.map((view, index) => (
+                <button
+                  key={view}
+                  type="button"
+                  aria-pressed={deviceView === index}
+                  onClick={() => showDeviceView(index)}
+                >
+                  {view}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -206,7 +235,25 @@ export function Downloads() {
             <p>Open Talio and sign in. You’ll see the workspace and tools your organisation gives you access to.</p>
           </li>
         </ol>
+        <nav className="dl-guide-nav" aria-label="Installation guide">
+          <a className="dl-text-link" href="#choose-your-build">Compare device builds <ArrowDown aria-hidden="true" /></a>
+          <a className="dl-text-link" href="#from-download-to-workspace">Walk through setup <ArrowDown aria-hidden="true" /></a>
+        </nav>
       </section>
+
+      <ParticleChapters
+        className="dl-wrap dl-device-tour particle-chapters-reverse"
+        id="choose-your-build"
+        heading="Find the build that fits."
+        chapters={deviceChapters}
+      />
+
+      <ParticleChapters
+        className="dl-wrap dl-first-day"
+        id="from-download-to-workspace"
+        heading="From the download to your first task."
+        chapters={setupChapters}
+      />
 
       <div className="dl-wrap dl-faq"><LandingFaq items={downloadFaq} title="Download and setup FAQs" /></div>
 

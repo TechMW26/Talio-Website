@@ -6,7 +6,9 @@ import { miraUseCases } from '@/app/content/miraUseCases';
 import { usePageMeta } from '@/app/hooks/usePageMeta';
 import appIcon from '@/assets/mira/mira-app-icon.webp';
 import { miraFaq } from '@/app/content/miraFaq';
+import { miraRequestChapters, miraReviewChapters } from '@/app/content/miraScrollChapters';
 import { LandingFaq } from './LandingFaq';
+import { ParticleChapters } from './ParticleChapters';
 import { ParticleIllustration, type ParticleShape } from './ParticleIllustration';
 import '@/styles/mira-landing.css';
 
@@ -169,12 +171,12 @@ function MiraWorkflow() {
         </div>
         <div className="mira-flow-chapters" ref={track}>
           {launchChapters.map(chapter => (
-            <article key={chapter.id} id={chapter.id} className="mira-flow-chapter" aria-labelledby={`${chapter.id}-heading`}>
+            <section key={chapter.id} id={chapter.id} className="mira-flow-chapter" aria-labelledby={`${chapter.id}-heading`}>
               <span className="mira-flow-label">{chapter.label}</span>
               <h3 id={`${chapter.id}-heading`}>{chapter.title}</h3>
               <p>{chapter.description}</p>
               {chapter.visual}
-            </article>
+            </section>
           ))}
         </div>
       </div>
@@ -210,6 +212,13 @@ export function MiraLanding() {
       </section>
 
       <MiraWorkflow />
+
+      <ParticleChapters
+        className="mira-wrap mira-request-tour"
+        id="mira-requests"
+        heading="What you can hand off to MIRA."
+        chapters={miraRequestChapters}
+      />
 
       <section className="mira-wrap mira-section mira-demo" id="mira-demo" aria-labelledby="mira-demo-heading">
         <motion.div className="mira-demo-intro" {...reveal}>
@@ -267,6 +276,13 @@ export function MiraLanding() {
           </div>
         </motion.div>
       </section>
+
+      <ParticleChapters
+        className="mira-wrap mira-review-tour particle-chapters-reverse"
+        id="mira-review"
+        heading="Stay in control of what happens next."
+        chapters={miraReviewChapters}
+      />
 
       <div className="mira-wrap mira-faq"><LandingFaq items={miraFaq} title="MIRA FAQs" /></div>
 

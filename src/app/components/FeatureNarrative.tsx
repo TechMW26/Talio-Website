@@ -52,12 +52,12 @@ function NarrativeChapter({ chapter, index, children }: {
   children?: ReactNode;
 }) {
   return (
-    <article id={`step-${index + 1}`} className="narrative-beat" aria-labelledby={`step-title-${index + 1}`}>
+    <section id={`step-${index + 1}`} className="narrative-beat" aria-labelledby={`step-title-${index + 1}`}>
       <p className="narrative-label">{chapter.label}</p>
       <h3 id={`step-title-${index + 1}`}>{chapter.title}</h3>
       <p className="narrative-copy">{chapter.description}</p>
       {children}
-    </article>
+    </section>
   );
 }
 

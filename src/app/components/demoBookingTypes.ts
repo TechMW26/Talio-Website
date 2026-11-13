@@ -11,6 +11,10 @@ export interface DemoBookingFormValues {
   preferredTime: string;
 }
 
+export const isValidDemoPhone = (value: string) => /^[0-9]+$/.test(value.trim());
+
+export const isValidDemoEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
+
 export interface PlanInfo {
   name: string;
   price: string;

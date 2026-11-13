@@ -1,7 +1,8 @@
 import { lazy, Suspense, useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { Link } from 'react-router';
 import { motion, useInView } from 'motion/react';
-import { ArrowDown, ArrowLeft, ArrowRight, ArrowUpRight, BellRing, Check, CircleHelp, ListTodo, Pause, Play, Search, ShieldCheck, Sparkles } from 'lucide-react';
+import { ArrowDown, ArrowLeft, ArrowRight, ArrowUpRight, CircleHelp, Pause, Play, Search, ShieldCheck, Sparkles } from 'lucide-react';
+import { miraUseCases } from '@/app/content/miraUseCases';
 import { usePageMeta } from '@/app/hooks/usePageMeta';
 import appIcon from '@/assets/mira/mira-app-icon.webp';
 import '@/styles/mira-landing.css';
@@ -22,33 +23,6 @@ function useReducedMotion() {
     () => true,
   );
 }
-
-const examples = [
-  {
-    title: 'Find a project',
-    icon: Search,
-    prompt: 'Open the Website Refresh project.',
-    response: 'I found Website Refresh in your workspace. Opening the project.',
-    result: 'Website Refresh opened',
-    context: 'MIRA looks up projects you can access and can ask you to choose if more than one name matches.',
-  },
-  {
-    title: 'Create a task',
-    icon: ListTodo,
-    prompt: 'Create a task for me to review the launch checklist in Website Refresh.',
-    response: 'I created “Review the launch checklist” in Website Refresh and assigned it to you.',
-    result: 'Task created in Website Refresh',
-    context: 'MIRA uses the project and assignee you give it. Talio checks that you can create tasks in that project.',
-  },
-  {
-    title: 'Set a reminder',
-    icon: BellRing,
-    prompt: 'Remind me tomorrow at 9 a.m. to send the launch notes.',
-    response: 'Your reminder to send the launch notes is set for tomorrow at 9 a.m. in your time zone.',
-    result: 'Personal reminder scheduled',
-    context: 'MIRA turns a time and a request into a personal reminder that appears in Talio notifications.',
-  },
-];
 
 const principles = [
   {
@@ -136,10 +110,10 @@ function MiraMascot({ reduceMotion }: { reduceMotion: boolean }) {
 }
 
 export function MiraLanding() {
-  usePageMeta('MIRA · Super Intelligence', 'Meet MIRA, Super Intelligence inside Talio. Find work, create tasks and schedule reminders with a conversation.');
+  usePageMeta('MIRA · Super Intelligence', 'Explore how MIRA Super Intelligence helps automate tasks, review workforce activity and coordinate project follow-ups in Talio.');
   const reduceMotion = useReducedMotion();
   const [selected, setSelected] = useState(0);
-  const example = examples[selected];
+  const example = miraUseCases[selected];
   const reveal = reduceMotion ? {} : {
     initial: { opacity: 0.45, y: 20 },
     whileInView: { opacity: 1, y: 0 },
@@ -153,9 +127,9 @@ export function MiraLanding() {
         <motion.div className="mira-hero-copy" {...reveal}>
           <Link className="mira-back" to="/features"><ArrowLeft size="1em" /> All features</Link>
           <h1 id="mira-heading">Super Intelligence<br />inside <em>Talio.</em></h1>
-          <p>Meet MIRA. Ask it to find a project, create a task or remind you about a deadline without leaving your workspace.</p>
+          <p>Meet MIRA. Turn a request into assigned work, bring the right people into a review, and get the context you need to make a decision.</p>
           <div className="mira-actions">
-            <a className="mira-primary" href="#mira-demo">Try a sample <ArrowDown size="1em" /></a>
+            <a className="mira-primary" href="#mira-demo">Explore use cases <ArrowDown size="1em" /></a>
             <Link className="mira-secondary" to="/get-started">Get started <ArrowUpRight size="1em" /></Link>
           </div>
         </motion.div>
@@ -184,20 +158,25 @@ export function MiraLanding() {
       </section>
 
       <section className="mira-wrap mira-section mira-demo" id="mira-demo" aria-labelledby="mira-demo-heading">
-        <motion.div className="mira-demo-selector" {...reveal}>
+        <motion.div className="mira-demo-intro" {...reveal}>
           <h2 id="mira-demo-heading">What would you ask MIRA?</h2>
-          <p>Choose a request to see how it works.</p>
-          <div className="mira-options" role="group" aria-label="Sample MIRA requests">
-            {examples.map(({ title, icon: Icon }, index) => (
-              <button key={title} type="button" aria-pressed={selected === index} onClick={() => setSelected(index)}>
-                <Icon size="1.15em" aria-hidden="true" />
-                <span>{title}</span>
-                <ArrowRight size="1em" aria-hidden="true" />
-              </button>
-            ))}
-          </div>
+          <p>Explore ten sample conversations, from automating a launch to spotting delivery risk.</p>
         </motion.div>
-        <motion.div className="mira-demo-window" {...reveal}>
+        <motion.div className="mira-options" role="group" aria-label="MIRA use cases" {...reveal}>
+          {miraUseCases.map(({ id, title, icon: Icon, type }, index) => (
+            <button
+              key={id}
+              type="button"
+              aria-pressed={selected === index}
+              aria-controls="mira-sample"
+              onClick={() => setSelected(index)}
+            >
+              <Icon size="1.1em" aria-hidden="true" />
+              <span>{title}{type === 'Concept' && <small>Concept</small>}</span>
+            </button>
+          ))}
+        </motion.div>
+        <motion.div className="mira-demo-window" id="mira-sample" {...reveal}>
           <div className="mira-demo-window-title">
             <img src={appIcon} alt="" width="36" height="36" loading="lazy" />
             <strong>MIRA</strong>
@@ -205,14 +184,20 @@ export function MiraLanding() {
           </div>
           <div className="mira-conversation" role="status">
             <motion.div
-              key={example.title}
+              key={example.id}
               initial={reduceMotion ? false : { opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: reduceMotion ? 0 : 0.24 }}
             >
+              <div className="mira-scenario-heading">
+                <h3>{example.title}</h3>
+                <span data-concept={example.type === 'Concept'}>{example.type}</span>
+              </div>
               <div className="mira-prompt"><span>You</span><p>{example.prompt}</p></div>
               <div className="mira-reply"><span>MIRA</span><p>{example.response}</p></div>
-              <div className="mira-result"><Check size="1em" aria-hidden="true" /> {example.result}</div>
+              <ul className="mira-results" aria-label="Sample outcomes">
+                {example.details.map(detail => <li key={detail}>{detail}</li>)}
+              </ul>
               <p className="mira-context">{example.context}</p>
             </motion.div>
           </div>

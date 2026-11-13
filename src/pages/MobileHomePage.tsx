@@ -66,13 +66,13 @@ const goalCards = [
   { title: 'Cross-team alignment', value: '12 teams', progress: 72, gradient: 'from-amber-400 to-orange-400' },
 ];
 
-const aiCapabilities = [
-  { icon: Bot, title: 'MIRA inside workflows', description: 'Get summaries, follow-ups, and operational help without leaving the flow of work.' },
-  { icon: Sparkles, title: 'Smart nudges', description: 'Flag delays, risks, and follow-ups before they become blockers.' },
-  { icon: Clock, title: 'Weekly time savings', description: 'Automate repetitive HR operations that eat into the day.' },
-  { icon: MessageCircle, title: 'Contextual support', description: 'Bring help, updates, and approvals into one conversation layer.' },
-  { icon: Shield, title: 'Trusted decisions', description: 'Human-readable summaries make AI suggestions easier to act on.' },
-  { icon: Globe, title: 'Ready for global teams', description: 'Support distributed teams with multilingual, mobile-friendly workflows.' },
+const miraCapabilities = [
+  { icon: Bot, title: 'Ask in plain language', description: 'Find a project, a task, or a teammate without digging through menus.' },
+  { icon: Sparkles, title: 'Summarize what happened', description: 'Review a summary of available meeting notes or transcripts.' },
+  { icon: Clock, title: 'Set a reminder', description: 'Ask MIRA to remind you about a follow-up at a time you choose.' },
+  { icon: MessageCircle, title: 'Create work from chat', description: 'Turn a request into a task or a meeting in Talio.' },
+  { icon: Shield, title: 'Work within your access', description: 'MIRA can use the workspace information your role is allowed to see.' },
+  { icon: Globe, title: 'Type or speak', description: 'Use text or voice where your device and permissions support it.' },
 ];
 
 const privacyFeatures = [
@@ -176,7 +176,7 @@ export function MobileHomePage() {
               transition={{ duration: 0.6 }}
               className="mobile-hero-eyebrow inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-[0.6875rem] font-semibold uppercase tracking-[0.18em] text-blue-300"
             >
-              ✦ AI-Powered Productivity Utility
+              ✦ Work and people operations with SI
             </motion.div>
 
             <motion.h1
@@ -394,14 +394,14 @@ export function MobileHomePage() {
       <section className="relative py-16 overflow-hidden bg-black">
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
           <SectionHeading
-            label="AI"
-            title="Workforce intelligence that teams can act on"
-            subtitle="Useful AI, clearer signals, and action-ready recommendations that support faster decisions across the organization."
+            label="Super Intelligence"
+            title="Find answers and take action with MIRA"
+            subtitle="Super Intelligence (SI) is how MIRA uses your Talio context to answer questions, summarize work, and carry out supported actions."
             accentClassName="text-gray-400"
           />
 
           <div className="mt-10 grid grid-cols-2 gap-3">
-            {aiCapabilities.map((item, index) => (
+            {miraCapabilities.map((item, index) => (
               <motion.div
                 key={item.title}
                 initial={{ opacity: 0, y: 24 }}
@@ -418,6 +418,9 @@ export function MobileHomePage() {
               </motion.div>
             ))}
           </div>
+          <Link to="/mira" className="mx-auto mt-7 flex w-fit items-center gap-2 rounded-full border border-violet-400/30 px-5 py-3 text-sm font-medium text-violet-200">
+            Explore SI with MIRA <ArrowRight className="h-4 w-4" />
+          </Link>
         </div>
       </section>
 

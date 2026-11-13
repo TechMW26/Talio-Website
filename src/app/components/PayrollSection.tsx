@@ -64,7 +64,7 @@ const NODES: FlowNode[] = [
   { id: 'r8',  icon: Timer,          label: 'Break Timer',      desc: 'Auto-scheduled',       color: '#fb923c', x: 98, y: 44,  parentId: 'r6',  delay: 1.02 },
   { id: 'r9',  icon: FileCheck,      label: 'Compliance',       desc: '100% adherence',       color: '#a3e635', x: 74, y: 48,  parentId: 'r7',  delay: 1.06 },
   { id: 'r10', icon: Gauge,          label: 'Overtime Alert',   desc: '2.5 h exceeded',       color: '#fb923c', x: 94, y: 55,  parentId: 'r8',  delay: 1.16 },
-  { id: 'r11', icon: Sparkles,       label: 'AI Insights',      desc: 'Pattern analysis',     color: '#c084fc', x: 78, y: 60,  parentId: 'r9',  delay: 1.20 },
+  { id: 'r11', icon: Sparkles,       label: 'Payroll insights',      desc: 'Pattern analysis',     color: '#c084fc', x: 78, y: 60,  parentId: 'r9',  delay: 1.20 },
   { id: 'r12', icon: BarChart3,      label: 'Analytics',        desc: 'Weekly insights',      color: '#34d399', x: 98, y: 67,  parentId: 'r10', delay: 1.30 },
   { id: 'r13', icon: BellRing,       label: 'Late Alerts',      desc: '3 triggered today',    color: '#fb7185', x: 81, y: 72,  parentId: 'r11', delay: 1.34 },
   { id: 'r14', icon: Database,       label: 'Shift Logs',       desc: '120 this week',        color: '#fbbf24', x: 93, y: 80,  parentId: 'r12', delay: 1.44 },

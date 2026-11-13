@@ -6,6 +6,8 @@ import {
   Share2, Copy, Check, ArrowRight,
 } from 'lucide-react';
 import { getBlogPostBySlug, getPublishedBlogPosts, type BlogPost } from '@/lib/firebase';
+import { publishedBlogCopy } from '@/app/content/publishedBlogCopy';
+import { setPageCanonical } from '@/app/hooks/usePageMeta';
 
 export function BlogPostPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -18,10 +20,11 @@ export function BlogPostPage() {
     (async () => {
       if (!slug) return;
       try {
-        const found = await getBlogPostBySlug(slug);
+        const stored = await getBlogPostBySlug(slug);
+        const found = stored && publishedBlogCopy(stored);
         setPost(found);
         if (found) {
-          const all = await getPublishedBlogPosts();
+          const all = (await getPublishedBlogPosts()).map(publishedBlogCopy);
           const others = all
             .filter(p => p.slug !== found.slug)
             .filter(p => p.tags?.some(t => found.tags?.includes(t)))
@@ -38,6 +41,7 @@ export function BlogPostPage() {
     if (!post) return;
 
     const base = 'Talio';
+    const canonical = setPageCanonical(window.location.pathname);
     document.title = `${post.title} — ${base} Blog`;
 
     const setMeta = (name: string, content: string, attr = 'name') => {
@@ -50,14 +54,16 @@ export function BlogPostPage() {
       el.content = content;
     };
 
+    setMeta('title', document.title);
     setMeta('description', post.metaDescription);
     setMeta('og:title', `${post.title} — ${base} Blog`, 'property');
     setMeta('og:description', post.metaDescription, 'property');
     setMeta('og:type', 'article', 'property');
-    setMeta('og:url', window.location.href, 'property');
+    setMeta('og:url', canonical, 'property');
     if (post.featuredImage) setMeta('og:image', post.featuredImage, 'property');
     setMeta('twitter:card', 'summary_large_image');
     setMeta('twitter:title', post.title);
+    setMeta('twitter:url', canonical);
     setMeta('twitter:description', post.metaDescription);
     if (post.featuredImage) setMeta('twitter:image', post.featuredImage);
     setMeta('article:published_time', post.publishedAt || post.createdAt, 'property');
@@ -78,7 +84,7 @@ export function BlogPostPage() {
         name: 'Talio',
         url: window.location.origin,
       },
-      mainEntityOfPage: { '@type': 'WebPage', '@id': window.location.href },
+      mainEntityOfPage: { '@type': 'WebPage', '@id': canonical },
       wordCount: post.content.replace(/<[^>]*>/g, '').split(/\s+/).filter(Boolean).length,
       articleBody: post.content.replace(/<[^>]*>/g, '').slice(0, 500),
     };
@@ -99,7 +105,7 @@ export function BlogPostPage() {
       itemListElement: [
         { '@type': 'ListItem', position: 1, name: 'Home', item: window.location.origin },
         { '@type': 'ListItem', position: 2, name: 'Blog', item: `${window.location.origin}/blog` },
-        { '@type': 'ListItem', position: 3, name: post.title, item: window.location.href },
+        { '@type': 'ListItem', position: 3, name: post.title, item: canonical },
       ],
     };
 

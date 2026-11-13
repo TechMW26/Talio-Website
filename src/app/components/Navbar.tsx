@@ -41,10 +41,10 @@ type FeatureGroup = {
 const NAV_ITEMS: NavItem[] = [
   {
     name: 'MIRA',
-    href: '/MIRA-ai',
+    href: '/mira',
     gradient: true,
     mobileIcon: Bot,
-    mobileDescription: 'Open the dedicated MIRA experience without leaving the site route.',
+    mobileDescription: 'Explore Super Intelligence with MIRA.',
   },
   {
     name: 'Features',
@@ -104,7 +104,7 @@ const FEATURE_GROUPS: FeatureGroup[] = [
     mobileBorderClassName: 'border-pink-500/20',
     mobileAuraClassName: 'from-pink-500/18 via-fuchsia-400/6 to-transparent',
     items: [
-      { icon: Bot, title: 'MIRA', description: 'Ask questions and take action in Talio', accentColor: 'violet', href: '/features/MIRA-ai', badge: 'New' },
+      { icon: Bot, title: 'MIRA', description: 'Put Super Intelligence to work', accentColor: 'violet', href: '/mira', badge: 'New' },
       { icon: MessageSquare, title: 'Team Chat', description: 'Private and group conversations', accentColor: 'pink', href: '/features/team-chat' },
       { icon: Bell, title: 'Notifications', description: 'Stay updated with real-time alerts', accentColor: 'orange', href: '/features/notifications' },
     ],

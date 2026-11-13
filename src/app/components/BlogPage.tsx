@@ -3,6 +3,7 @@ import { motion } from 'motion/react';
 import { Link } from 'react-router';
 import { Clock, ArrowRight, Search, Tag, Calendar, User, ChevronRight } from 'lucide-react';
 import { getPublishedBlogPosts, type BlogPost } from '@/lib/firebase';
+import { publishedBlogCopy } from '@/app/content/publishedBlogCopy';
 import { usePageMeta } from '@/app/hooks/usePageMeta';
 
 export function BlogPage() {
@@ -15,7 +16,7 @@ export function BlogPage() {
 
   useEffect(() => {
     (async () => {
-      try { setPosts(await getPublishedBlogPosts()); } catch { /* silent */ }
+      try { setPosts((await getPublishedBlogPosts()).map(publishedBlogCopy)); } catch { /* silent */ }
       setLoading(false);
     })();
   }, []);

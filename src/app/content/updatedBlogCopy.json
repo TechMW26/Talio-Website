@@ -1,0 +1,32 @@
+{
+  "talio-transforms-attendance-tracking-gps-geofencing-facial-recognition": {
+    "title": "How GPS and Geofencing Work in Talio Attendance",
+    "metaDescription": "See how Talio checks your location at clock-in, handles configured workplace boundaries, and routes attendance corrections for review.",
+    "tags": [
+      "Attendance",
+      "GPS Tracking",
+      "Workforce Management"
+    ],
+    "content": "<p>Talio keeps clock-ins, clock-outs, and corrections in the same attendance record. When your organization uses location checks, Talio can compare the location of a punch with a configured worksite.</p>\n<h2>Check in at your worksite</h2>\n<p>Open Attendance and select Check In. If your organization requires location verification, allow location access on your device and wait for the check. Check Out closes the record at the end of your shift.</p>\n<h2>Set workplace boundaries</h2>\n<p>Admins can configure a geofence for a work location. A geofence is a boundary Talio uses when it evaluates a punch under your organization’s attendance rules. Your admin can help if you’re assigned to the wrong worksite or your device can’t get a reliable location.</p>\n<h2>Review and correct your record</h2>\n<p>Use attendance history to check your punches. If an entry is missing or incorrect, submit a correction with the time and reason. A reviewer can check the details before approving it.</p>\n<p><a href=\"/features/attendance\">Explore Talio attendance</a>.</p>"
+  },
+  "meet-mira-talio-ai-assistant-redefining-hr-operations": {
+    "title": "Meet MIRA, Talio’s Super Intelligence Assistant",
+    "metaDescription": "See how MIRA uses Super Intelligence (SI) to find work in Talio, summarize available meeting notes, and carry out supported requests.",
+    "tags": [
+      "MIRA",
+      "Super Intelligence",
+      "HR Operations"
+    ],
+    "content": "<p>MIRA is the assistant inside Talio. Super Intelligence (SI) is Talio’s name for the way MIRA uses your workspace context to understand a request and help you act on it.</p>\n<h2>Find what you’re working on</h2>\n<p>Ask MIRA to find a project, a task, or a teammate you have access to. Try “Open the website launch project.” If your request could mean more than one thing, give MIRA a little more detail.</p>\n<h2>Go from a request to a next step</h2>\n<p>Give MIRA the project, due date, and other details it needs to create a task. You can also ask it to arrange a meeting, send a message, or set a personal reminder. Open the resulting item and check the details.</p>\n<h2>Pick up a meeting after it ends</h2>\n<p>Where the workspace has meeting notes or a transcript, MIRA can help you review a summary. Use the source material to check any decision you plan to act on.</p>\n<h2>Work within your access</h2>\n<p>Supported actions depend on your workspace, role, and device. For example, voice and screen features depend on device permissions and service availability.</p>\n<p><a href=\"/mira\">Explore Super Intelligence with MIRA</a>.</p>"
+  },
+  "why-growing-companies-switching-talio-unified-workforce-management": {
+    "title": "How Talio Connects Team Work and People Operations",
+    "metaDescription": "See how projects, team chat, attendance, leave, payroll, and MIRA fit together in a Talio workspace.",
+    "tags": [
+      "Workforce Management",
+      "HR Platform",
+      "Team Productivity"
+    ],
+    "content": "<p>A project update, a leave request, and a payroll question often reach different people. Talio gives teams a workspace for daily work and employee operations so they can find each record in the same system.</p>\n<h2>Give the work a clear home</h2>\n<p>Plan work in projects, assign tasks, and use team chat to share decisions. Project members can refer to task updates and notes when they need to check what changed.</p>\n<h2>Keep people records together</h2>\n<p>Employees can review attendance history and request leave. Managers can review requests within their access, and payroll teams can use the workspace’s payroll tools to prepare records and make payslips available.</p>\n<h2>Ask MIRA for help</h2>\n<p>Super Intelligence (SI) lets MIRA use the work your role can access. Ask it to find a project, create a task, set a reminder, or summarize available notes.</p>\n<p><a href=\"/features\">Explore Talio features</a> or <a href=\"/mira\">try the MIRA walkthrough</a>.</p>"
+  }
+}

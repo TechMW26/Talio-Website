@@ -940,7 +940,7 @@ section {
     color: white;
 }
 
-.chat-bubble.ai {
+.chat-bubble.assistant {
     align-self: flex-start;
     background: var(--bg-tertiary);
     color: var(--text-primary);
@@ -3844,7 +3844,7 @@ body {
     z-index: 1;
 }
 
-/* MIRA AI Section - Liquid Glass Experience */
+/* MIRA Section - Liquid Glass Experience */
 .MIRA-experience {
     position: relative;
     background: transparent;

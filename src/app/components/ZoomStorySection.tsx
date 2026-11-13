@@ -153,7 +153,7 @@ export function ZoomStorySection() {
   });
 
   const stats = [
-    { value: 'AI-first', label: 'Product direction', icon: TrendingUp },
+    { value: 'SI', label: 'Super Intelligence', icon: TrendingUp },
     { value: 'Daily-use', label: 'Operating model', icon: Users },
     { value: 'One stack', label: 'Platform philosophy', icon: Sparkles }
   ];

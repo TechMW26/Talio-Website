@@ -41,9 +41,39 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://talio.in/features/MIRA-ai</loc>
+    <loc>https://talio.in/features/productivity</loc>
     <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://talio.in/features/meetings</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://talio.in/features/whiteboard</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://talio.in/features/people</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://talio.in/features/recruitment</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://talio.in/features/operations</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://talio.in/features/documents</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://talio.in/features/team-chat</loc>
@@ -81,7 +111,7 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://talio.in/MIRA-ai</loc>
+    <loc>https://talio.in/mira</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>

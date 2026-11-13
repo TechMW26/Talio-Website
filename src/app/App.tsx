@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router';
 import { Suspense, lazy, useEffect, useRef } from 'react';
 import Lenis from 'lenis';
 import { Navbar } from '@/app/components/Navbar';
@@ -32,7 +32,7 @@ const LeavesFeature = lazy(() => import('@/app/components/features/LeavesFeature
 const ProjectsFeature = lazy(() => import('@/app/components/features/ProjectsFeature').then((module) => ({ default: module.ProjectsFeature })));
 const GoalsFeature = lazy(() => import('@/app/components/features/GoalsFeature').then((module) => ({ default: module.GoalsFeature })));
 const WorkflowsFeature = lazy(() => import('@/app/components/features/WorkflowsFeature').then((module) => ({ default: module.WorkflowsFeature })));
-const MIRAAIFeature = lazy(() => import('@/app/components/features/MiraAIFeature').then((module) => ({ default: module.MIRAAIFeature })));
+const MiraLanding = lazy(() => import('@/app/components/MiraLanding').then((module) => ({ default: module.MiraLanding })));
 const TeamChatFeature = lazy(() => import('@/app/components/features/TeamChatFeature').then((module) => ({ default: module.TeamChatFeature })));
 const NotificationsFeature = lazy(() => import('@/app/components/features/NotificationsFeature').then((module) => ({ default: module.NotificationsFeature })));
 const AdminDashboard = lazy(() => import('@/app/components/AdminDashboard').then((module) => ({ default: module.AdminDashboard })));
@@ -66,6 +66,11 @@ function ScrollToTop({ lenisRef }: { lenisRef?: React.RefObject<Lenis | null> })
   return null;
 }
 
+function MiraRedirect() {
+  const { search, hash } = useLocation();
+  return <Navigate to={{ pathname: '/mira', search, hash }} replace />;
+}
+
 function AppLayout() {
   const { pathname } = useLocation();
   const isAdmin = pathname === '/admin';
@@ -73,8 +78,8 @@ function AppLayout() {
   const isMobileViewport = useIsMobileViewport();
   const lenisRef = useRef<Lenis | null>(null);
 
-  const isProductPage = pathname.startsWith('/features') || pathname === '/downloads' || pathname === '/MIRA-ai';
-  useDesktopScaleCompensation(isMobileViewport || isAdmin || isProductPage);
+  const isProductPage = /^\/(?:features(?:\/|$)|(?:downloads|mira|mira-ai)\/?$)/i.test(pathname);
+  useDesktopScaleCompensation(isMobileViewport || isAdmin);
 
   useEffect(() => {
     if (isMobileViewport || isProductPage) {
@@ -124,7 +129,8 @@ function AppLayout() {
           <Route path="/about" element={<AboutPage />} />
           <Route path="/downloads" element={<Downloads />} />
           <Route path="/documents" element={<Documents />} />
-          <Route path="/MIRA-ai" element={<MIRAAIFeature />} />
+          <Route path="/mira" element={<MiraLanding />} />
+          <Route path="/MIRA-ai" element={<MiraRedirect />} />
           <Route path="/features" element={<FeaturesPage />} />
           <Route path="/features/:slug" element={<FeatureDetail />} />
           <Route path="/features/attendance" element={<AttendanceFeature />} />
@@ -133,7 +139,8 @@ function AppLayout() {
           <Route path="/features/projects" element={<ProjectsFeature />} />
           <Route path="/features/goals" element={<GoalsFeature />} />
           <Route path="/features/workflows" element={<WorkflowsFeature />} />
-          <Route path="/features/MIRA-ai" element={<MIRAAIFeature />} />
+          <Route path="/features/mira" element={<MiraRedirect />} />
+          <Route path="/features/MIRA-ai" element={<MiraRedirect />} />
           <Route path="/features/team-chat" element={<TeamChatFeature />} />
           <Route path="/features/notifications" element={<NotificationsFeature />} />
           <Route path="/pricing" element={<PricingPage />} />

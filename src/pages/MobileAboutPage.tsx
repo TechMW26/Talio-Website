@@ -16,7 +16,7 @@ const aboutHighlights = [
   },
   {
     title: 'Real Innovation',
-    description: 'AI, analytics, and workflow design come together to solve practical workforce problems.',
+    description: 'Super Intelligence, analytics, and workflow design help teams handle everyday work.',
     gradient: 'from-violet-500 to-indigo-500',
   },
   {
@@ -54,14 +54,14 @@ const values = [
 ];
 
 const stats = [
-  { value: 'AI-first', label: 'Product direction' },
+  { value: 'SI', label: 'Super Intelligence' },
   { value: 'Daily-use', label: 'Operating model' },
   { value: 'One stack', label: 'Platform philosophy' },
   { value: 'Ops-ready', label: 'Team fit' },
 ];
 
 export function MobileAboutPage() {
-  usePageMeta('About', 'Learn how Talio is building an AI-powered productivity utility with MIRA and HRMS add-ons for modern teams.');
+  usePageMeta('About', 'Meet the team building Talio, a workspace for projects, people operations, and MIRA with Super Intelligence.');
 
   return (
     <div className="min-h-screen bg-black text-white">

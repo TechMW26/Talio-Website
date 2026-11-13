@@ -22,7 +22,7 @@ export function Footer() {
         { label: 'Pricing', href: '/pricing' },
         { label: 'Downloads', href: '/downloads' },
         { label: 'Solutions', href: '/solutions' },
-        { label: 'MIRA', href: '/MIRA-ai' },
+        { label: 'MIRA', href: '/mira' },
       ]
     },
     {
@@ -149,7 +149,7 @@ export function Footer() {
               </div>
               
               <p className="text-sm text-gray-500 leading-relaxed mb-8 max-w-xs">
-                Talio is an AI-powered productivity utility for modern teams, with MIRA and built-in HRMS add-ons in one operating layer.
+                Talio brings projects, team chat, and people operations together, with help from MIRA and Super Intelligence.
               </p>
 
               {/* Contact Info */}

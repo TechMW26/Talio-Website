@@ -6,7 +6,7 @@ const DesktopHomePage = lazy(() => import('@/pages/DesktopHomePage').then((modul
 const MobileHomePage = lazy(() => import('@/pages/MobileHomePage').then((module) => ({ default: module.MobileHomePage })));
 
 export function HomePage() {
-  usePageMeta('', 'Talio is an AI-powered productivity utility for modern teams, with MIRA inside workflows and built-in HRMS add-ons for attendance, leave, payroll, and employee management.');
+  usePageMeta('', 'Manage projects, coordinate teams, and handle attendance, leave, and payroll in Talio. Ask MIRA for help using Super Intelligence (SI).');
   const isMobileViewport = useIsMobileViewport();
 
   return (

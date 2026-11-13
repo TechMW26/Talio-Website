@@ -6,7 +6,7 @@ const quickLinks = [
   { label: 'Features', href: '/features' },
   { label: 'Pricing', href: '/pricing' },
   { label: 'Downloads', href: '/downloads' },
-  { label: 'MIRA', href: '/MIRA-ai' },
+  { label: 'MIRA', href: '/mira' },
   { label: 'Docs', href: '/documents' },
   { label: 'Contact', href: '/contact' },
   { label: 'Help Center', href: '/help' },
@@ -60,7 +60,7 @@ export function MobileFooter() {
           </div>
 
           <span className="mt-4 block text-sm font-light leading-relaxed text-gray-500">
-            Talio combines daily productivity visibility, coordination, MIRA, and HRMS add-ons in one operating layer.
+            Talio brings projects, team chat, and people operations together, with help from MIRA and Super Intelligence.
           </span>
 
           <div className="mt-5 space-y-2.5 text-sm text-gray-500">

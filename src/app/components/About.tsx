@@ -7,7 +7,7 @@ import { usePageMeta } from '@/app/hooks/usePageMeta';
 import { useCompensatedMinWidth } from '@/app/hooks/useZoomCompensatedViewport';
 
 export function About() {
-  usePageMeta('About', 'Learn how Talio is building an AI-powered productivity utility with MIRA and HRMS add-ons for modern teams.');
+  usePageMeta('About', 'Meet the team building Talio, a workspace for projects, people operations, and MIRA with Super Intelligence.');
   const hasAboutSplitLayout = useCompensatedMinWidth(1120);
   const hasAboutAsymmetricGrid = useCompensatedMinWidth(1320);
   const hasAboutTwoColumnGrid = useCompensatedMinWidth(900);
@@ -50,7 +50,7 @@ export function About() {
   const [activeValueIndex, setActiveValueIndex] = useState(0);
 
   const stats = [
-    { value: 'AI-first', label: 'Product direction' },
+    { value: 'SI', label: 'Super Intelligence' },
     { value: 'Daily-use', label: 'Operating model' },
     { value: 'One stack', label: 'Platform philosophy' }
   ];
@@ -367,7 +367,7 @@ export function About() {
                 { 
                   icon: '03', 
                   title: 'Real Innovation', 
-                  desc: 'Cutting-edge AI and data analytics',
+                  desc: 'Super Intelligence and data analytics',
                   span: 'col-span-7',
                   gradient: 'from-violet-600 to-indigo-600'
                 },
@@ -468,7 +468,7 @@ export function About() {
           >
             <div className={`grid gap-8 ${hasFourStatColumns ? 'grid-cols-4 lg:gap-12' : 'grid-cols-2'}`}>
               {[
-                { value: 'AI-first', label: 'Product direction' },
+                { value: 'SI', label: 'Super Intelligence' },
                 { value: 'Daily-use', label: 'Operating model' },
                 { value: 'One stack', label: 'Platform philosophy' },
                 { value: 'Ops-ready', label: 'Team fit' }

@@ -27,6 +27,10 @@ html.lenis, html.lenis body {
   }
 }
 
+.product-site-shell, .product-site-shell * { cursor: auto !important; }
+.product-site-shell :is(a,button,summary), .product-site-shell :is(a,button,summary) * { cursor: pointer !important; }
+.product-site-shell input { cursor: text !important; }
+
 /* Restore cursor inside admin panel */
 .admin-panel,
 .admin-panel * {

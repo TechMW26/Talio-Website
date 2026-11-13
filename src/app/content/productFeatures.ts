@@ -18,10 +18,10 @@ export const productFeatures: ProductFeature[] = [
     preview: 'board', rows: [['Outline the launch', 'Planning', 'Brief ready'], ['Review the first draft', 'In progress', 'Team review'], ['Share the final assets', 'Complete', 'Approved']],
   },
   {
-    slug: 'MIRA-ai', name: 'MIRA assistant', category: 'MIRA & insights', icon: Sparkles,
+    slug: 'mira', name: 'MIRA Super Intelligence', category: 'MIRA & insights', icon: Sparkles,
     eyebrow: 'Ask. Find. Get something done.', headline: 'A little less searching.\nA little more doing.',
     description: 'Talk or type to MIRA inside Talio. Find a project, create a task, arrange a meeting or get help making sense of your work.',
-    note: 'MIRA uses your access permissions. AI output needs review; voice, screen tools and image features depend on device support, permissions and provider availability.',
+    note: 'MIRA uses your access permissions. Review MIRA’s output; voice, screen tools and image features depend on device support, permissions and provider availability.',
     capabilities: [['Turn a request into an action', 'Create tasks, projects and meetings, assign work, and send a message when you ask.'], ['Stay in the conversation', 'Use voice, a compact view, quick notes and personal reminders as you move through Talio.'], ['Bring in context', 'Ask about accessible work, attach supported files, or request help navigating the current app view.']],
     flow: [['Ask naturally', 'Describe what you need in text or voice.'], ['Fill in the gaps', 'MIRA asks for missing details or helps resolve a name.'], ['Check the outcome', 'See the result of the action and open the related work.']],
     preview: 'conversation', rows: [['You', 'Find the launch project.', 'Request'], ['MIRA', 'Which launch project do you mean?', 'Clarify'], ['You', 'The website launch. Open its tasks.', 'Continue']],
@@ -30,9 +30,9 @@ export const productFeatures: ProductFeature[] = [
     slug: 'productivity', name: 'Productivity insights', category: 'MIRA & insights', icon: Activity,
     eyebrow: 'Context for your working day', headline: 'Review the day.\nUnderstand the work.',
     description: 'Bring activity, captured screens and MIRA summaries into a daily view. Explore a date or an accessible team member when you need more context.',
-    note: 'Desktop capture requires permissions and company configuration. Activity and AI summaries are context for a conversation, not proof of the quality of someone’s work.',
+    note: 'Desktop capture requires permissions and company configuration. Activity and MIRA summaries are context for a conversation, not proof of the quality of someone’s work.',
     capabilities: [['Look at a specific day', 'Choose a date and review the activity and captures available for it.'], ['Inspect the evidence', 'Open captured screens and move through a gallery rather than relying only on a summary.'], ['Use MIRA for a first pass', 'Request analysis of available captures and review the result alongside the source material.']],
-    flow: [['Set up capture', 'Install the desktop app and follow your company’s permission setup.'], ['Choose a view', 'Look at your day or the team data your role can access.'], ['Review in context', 'Use the underlying captures to check AI observations.']],
+    flow: [['Set up capture', 'Install the desktop app and follow your company’s permission setup.'], ['Choose a view', 'Look at your day or the team data your role can access.'], ['Review in context', 'Use the underlying captures to check MIRA’s observations.']],
     preview: 'records', rows: [['Daily activity', 'Selected day', 'Review'], ['Screen captures', 'Available captures', 'Open gallery'], ['MIRA summary', 'Review with context', 'Insights']],
   },
   {
@@ -93,7 +93,7 @@ export const productFeatures: ProductFeature[] = [
     slug: 'meetings', name: 'Meetings', category: 'Daily work', icon: Video,
     eyebrow: 'Before, during and after', headline: 'Meet with a plan.\nLeave with context.',
     description: 'Schedule a meeting, invite the right people and keep the agenda nearby. Online meeting tools and MIRA summaries help you return to what was discussed.',
-    note: 'Online calls need camera or microphone permissions as appropriate. Summaries need available transcript or notes and an AI provider; review them for accuracy.',
+    note: 'Online calls need camera or microphone permissions as appropriate. Summaries need available transcript or notes and a configured model provider; review them for accuracy.',
     capabilities: [['Arrange the meeting', 'Choose a time, agenda and attendees for an online or offline meeting.'], ['Join the conversation', 'Use Talio’s online meeting room and supported screen-sharing tools.'], ['Return to the discussion', 'Generate or refresh a MIRA summary from the transcript and notes available.']],
     flow: [['Schedule', 'Set the agenda and invite attendees.'], ['Meet', 'Join online or use the offline location details.'], ['Follow up', 'Review the summary and carry decisions into your work.']],
     preview: 'records', rows: [['Weekly planning', 'Agenda & attendees', 'Scheduled'], ['Meeting room', 'Audio, video & sharing', 'Join'], ['Meeting summary', 'From notes or transcript', 'Review']],
@@ -154,3 +154,7 @@ export const productFeatures: ProductFeature[] = [
   },
 ];
 export function getProductFeature(slug: string) { return productFeatures.find(feature => feature.slug === slug); }
+
+export function featureHref(slug: string) {
+  return slug === 'mira' ? '/mira' : `/features/${slug}`;
+}

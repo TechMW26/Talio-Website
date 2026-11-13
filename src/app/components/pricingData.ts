@@ -102,7 +102,7 @@ export const pricingPlans: PricingPlan[] = [
       { name: 'Dedicated account manager', included: true },
       { name: 'Advanced control options', included: true },
       { name: 'Deployment flexibility', included: true },
-      { name: 'Strategic AI enablement', included: true },
+      { name: 'Super Intelligence onboarding', included: true },
       { name: 'Priority support channels', included: true },
     ],
     cta: 'Contact Sales',

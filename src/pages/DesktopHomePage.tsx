@@ -3,7 +3,7 @@ import { KeyboardSection } from '@/app/components/KeyboardSection';
 import { ProjectManagement } from '@/app/components/ProjectManagement';
 import { PayrollSection } from '@/app/components/PayrollSection';
 import { OKRSection } from '@/app/components/OKRSection';
-import { AISection } from '@/app/components/AISection';
+import { SuperIntelligenceSection } from '@/app/components/SuperIntelligenceSection';
 import { LanguagesSection } from '@/app/components/LanguagesSection';
 import { PrivacySection } from '@/app/components/PrivacySection';
 import { PricingCTA } from '@/app/components/PricingCTA';
@@ -16,7 +16,7 @@ export function DesktopHomePage() {
       <ProjectManagement />
       <PayrollSection />
       <OKRSection />
-      <AISection />
+      <SuperIntelligenceSection />
       <PrivacySection />
       <LanguagesSection />
       <PricingCTA />

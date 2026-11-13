@@ -9,7 +9,7 @@ const comparisonCompetitors = [
 
 const comparisonFeatures = [
   { name: 'Unified workspace', values: [true, false, false, false] },
-  { name: 'AI-powered automation', values: [true, false, false, false] },
+  { name: 'MIRA with Super Intelligence', values: [true, false, false, false] },
   { name: 'Built-in team chat', values: [true, false, false, true] },
   { name: 'Project management', values: [true, true, true, false] },
   { name: 'HR & Payroll', values: [true, false, false, false] },

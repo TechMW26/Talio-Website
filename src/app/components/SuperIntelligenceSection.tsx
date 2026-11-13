@@ -1,5 +1,6 @@
 import { motion, useInView, useScroll, useTransform } from 'motion/react';
 import { useRef, useEffect, useState } from 'react';
+import { Link } from 'react-router';
 import {
   Sparkles,
   CalendarCheck,
@@ -17,20 +18,19 @@ const ICONS = [
   { icon: DollarSign, color: '#A666AA', label: 'Payroll' },
   { icon: BarChart3, color: '#EC4492', label: 'Analytics' },
   { icon: Users, color: '#EC4492', label: 'Teams' },
-  { icon: Brain, color: '#A666AA', label: 'AI' },
+  { icon: Brain, color: '#A666AA', label: 'MIRA' },
   { icon: ShieldCheck, color: '#3E86C6', label: 'Compliance' },
 ];
 
-/* ── Stats data ── */
-const STATS = [
-  { value: '10M+', desc: 'workforce data points processed' },
-  { value: '19,000+', desc: 'teams and organizations onboarded' },
-  { value: '27%', desc: 'average productivity lift across teams' },
-  { value: '95+', desc: 'countries supported for global teams' },
+const CAPABILITIES = [
+  { label: 'Ask', description: 'Find a project, a task, or a teammate in Talio.' },
+  { label: 'Summarize', description: 'Review a digest of available meeting notes or transcripts.' },
+  { label: 'Act', description: 'Create a task, schedule a meeting, or set a reminder.' },
+  { label: 'Review', description: 'Check MIRA’s response against the workspace record.' },
 ];
 
-/* ── Gradient for stat numbers ── */
-const STAT_GRADIENT =
+/* ── Gradient for capability labels ── */
+const CAPABILITY_GRADIENT =
   'linear-gradient(315deg, #3E86C6 0%, #A666AA 24.77%, #EC4492 50%, #EE4454 74.32%, #F05427 100%)';
 
 /*
@@ -61,12 +61,12 @@ function ConnectorLines({ isInView, showDesktopConnector }: { isInView: boolean;
       <svg viewBox="0 0 600 280" className="w-full max-w-4xl" style={{ overflow: 'visible', height: 'auto', minHeight: '13.75rem' }} fill="none">
         <defs>
           {CONNECTOR_PATHS.map((p, i) => (
-            <linearGradient key={`g${i}`} id={`aiLineGrad-${i}`} x1="0" y1="0" x2="0" y2="1">
+            <linearGradient key={`g${i}`} id={`siLineGrad-${i}`} x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stopColor={p.color} stopOpacity="0.8" />
               <stop offset="100%" stopColor={p.color} stopOpacity="0.1" />
             </linearGradient>
           ))}
-          <radialGradient id="aiCenterGlow">
+          <radialGradient id="siCenterGlow">
             <stop offset="0%" stopColor="#EC4492" />
             <stop offset="100%" stopColor="#3E86C6" />
           </radialGradient>
@@ -80,7 +80,7 @@ function ConnectorLines({ isInView, showDesktopConnector }: { isInView: boolean;
             {/* Animated wave — slow start then sudden rush to bottom */}
             <path
               d={p.d}
-              stroke={`url(#aiLineGrad-${i})`}
+              stroke={`url(#siLineGrad-${i})`}
               strokeWidth="1.5"
               strokeLinecap="round"
               pathLength="100"
@@ -147,14 +147,14 @@ function ConnectorLines({ isInView, showDesktopConnector }: { isInView: boolean;
         ))}
 
         {/* Converge point glow */}
-        <circle cx={CONVERGE.x} cy={CONVERGE.y} r="3.5" fill="url(#aiCenterGlow)" opacity="0.8" />
-        <circle cx={CONVERGE.x} cy={CONVERGE.y} r="8" fill="url(#aiCenterGlow)" opacity="0.15">
+        <circle cx={CONVERGE.x} cy={CONVERGE.y} r="3.5" fill="url(#siCenterGlow)" opacity="0.8" />
+        <circle cx={CONVERGE.x} cy={CONVERGE.y} r="8" fill="url(#siCenterGlow)" opacity="0.15">
           <animate attributeName="r" values="8;14;8" dur="2s" repeatCount="indefinite" />
           <animate attributeName="opacity" values="0.15;0.05;0.15" dur="2s" repeatCount="indefinite" />
         </circle>
 
         {/* Vertical line from converge point downward (extends past viewBox via overflow:visible) */}
-        <line x1={CONVERGE.x} y1={CONVERGE.y} x2={CONVERGE.x} y2="500" stroke="url(#aiCenterGlow)" strokeWidth="2" opacity="0.5" />
+        <line x1={CONVERGE.x} y1={CONVERGE.y} x2={CONVERGE.x} y2="500" stroke="url(#siCenterGlow)" strokeWidth="2" opacity="0.5" />
         <line x1={CONVERGE.x} y1={CONVERGE.y} x2={CONVERGE.x} y2="500" stroke="#8fd7ff" strokeWidth="1.2" opacity="0.8" />
         {/* Glow around the vertical line */}
         <line x1={CONVERGE.x} y1={CONVERGE.y} x2={CONVERGE.x} y2="500" stroke="#4da3ff" strokeWidth="8" opacity="0.08" />
@@ -231,7 +231,7 @@ function IconBox({
   );
 }
 
-export function AISection() {
+export function SuperIntelligenceSection() {
   const sectionRef = useRef(null);
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: '-10%' });
@@ -269,7 +269,7 @@ export function AISection() {
             className="inline-flex items-center gap-2 text-sm font-semibold text-gray-400 uppercase tracking-widest mb-10"
           >
             <Sparkles className="w-4 h-4" />
-            AI Intelligence
+            Super Intelligence
           </motion.div>
 
           <motion.h2
@@ -278,12 +278,10 @@ export function AISection() {
             transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
             className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-10 leading-[1.05] tracking-tighter text-center"
           >
-            AI trained on millions of{' '}
-            {showDesktopConnector ? <br /> : ' '}
-            workforce insights from{' '}
+            Find answers and take action{' '}
             {showDesktopConnector ? <br /> : ' '}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#3E86C6] via-[#EC4492] to-[#F05427]">
-              top organizations
+              with MIRA
             </span>
           </motion.h2>
         </div>
@@ -316,23 +314,26 @@ export function AISection() {
             transition={{ duration: 0.8, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
             className="relative text-2xl md:text-4xl lg:text-5xl font-bold text-white leading-tight tracking-tight"
           >
-            This isn&apos;t just AI.{' '}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#3E86C6] via-[#A666AA] to-[#EC4492]">
-              It&apos;s workforce intelligence.
-            </span>
+            What is Super Intelligence?
           </motion.h3>
+          <p className="relative mx-auto max-w-2xl text-base leading-relaxed text-zinc-400 md:text-lg">
+            Super Intelligence (SI) is how MIRA uses your Talio context to answer questions, summarize work, and carry out supported actions.
+          </p>
+          <Link to="/mira" className="relative text-sm font-medium text-violet-300 underline underline-offset-4 hover:text-white">
+            Explore SI with MIRA
+          </Link>
         </div>
 
-        {/* ── Stats Grid ── */}
+        {/* Capabilities */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.8, delay: 0.6 }}
           className={`relative z-10 mx-auto mt-12 grid max-w-6xl gap-5 md:mt-16 md:gap-6 ${showDesktopConnector ? 'grid-cols-4' : 'grid-cols-2'}`}
         >
-          {STATS.map((stat, i) => (
+          {CAPABILITIES.map((capability, i) => (
             <motion.div
-              key={stat.value}
+              key={capability.label}
               initial={{ opacity: 0, y: 20 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.6, delay: 0.7 + i * 0.1 }}
@@ -352,17 +353,17 @@ export function AISection() {
                 }}
               />
 
-              {/* Gradient number */}
+              {/* Capability label */}
               <div
-                className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight mb-2 bg-clip-text text-transparent whitespace-nowrap"
-                style={{ backgroundImage: STAT_GRADIENT }}
+                className="text-xl sm:text-2xl md:text-3xl font-extrabold tracking-tight mb-2 bg-clip-text text-transparent whitespace-nowrap"
+                style={{ backgroundImage: CAPABILITY_GRADIENT }}
               >
-                {stat.value}
+                {capability.label}
               </div>
 
               {/* Description */}
               <p className="text-[0.8125rem] md:text-sm text-zinc-500 leading-relaxed font-light">
-                {stat.desc}
+                {capability.description}
               </p>
             </motion.div>
           ))}

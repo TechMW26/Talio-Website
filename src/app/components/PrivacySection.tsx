@@ -266,11 +266,11 @@ export function PrivacySection() {
               {/* Ghost path */}
               <path d={pathD} fill="none" stroke="#8fd7ff" strokeWidth="1.2" opacity="0.15" />
 
-              {/* Seamless connector line matching AI section's vertical line */}
+              {/* Seamless connector line matching Super Intelligence section's vertical line */}
               <line x1="430" y1="-70" x2="430" y2="0" stroke="#8fd7ff" strokeWidth="1.2" opacity="0.8" />
               <line x1="430" y1="-70" x2="430" y2="0" stroke="#4da3ff" strokeWidth="8" opacity="0.08" />
 
-              {/* Main line — no glow, matches AI section style */}
+              {/* Main line — no glow, matches Super Intelligence section style */}
               <path
                 d={pathD}
                 fill="none"

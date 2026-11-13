@@ -15,24 +15,22 @@ function getViewportSnapshot(): ViewportSnapshot {
     };
   }
 
-  const visualViewportScale = window.visualViewport?.scale;
-  let zoomFactor = 1;
-
-  if (visualViewportScale && Number.isFinite(visualViewportScale) && visualViewportScale > 0 && visualViewportScale !== 1) {
-    zoomFactor = visualViewportScale;
-  } else {
-    const outerWidth = window.outerWidth;
-    const innerWidth = window.innerWidth;
-    const ratio = outerWidth && innerWidth ? outerWidth / innerWidth : 1;
-
-    if (Number.isFinite(ratio) && ratio > 0 && !(ratio > 0.9 && ratio < 1.1)) {
-      zoomFactor = ratio;
-    }
-  }
+  // Desktop page zoom changes the ratio between the window and layout viewport.
+  // Touch browsers keep their native pinch zoom and viewport breakpoints.
+  const touchDevice = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
+    || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const ratio = window.innerWidth ? window.outerWidth / window.innerWidth : 1;
+  // Chrome changes devicePixelRatio at page zoom. An emulated viewport or
+  // docked inspector can change the widths alone, so reject unlikely base scales.
+  const basePixelRatio = window.devicePixelRatio / ratio;
+  const displayScale = Math.round(basePixelRatio * 4) / 4;
+  const plausibleZoom = displayScale >= 1 && Math.abs(basePixelRatio - displayScale) < 0.04;
+  const zoomFactor = !touchDevice && plausibleZoom && Number.isFinite(ratio)
+    && ratio > 0 && (ratio <= 0.95 || ratio >= 1.05) ? ratio : 1;
 
   return {
-    width: window.innerWidth,
-    height: window.innerHeight,
+    width: Math.round(window.innerWidth * zoomFactor),
+    height: Math.round(window.innerHeight * zoomFactor),
     zoomFactor,
   };
 }

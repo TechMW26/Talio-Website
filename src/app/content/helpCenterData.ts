@@ -141,28 +141,28 @@ export const categories: CategoryData[] = [
   },
   {
     icon: Bot,
-    title: 'MIRA AI',
-    desc: 'AI assistant tips and tricks',
+    title: 'MIRA & Super Intelligence',
+    desc: 'Find work and take action with MIRA',
     articles: [
       {
         title: 'What is MIRA?',
         content:
-          "MIRA is Talio's AI assistant that understands natural language. Ask questions like 'Who's on leave today?', 'Show me overtime trends this quarter', or 'Generate this month's payroll summary'. MIRA can also execute actions like approving leave requests or sending reminders.",
+          "MIRA is Talio's assistant. It uses Super Intelligence (SI) to work with the parts of Talio your role can access. Ask it to find a project or task, schedule a meeting, or set a reminder.",
       },
       {
         title: 'Talking to MIRA',
         content:
-          'Access MIRA from the chat icon in the bottom-right corner of any page, or press Ctrl+K / Cmd+K. Type your question naturally — MIRA understands context and follow-up questions. You can ask for reports, request data, or trigger workflows through conversation.',
+          'Open MIRA in your Talio workspace and describe what you need in your own words. Try asking it to open a project or summarize available meeting notes. Voice depends on your device and permissions.',
       },
       {
         title: 'MIRA Commands & Actions',
         content:
-          "MIRA can execute tasks when you ask: 'Approve John's leave request', 'Add a new employee named…', 'Send payslips for March'. MIRA will show a confirmation before executing any action. You can undo recent MIRA actions from the Activity Log.",
+          "Try asking MIRA to create a task, arrange a meeting, or send a message. Include the project, person, or date if you know it. Check the response and open the linked item to verify the details.",
       },
       {
-        title: 'MIRA Insights & Alerts',
+        title: 'Summaries & reminders',
         content:
-          'MIRA proactively alerts you about potential issues: upcoming compliance deadlines, employees at risk of burnout (high overtime), understaffing on particular days, and anomalous attendance patterns. Configure alert preferences under Settings → MIRA → Notifications.',
+          'MIRA can summarize available meeting transcripts or notes and schedule personal reminders. Review summaries against the original material before relying on them.',
       },
     ],
   },
@@ -214,7 +214,7 @@ export const faqs = [
   },
   {
     q: 'What is MIRA?',
-    a: "MIRA is Talio's AI assistant. Ask her questions in natural language about your attendance, leave balance, payroll, and more. She can also generate reports and automate tasks.",
+    a: "MIRA is the assistant inside Talio. Its Super Intelligence (SI) lets you ask questions about accessible work and request supported actions such as creating a task or setting a reminder.",
   },
   {
     q: 'How is overtime calculated?',

@@ -81,7 +81,7 @@ export function Hero() {
                 className="w-2 h-2 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full"
               />
               <span className="text-xs md:text-sm font-semibold tracking-wide text-gray-200">
-                AI-Powered Productivity Utility
+                Work and people operations with SI
               </span>
             </motion.div>
           </motion.div>

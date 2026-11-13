@@ -1,7 +1,7 @@
 import { AnimatePresence, motion } from 'motion/react';
 import { ArrowLeft, ArrowRight, Calendar, User, Building2, Clock, Sparkles, Check } from 'lucide-react';
 import { useEffect, useState, type ChangeEvent, type ComponentPropsWithoutRef, type FormEvent, type ReactNode } from 'react';
-import { demoTimeSlots, type DemoBookingFormValues, type PlanInfo } from '@/app/components/demoBookingTypes';
+import { demoTimeSlots, isValidDemoEmail, isValidDemoPhone, type DemoBookingFormValues, type PlanInfo } from '@/app/components/demoBookingTypes';
 import { DatePicker } from '@/app/components/ui/date-picker';
 import { TimePicker } from '@/app/components/ui/time-picker';
 
@@ -48,13 +48,41 @@ const steps = [
 const inputClass =
   'site-dark-input w-full rounded-xl px-4 py-3 text-[1rem] md:text-[0.8125rem] text-white placeholder-gray-500 outline-none transition-all duration-200';
 
-function StepInput(props: ComponentPropsWithoutRef<'input'>) {
-  return <input {...props} className={inputClass} />;
+const invalidInputClass = 'border-red-500/60';
+
+const validators: Partial<Record<FieldName, (value: string) => boolean>> = {
+  email: isValidDemoEmail,
+  phone: isValidDemoPhone,
+};
+
+function StepInput({ invalid, className, ...props }: ComponentPropsWithoutRef<'input'> & { invalid?: boolean }) {
+  return (
+    <div className="w-full">
+      <input
+        {...props}
+        aria-invalid={invalid || undefined}
+        aria-describedby={invalid && props.id ? `${props.id}-error` : undefined}
+        className={`${inputClass} ${invalid ? invalidInputClass : ''} ${className ?? ''}`}
+      />
+      {invalid && (
+        <span id={props.id ? `${props.id}-error` : undefined} className="mt-1 block text-[0.6875rem] text-red-400">
+          Invalid
+        </span>
+      )}
+    </div>
+  );
 }
 
 function StepSelect(props: ComponentPropsWithoutRef<'select'>) {
   return <select {...props} className={inputClass} />;
 }
+
+const fieldIds: Partial<Record<FieldName, string>> = {
+  firstName: 'demo-first-name',
+  lastName: 'demo-last-name',
+  email: 'demo-email',
+  phone: 'demo-phone',
+};
 
 export function DemoBookingStepper({
   form,
@@ -78,7 +106,9 @@ export function DemoBookingStepper({
   }, [resetKey, submitted]);
 
   const isStepComplete = (stepIndex: number) =>
-    steps[stepIndex].fields.every((field) => form[field].trim() !== '');
+    steps[stepIndex].fields.every((field) =>
+      form[field].trim() !== '' && (validators[field]?.(form[field]) ?? true),
+    );
 
   const canOpenStep = (stepIndex: number) =>
     stepIndex <= currentStep || steps.slice(0, stepIndex).every((_, index) => isStepComplete(index));
@@ -196,11 +226,41 @@ export function DemoBookingStepper({
             {currentStep === 0 && (
               <>
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                  <StepInput name="firstName" value={form.firstName} onChange={onFieldChange} placeholder="First Name" required />
-                  <StepInput name="lastName" value={form.lastName} onChange={onFieldChange} placeholder="Last Name" required />
+                  <StepInput id={fieldIds.firstName} name="firstName" value={form.firstName} onChange={onFieldChange} placeholder="First Name" required />
+                  <StepInput id={fieldIds.lastName} name="lastName" value={form.lastName} onChange={onFieldChange} placeholder="Last Name" required />
                 </div>
-                <StepInput name="email" type="email" value={form.email} onChange={onFieldChange} placeholder="Work Email" required />
-                <StepInput name="phone" type="tel" value={form.phone} onChange={onFieldChange} placeholder="Phone Number" required />
+                <StepInput
+                  id={fieldIds.email}
+                  name="email"
+                  type="email"
+                  value={form.email}
+                  onChange={onFieldChange}
+                  placeholder="Work Email"
+                  invalid={form.email.trim() !== '' && !isValidDemoEmail(form.email)}
+                  required
+                />
+                <StepInput
+                  id={fieldIds.phone}
+                  name="phone"
+                  type="tel"
+                  inputMode="numeric"
+                  maxLength={15}
+                  value={form.phone}
+                  onChange={(event) => {
+                    const { value } = event.target;
+                    if (value === '' || /^[0-9]*$/.test(value)) {
+                      onFieldChange(event);
+                    }
+                  }}
+                  onBeforeInput={(event) => {
+                    if (event.data && /\D/.test(event.data)) {
+                      event.preventDefault();
+                    }
+                  }}
+                  placeholder="Phone Number"
+                  invalid={form.phone.trim() !== '' && !isValidDemoPhone(form.phone)}
+                  required
+                />
               </>
             )}
 

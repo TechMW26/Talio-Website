@@ -1,11 +1,13 @@
 import { lazy, Suspense, useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { Link } from 'react-router';
-import { motion, useInView } from 'motion/react';
+import { motion, useInView, useScroll, useTransform } from 'motion/react';
 import { ArrowDown, ArrowLeft, ArrowRight, ArrowUpRight, CalendarDays, Check, Folder, ListTodo, Pause, Play, ShieldCheck, UserRound } from 'lucide-react';
 import { miraUseCases } from '@/app/content/miraUseCases';
 import { usePageMeta } from '@/app/hooks/usePageMeta';
 import appIcon from '@/assets/mira/mira-app-icon.webp';
-import { StoryPath, type StoryChapter } from './StoryPath';
+import { miraFaq } from '@/app/content/miraFaq';
+import { LandingFaq } from './LandingFaq';
+import { ParticleIllustration, type ParticleShape } from './ParticleIllustration';
 import '@/styles/mira-landing.css';
 
 const RobotHead = lazy(() => import('robot-heads').then(({ RobotHead }) => ({ default: RobotHead })));
@@ -25,12 +27,14 @@ function useReducedMotion() {
   );
 }
 
-const launchChapters: StoryChapter[] = [
+const miraShapes = ['chat', 'network', 'checklist'] as const satisfies readonly ParticleShape[];
+
+const launchChapters = [
   {
     id: 'mira-request',
-    label: 'The request',
-    title: 'Start with the outcome.',
-    description: 'You need a project for the partner launch and a checklist for Priya. Say both in one request. Give MIRA the dates, the owner and the due date, or let it ask for the detail it needs.',
+    label: 'Request',
+    title: 'Say what needs to happen.',
+    description: 'Give MIRA the launch dates, task owner and deadline. It can ask for anything it needs to complete the request.',
     visual: (
       <figure className="mira-request-example">
         <figcaption>Example request</figcaption>
@@ -45,9 +49,9 @@ const launchChapters: StoryChapter[] = [
   },
   {
     id: 'mira-context',
-    label: 'The context',
-    title: 'Match the request to your workspace.',
-    description: 'MIRA looks up Priya in Talio and checks which actions your role allows. If two people share the name, you can choose the right one before the task is assigned.',
+    label: 'Context',
+    title: 'Find the right person.',
+    description: 'MIRA looks up Priya and checks what your role allows. If more than one person matches, pick the right colleague before it assigns the task.',
     visual: (
       <dl className="mira-context-example" aria-label="Context for the launch">
         <div><dt><UserRound size="1.1em" aria-hidden="true" /> Collaborator</dt><dd>Priya · Launch team</dd></div>
@@ -58,9 +62,9 @@ const launchChapters: StoryChapter[] = [
   },
   {
     id: 'mira-action',
-    label: 'The result',
-    title: 'Turn a plan into assigned work.',
-    description: 'MIRA creates the project first, then uses that confirmed project to add the checklist. If an earlier action fails, dependent steps wait. You can review what changed and what still needs attention.',
+    label: 'Action',
+    title: 'See exactly what changed.',
+    description: 'MIRA creates the project first and adds the checklist to it. If the project can’t be created, the checklist waits. Open the results to check what went through.',
     visual: (
       <ol className="mira-action-example" aria-label="Sample workflow results">
         <li><Folder size="1.1em" aria-hidden="true" /><div><strong>Partner Launch</strong><span>Project created · Priya added</span></div><Check size="1em" aria-hidden="true" /></li>
@@ -136,6 +140,48 @@ function MiraMascot({ reduceMotion }: { reduceMotion: boolean }) {
   );
 }
 
+function MiraWorkflow() {
+  const track = useRef<HTMLDivElement>(null);
+  const reduceMotion = useReducedMotion();
+  const { scrollYProgress } = useScroll({ target: track, offset: ['start 66%', 'end 66%'] });
+  const morph = useTransform(scrollYProgress, [0, 0.16, 0.84, 1], [0, 0, 1, 1]);
+
+  return (
+    <section className="mira-wrap mira-section mira-story" id="mira-explainer" aria-labelledby="mira-story-heading">
+      <header className="mira-explainer">
+        <h2 id="mira-story-heading">From one request to a launch checklist.</h2>
+        <p>Follow what MIRA needs to know, what it checks, and what it does in Talio.</p>
+      </header>
+      <div className="mira-flow">
+        <div className="mira-flow-visual">
+          <ParticleIllustration
+            className="mira-flow-particles"
+            shapes={miraShapes}
+            progress={morph}
+            label="A conversation becomes a workspace network, then an assigned checklist"
+          />
+          <nav className="mira-flow-nav" aria-label="MIRA request stages">
+            {launchChapters.map(chapter => <a key={chapter.id} href={`#${chapter.id}`}>{chapter.label}</a>)}
+            <span className="mira-flow-line" aria-hidden="true">
+              <motion.span style={{ scaleX: reduceMotion ? 1 : morph }} />
+            </span>
+          </nav>
+        </div>
+        <div className="mira-flow-chapters" ref={track}>
+          {launchChapters.map(chapter => (
+            <article key={chapter.id} id={chapter.id} className="mira-flow-chapter" aria-labelledby={`${chapter.id}-heading`}>
+              <span className="mira-flow-label">{chapter.label}</span>
+              <h3 id={`${chapter.id}-heading`}>{chapter.title}</h3>
+              <p>{chapter.description}</p>
+              {chapter.visual}
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export function MiraLanding() {
   usePageMeta('MIRA · Super Intelligence', 'Explore how MIRA Super Intelligence helps automate tasks, review workforce activity and coordinate project follow-ups in Talio.');
   const reduceMotion = useReducedMotion();
@@ -153,8 +199,8 @@ export function MiraLanding() {
       <section className="mira-wrap mira-hero" aria-labelledby="mira-heading">
         <motion.div className="mira-hero-copy" {...reveal}>
           <Link className="mira-back" to="/features"><ArrowLeft size="1em" /> All features</Link>
-          <h1 id="mira-heading">One request.<br /><em>Work in motion.</em></h1>
-          <p>MIRA is the Super Intelligence (SI) assistant in Talio. Ask it to set up a project, assign the next step, or bring the right people into a review.</p>
+          <h1 id="mira-heading">Ask MIRA.<br /><em>Move work forward.</em></h1>
+          <p>Use Talio’s Super Intelligence (SI) assistant to create a project, assign a task, or set up a review in one conversation.</p>
           <div className="mira-actions">
             <a className="mira-primary" href="#mira-explainer">Follow a request <ArrowDown size="1em" /></a>
             <a className="mira-secondary" href="#mira-demo">Explore use cases <ArrowRight size="1em" /></a>
@@ -163,13 +209,7 @@ export function MiraLanding() {
         <motion.div className="mira-hero-graphic" {...reveal}><MiraMascot reduceMotion={reduceMotion} /></motion.div>
       </section>
 
-      <section className="mira-wrap mira-section mira-story" id="mira-explainer" aria-labelledby="mira-story-heading">
-        <motion.div className="mira-explainer" {...reveal}>
-          <h2 id="mira-story-heading">How Super Intelligence works in Talio</h2>
-          <p>SI connects a conversation to the work you can see and do in Talio. Follow a sample request from a launch brief to a project with an owner, a due date and an assigned task.</p>
-        </motion.div>
-        <StoryPath chapters={launchChapters} ariaLabel="Follow a MIRA request" />
-      </section>
+      <MiraWorkflow />
 
       <section className="mira-wrap mira-section mira-demo" id="mira-demo" aria-labelledby="mira-demo-heading">
         <motion.div className="mira-demo-intro" {...reveal}>
@@ -227,6 +267,8 @@ export function MiraLanding() {
           </div>
         </motion.div>
       </section>
+
+      <div className="mira-wrap mira-faq"><LandingFaq items={miraFaq} title="MIRA FAQs" /></div>
 
       <section className="mira-wrap mira-section" aria-labelledby="mira-cta-heading">
         <motion.div className="mira-cta" {...reveal}>

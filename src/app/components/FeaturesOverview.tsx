@@ -1,43 +1,47 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Link } from 'react-router';
+import { motion, useReducedMotion, useScroll, useTransform } from 'motion/react';
 import { ArrowDown, ArrowRight, Search, X } from 'lucide-react';
 import { categories, featureHref, productFeatures } from '@/app/content/productFeatures';
+import { featureFaqs } from '@/app/content/featureFaqs';
 import { usePageMeta } from '@/app/hooks/usePageMeta';
-import { FeatureArtwork } from './FeatureMotion';
-import { StoryPath, StorySignals, type StoryChapter } from './StoryPath';
+import { LandingFaq } from './LandingFaq';
+import { ParticleIllustration, type ParticleShape } from './ParticleIllustration';
 import '@/styles/product.css';
 
-const dayInTalio: StoryChapter[] = [
+const workspaceShapes: readonly ParticleShape[] = ['workspace', 'project', 'team', 'spark'];
+
+const workspaceStory = [
   {
-    id: 'plan-the-work',
-    label: 'Plan the work',
-    title: 'Give the next step an owner.',
-    description: 'A website launch starts with a brief. Put it in a project, assign the first draft, and set a due date. When the team asks what needs review, the answer sits alongside the task and its conversation.',
-    visual: <StorySignals signals={[[ 'Project', 'Website refresh' ], [ 'Next up', 'Review the first draft' ], [ 'Owner', 'Design lead' ]]} />,
-    children: <Link to="/features/projects" className="product-text-link">Explore projects & tasks <ArrowRight /></Link>,
+    title: 'Give the work an owner.',
+    description: 'Put the brief in a project. Assign the first draft, add a due date, and keep feedback with the task.',
+    href: '/features/projects',
+    action: 'Explore projects',
   },
   {
-    id: 'coordinate-the-team',
-    label: 'Coordinate the team',
-    title: 'Make room for changes in the day.',
-    description: 'A teammate requests Friday off. They can see their available balance before submitting, and the person responsible can review the request in Talio. The decision is recorded where the teammate can find it.',
-    visual: <StorySignals variation={1} signals={[[ 'Request', 'Friday annual leave' ], [ 'Decision', 'Approved by manager' ]]} />,
-    children: <Link to="/features/leaves" className="product-text-link">Explore leave & availability <ArrowRight /></Link>,
+    title: 'Know who’s available.',
+    description: 'Check leave balances, submit a request, and see the decision in the same place.',
+    href: '/features/leaves',
+    action: 'Explore leave & availability',
   },
   {
-    id: 'act-with-mira',
-    label: 'Act with MIRA',
-    title: 'Turn the follow-up into work.',
-    description: 'After the launch review, ask MIRA to create the agreed checklist task, assign it to the project member you name, and set a reminder for the sign-off. Talio applies your permissions to each action.',
-    visual: <StorySignals variation={2} signals={[[ 'Task', 'Review launch checklist' ], [ 'Follow-up', 'Personal reminder for sign-off' ]]} />,
-    children: <Link to="/mira#mira-demo" className="product-text-link">Try a MIRA example <ArrowRight /></Link>,
+    title: 'Turn the next step into a task.',
+    description: 'Ask MIRA to create the checklist you just agreed on and set a reminder to follow up. Talio checks access for each action.',
+    href: '/mira#mira-demo',
+    action: 'Try a MIRA scenario',
   },
 ];
 
 export function FeaturesOverview() {
-  usePageMeta('Features', 'See how a working day fits together in Talio, from projects and team chat to people operations and MIRA Super Intelligence.');
+  usePageMeta('Features', 'Explore projects, team chat, people operations and MIRA Super Intelligence in Talio.');
   const [category, setCategory] = useState<(typeof categories)[number]>('All features');
   const [query, setQuery] = useState('');
+  const stage = useRef<HTMLDivElement>(null);
+  const art = useRef<HTMLDivElement>(null);
+  const reduced = useReducedMotion();
+  const { scrollYProgress } = useScroll({ target: stage, offset: ['start start', 'end 70%'] });
+  const { scrollYProgress: artProgress } = useScroll({ target: art, offset: ['start 75%', 'end 30%'] });
+  const morph = useTransform([scrollYProgress, artProgress], ([story, visual]: number[]) => Math.max(story, visual));
   const search = query.toLowerCase().trim();
   const filtered = productFeatures.filter(feature =>
     (category === 'All features' || feature.category === category)
@@ -46,29 +50,37 @@ export function FeaturesOverview() {
 
   return (
     <main className="product-page feature-index">
-      <section className="product-wrap product-hero feature-hero">
-        <div className="product-hero-copy feature-hero-enter">
-          <span className="product-eyebrow">The Talio workspace</span>
-          <h1>A working day.<em>One workspace.</em></h1>
-          <p className="product-lead">
-            Follow a launch from its first brief to the team’s next decision.
-            See where projects, people operations, and MIRA fit into the day.
-          </p>
-          <div className="product-actions">
-            <a href="#working-day" className="product-button">Follow the story <ArrowDown /></a>
-            <a href="#explore" className="product-text-link">Browse all features <ArrowRight /></a>
+      <div className="product-wrap overview-story" ref={stage}>
+        <div className="overview-graphic" ref={art}>
+          <ParticleIllustration shapes={workspaceShapes} progress={morph} label="A workspace forms into a project, a team, and MIRA" />
+        </div>
+        <div className="overview-story-copy">
+          <section className="overview-intro" aria-labelledby="overview-title">
+            <span className="product-eyebrow">The Talio workspace</span>
+            <h1 id="overview-title">Keep work <em>moving.</em></h1>
+            <p className="product-lead">
+              Run a project, coordinate the team, and hand the next step to MIRA. See how it fits together in one working day.
+            </p>
+            <div className="product-actions">
+              <a href="#working-day" className="product-button">Follow the day <ArrowDown /></a>
+              <a href="#explore" className="product-text-link">Browse features <ArrowRight /></a>
+            </div>
+          </section>
+          <div className="overview-chapters" id="working-day">
+            <motion.div className="overview-progress" aria-hidden="true" style={{ scaleY: reduced ? 1 : scrollYProgress }} />
+            {workspaceStory.map(chapter => (
+              <article key={chapter.title}>
+                <h2>{chapter.title}</h2>
+                <p>{chapter.description}</p>
+                <Link to={chapter.href} className="product-text-link">{chapter.action} <ArrowRight /></Link>
+              </article>
+            ))}
           </div>
         </div>
-        <FeatureArtwork />
-      </section>
-
-      <section className="product-wrap product-section" id="working-day" aria-labelledby="working-day-heading">
-        <div className="product-section-heading"><h2 id="working-day-heading">From a plan to the next decision</h2></div>
-        <StoryPath chapters={dayInTalio} ariaLabel="A working day in Talio" />
-      </section>
+      </div>
 
       <section id="explore" className="product-wrap product-section" aria-labelledby="explore-heading">
-        <div className="product-section-heading"><h2 id="explore-heading">Browse the workspace</h2></div>
+        <div className="product-section-heading"><h2 id="explore-heading">Find the tool you need.</h2></div>
         <div className="product-tools">
           <div className="product-filters" role="group" aria-label="Filter features">
             {categories.map(item => (
@@ -103,8 +115,8 @@ export function FeaturesOverview() {
             </button>
           </div>
         )}
-        <p className="product-footnote">Your role and your company’s enabled modules determine what you can access.</p>
       </section>
+      <LandingFaq title="Questions about Talio" items={featureFaqs.overview} />
     </main>
   );
 }

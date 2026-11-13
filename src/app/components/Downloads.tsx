@@ -1,16 +1,17 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router';
-import { motion, useReducedMotion, useScroll, useTransform } from 'motion/react';
+import { useScroll } from 'motion/react';
 import {
-  ArrowDown, ArrowUpRight, Check, Download, Globe, Laptop, PackageCheck,
-  Plus, RefreshCw, Smartphone, UserRound,
+  ArrowDown, ArrowUpRight, Check, Download, Laptop, PackageCheck, Plus, RefreshCw, UserRound,
 } from 'lucide-react';
 import { IoLogoMicrosoft } from 'react-icons/io5';
 import { SiAndroid, SiApple, SiLinux } from 'react-icons/si';
 import { usePageMeta } from '@/app/hooks/usePageMeta';
 import { useLatestRelease } from '@/app/hooks/useLatestRelease';
 import { detectPlatform, releaseDownload } from '@/app/lib/downloads';
-import { StoryPath, type StoryChapter } from './StoryPath';
+import { downloadFaq } from '@/app/content/downloadFaq';
+import { LandingFaq } from './LandingFaq';
+import { ParticleIllustration, type ParticleShape } from './ParticleIllustration';
 import '@/styles/downloads-landing.css';
 
 type PlatformId = 'mac' | 'windows' | 'linux' | 'ios' | 'android';
@@ -24,10 +25,10 @@ type Platform = {
   options: DownloadOption[];
 };
 
-const macStore = 'https://apps.apple.com/in/app/talio-productivity/id6758448703';
+const iosStore = 'https://apps.apple.com/in/app/talio-productivity/id6758448703';
 const playStore = 'https://play.google.com/store/apps/details?id=sbs.zenova.twa&hl=en_IN';
 const browserApp = 'https://app.talio.in';
-const heroTrace = 'M-100 410 C65 405 97 82 318 136 S548 393 699 211 S900 40 1040 79';
+const downloadShapes = ['laptop', 'phone', 'globe'] as const satisfies readonly ParticleShape[];
 
 export function Downloads() {
   usePageMeta(
@@ -35,12 +36,10 @@ export function Downloads() {
     'Get Talio for macOS, Windows, Linux, iOS or Android. Find your installer, choose the right Mac chip, and sign in to your workspace.',
   );
   const { release, status, retry } = useLatestRelease();
-  const reducedMotion = useReducedMotion();
   const [device, setDevice] = useState<PlatformId | null>(null);
   const macHelp = useRef<HTMLDetailsElement>(null);
   const heroRef = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({ target: heroRef, offset: ['start 80%', 'end 20%'] });
-  const traceLength = useTransform(scrollYProgress, [0, 1], [0.16, 1]);
+  const { scrollYProgress } = useScroll({ target: heroRef, offset: ['start 12%', 'end 55%'] });
 
   useEffect(() => setDevice(detectPlatform(navigator)), []);
 
@@ -71,7 +70,7 @@ export function Downloads() {
       name: 'iOS',
       icon: SiApple,
       store: true,
-      options: [{ name: 'Open App Store', arch: 'Talio Productivity', url: macStore, isAvailable: true }],
+      options: [{ name: 'Open App Store', arch: 'Talio Productivity', url: iosStore, isAvailable: true }],
     },
     {
       id: 'android',
@@ -87,75 +86,14 @@ export function Downloads() {
   const unavailableLabel = status === 'loading' ? 'Checking availability…'
     : status === 'error' ? 'Release check unavailable' : 'Not in the current release';
 
-  const chapters: StoryChapter[] = [
-    {
-      id: 'match-your-device',
-      label: 'Choose the right build',
-      title: 'Which Talio should I get?',
-      description: 'If you use Talio from a managed work computer, check whether your IT team provides the installer. For a Mac you manage yourself, the chip tells you which build to choose.',
-      visual: (
-        <dl className="dl-story-list">
-          <div><dt><Laptop aria-hidden="true" /> On your computer</dt><dd>macOS, Windows or Linux</dd></div>
-          <div><dt><Smartphone aria-hidden="true" /> On your phone</dt><dd>iOS App Store or Google Play</dd></div>
-          <div><dt><Globe aria-hidden="true" /> In a browser</dt><dd>Open your workspace without installing</dd></div>
-        </dl>
-      ),
-      children: (
-        <details id="mac-download-help" ref={macHelp} className="dl-disclosure">
-          <summary>Find your Mac chip <Plus aria-hidden="true" /></summary>
-          <p>Open the Apple menu and choose About This Mac. If it lists an Apple M-series chip, choose Apple Silicon. If it lists an Intel processor, choose Intel.</p>
-          <a className="dl-text-link" href="#download-mac">See Mac downloads <ArrowUpRight aria-hidden="true" /></a>
-        </details>
-      ),
-    },
-    {
-      id: 'install-talio',
-      label: 'Install Talio',
-      title: 'Install the app for your device.',
-      description: 'On a computer, open the downloaded package and follow the setup prompts for your platform. On iOS or Android, check compatibility on the store listing and install Talio Productivity there.',
-      visual: (
-        <div className="dl-story-release">
-          <PackageCheck aria-hidden="true" />
-          <strong>{release?.tagName ?? 'Desktop installer'}</strong>
-          <span>{release ? 'Current desktop release' : 'Version shown when available'}</span>
-        </div>
-      ),
-      children: (
-        <p className="dl-story-note">
-          The desktop links resolve to the latest published installer each time you click.
-        </p>
-      ),
-    },
-    {
-      id: 'sign-in',
-      label: 'Open your workspace',
-      title: 'Pick up where you left off.',
-      description: 'Open Talio and sign in with your work account. Your workspace and role determine which projects, tasks and people tools you can access.',
-      visual: (
-        <dl className="dl-story-list">
-          <div><dt><UserRound aria-hidden="true" /> Work account</dt><dd>Use the account from your organisation</dd></div>
-          <div><dt><Check aria-hidden="true" /> Workspace access</dt><dd>Open the work your role can see</dd></div>
-        </dl>
-      ),
-      children: (
-        <>
-          <p className="dl-story-note">
-            Desktop activity capture requires the desktop app and your organisation’s setup. Follow the permission prompts for the features you use.
-          </p>
-          <a className="dl-text-link" href={browserApp}>Open Talio in a browser <ArrowUpRight aria-hidden="true" /></a>
-        </>
-      ),
-    },
-  ];
-
   return (
     <main className="download-landing">
       <section ref={heroRef} className="dl-hero" aria-labelledby="dl-title">
         <div className="dl-wrap dl-hero-layout">
           <div className="dl-hero-copy">
             <span className="dl-kicker"><Download aria-hidden="true" /> Talio downloads</span>
-            <h1 id="dl-title">Take your work <em>with you.</em></h1>
-            <p>Open the same Talio workspace on your computer, phone or browser. Start with the download for your device.</p>
+            <h1 id="dl-title">Your work.<em>Your device.</em></h1>
+            <p>Install Talio on your computer or phone, or open it in your browser. Sign in with the same work account.</p>
             <div className="dl-actions">
               <a className="dl-primary" href={recommended ? `#download-${recommended.id}` : '#platforms'}>
                 {device === 'mac' ? 'Choose your Mac chip' : recommended ? `Get Talio for ${recommended.name}` : 'Choose your platform'}
@@ -169,22 +107,14 @@ export function Downloads() {
               <p className="dl-device-note"><span aria-hidden="true" /> {recommended.name} detected</p>
             )}
           </div>
-          <div className="dl-hero-visual" aria-hidden="true">
-            <svg className="dl-hero-trace" viewBox="0 0 900 460" fill="none" focusable="false">
-              <path d={heroTrace} className="dl-trace-base" />
-              <motion.path d={heroTrace} className="dl-trace-light" style={{ pathLength: reducedMotion ? 1 : traceLength }} />
-            </svg>
-            <picture className="dl-art">
-              <source media="(max-width: 40rem)" srcSet="/landing/devices-small.webp" />
-              <img
-                src="/landing/devices.webp"
-                alt=""
-                width={1120}
-                height={631}
-                {...{ fetchpriority: 'high' }}
-                decoding="async"
-              />
-            </picture>
+          <div className="dl-hero-visual">
+            <ParticleIllustration
+              className="dl-device-particles"
+              shapes={downloadShapes}
+              progress={scrollYProgress}
+              label="A particle laptop becomes a phone, then a globe for browser access"
+            />
+            <p>Desktop <span /> Mobile <span /> Browser</p>
           </div>
         </div>
       </section>
@@ -251,10 +181,34 @@ export function Downloads() {
 
       <section className="dl-wrap dl-setup" aria-labelledby="dl-setup-heading">
         <div className="dl-section-heading">
-          <h2 id="dl-setup-heading">From installer to workspace.</h2>
+          <h2 id="dl-setup-heading">Get set up in three steps.</h2>
+          <p>Already installed? <a className="dl-text-link" href={browserApp}>Open your workspace <ArrowUpRight aria-hidden="true" /></a></p>
         </div>
-        <StoryPath ariaLabel="Download and setup chapters" chapters={chapters} />
+        <ol className="dl-setup-steps">
+          <li id="match-your-device">
+            <Laptop aria-hidden="true" />
+            <h3>Match the installer.</h3>
+            <p>Choose the build for your device. If your organisation manages your computer, use the installer your IT team provides.</p>
+            <details id="mac-download-help" ref={macHelp} className="dl-disclosure">
+              <summary>Find your Mac chip <Plus aria-hidden="true" /></summary>
+              <p>Open the Apple menu and select About This Mac. Choose Apple Silicon if you see an Apple chip, or Intel if you see an Intel processor.</p>
+              <a className="dl-text-link" href="#download-mac">See Mac downloads <ArrowUpRight aria-hidden="true" /></a>
+            </details>
+          </li>
+          <li id="install-talio">
+            <PackageCheck aria-hidden="true" />
+            <h3>Open the package.</h3>
+            <p>Follow the desktop setup prompts, or install Talio Productivity from your mobile store. Check the store listing for device compatibility.</p>
+          </li>
+          <li id="sign-in">
+            <UserRound aria-hidden="true" />
+            <h3>Use your work account.</h3>
+            <p>Open Talio and sign in. You’ll see the workspace and tools your organisation gives you access to.</p>
+          </li>
+        </ol>
       </section>
+
+      <div className="dl-wrap dl-faq"><LandingFaq items={downloadFaq} title="Download and setup FAQs" /></div>
 
       <section className="dl-wrap dl-support" aria-labelledby="dl-support-heading">
         <div>

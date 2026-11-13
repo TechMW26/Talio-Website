@@ -1,0 +1,21 @@
+.particle-illustration {
+  position: relative;
+  isolation: isolate;
+  inline-size: 100%;
+  min-inline-size: 0;
+  aspect-ratio: 1.32;
+  overflow: hidden;
+  background: radial-gradient(ellipse at 43% 45%, #6122b524, transparent 61%),
+    radial-gradient(ellipse at 61% 61%, #1749ad21, transparent 64%);
+}
+
+.particle-illustration canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  pointer-events: none;
+}
+
+.particle-illustration canvas[hidden] { display: none; }

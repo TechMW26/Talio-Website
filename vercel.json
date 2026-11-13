@@ -5,7 +5,7 @@
       "destination": "/api/$1"
     },
     {
-      "source": "/((?!api|assets/|landing/|old-site/).*)",
+      "source": "/((?!api|assets/|old-site/).*)",
       "destination": "/index.html"
     }
   ]

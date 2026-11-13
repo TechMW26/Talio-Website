@@ -1,0 +1,64 @@
+:root {
+  --landing-bg: #000;
+  --landing-ink: #fff;
+  --landing-muted: #9ca3af;
+  --landing-line: #ffffff26;
+  --landing-purple: #a855f7;
+  --landing-blue: #3b82f6;
+  --landing-pink: #ec4899;
+  --landing-gradient: linear-gradient(105deg, #c084fc, #60a5fa 57%, #e879f9);
+}
+.product-site-shell :is(a, button, summary, select, input):focus-visible {
+  outline: 2px solid #93c5fd;
+  outline-offset: .25rem;
+}
+.app-site-shell .landing-faq {
+  width: min(76rem, calc(100% - 4rem));
+  margin-inline: auto;
+  padding-block: clamp(2.7rem, 6vw, 5rem);
+  border-top: 1px solid var(--landing-line);
+  display: grid;
+  grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr);
+  gap: 2rem;
+  align-items: start;
+  color: var(--landing-ink);
+  background: var(--landing-bg) !important;
+}
+.app-site-shell .landing-faq h2 {
+  margin: 0 !important;
+  font-size: clamp(1.9rem, 3.6cqi, 3.2rem);
+  font-weight: 560;
+  line-height: 1.08;
+  letter-spacing: -.05em;
+  text-wrap: balance;
+}
+.landing-faq details { border-bottom: 1px solid var(--landing-line); }
+.landing-faq details:first-child { border-top: 1px solid var(--landing-line); }
+.landing-faq summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 3.35rem;
+  gap: .9rem;
+  list-style: none;
+  padding: .8rem .2rem;
+  color: #eeeef2;
+  font-size: .95rem;
+}
+.landing-faq summary::-webkit-details-marker { display: none; }
+.landing-faq summary svg { flex: none; color: #a5b4fc; transition: transform .2s; }
+.landing-faq details[open] svg { transform: rotate(45deg); }
+.landing-faq summary:hover { color: #bfdbfe; }
+.app-site-shell .landing-faq details p {
+  margin: 0 !important;
+  padding: 0 1.5rem 1rem .2rem;
+  color: #b6bbc5;
+  font-size: .9rem;
+  line-height: 1.7;
+}
+@container (max-width: 45em) {
+  .app-site-shell .landing-faq { width: calc(100% - 2rem); grid-template-columns: minmax(0,1fr); gap: 1.2rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .landing-faq summary svg { transition: none; }
+}

@@ -1,6 +1,7 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import { useInView, useMotionValueEvent, useScroll, useTransform } from 'motion/react';
 import { ArrowDown, ArrowLeft, ArrowRight } from 'lucide-react';
+import { getBrowserZoomFactor } from '@/app/hooks/useZoomCompensatedViewport';
 import { ParticleIllustration, type ParticleShape } from './ParticleIllustration';
 import StoryLoadingText from './StoryLoadingText';
 import '@/styles/particle-chapters.css';
@@ -60,15 +61,15 @@ export function ParticleChapters({ chapters, heading, id, flight = 'rise' }: {
       // A mouse wheel notch can fall within the browser's snap-back range.
       // Keep fine trackpad movement and large swipes on native scroll snapping.
       const next = anchors?.[index + direction];
-      const distance = next ? Math.abs(next.getBoundingClientRect().top) : field.clientHeight;
+      const delta = Math.abs(event.deltaY) * getBrowserZoomFactor();
       const notch = event.deltaMode === WheelEvent.DOM_DELTA_LINE || (
-        event.deltaMode === WheelEvent.DOM_DELTA_PIXEL && Math.abs(event.deltaY) >= 64 && Math.abs(event.deltaY) < distance / 2
+        event.deltaMode === WheelEvent.DOM_DELTA_PIXEL && delta >= 64 && delta <= 160
       );
       if (!notch) return;
 
       event.preventDefault();
       if (next) next.scrollIntoView({ block: 'start', behavior: 'smooth' });
-      else window.scrollBy({ top: direction * distance * .45, behavior: 'smooth' });
+      else window.scrollBy({ top: direction * field.clientHeight * .45, behavior: 'smooth' });
     }
 
     field.addEventListener('wheel', advanceOnWheel, { passive: false });

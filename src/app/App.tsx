@@ -66,7 +66,8 @@ function ScrollToTop({ lenisRef }: { lenisRef?: React.RefObject<Lenis | null> })
     const scrollToChapter = () => {
       const chapter = document.getElementById(id);
       if (!chapter) return false;
-      chapter.scrollIntoView({ block: 'start', behavior: 'instant' });
+      const target = chapter.closest('.particle-chapter') ?? chapter;
+      target.scrollIntoView({ block: 'start', behavior: 'instant' });
       return true;
     };
 

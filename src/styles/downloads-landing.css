@@ -36,7 +36,7 @@
   gap: clamp(1.8rem, 4.8cqi, 4rem);
   align-items: center;
   min-height: min(71svh, 43rem);
-  padding-block-start: 2.3rem;
+  padding-block: 2.3rem clamp(1.5rem, 4.5svh, 3.5rem);
 }
 
 .dl-hero-copy {
@@ -122,11 +122,11 @@
   background: var(--dl-accent);
 }
 
-/* The two silhouettes share a baseline so the hero opens into the black story. */
+/* The devices sit on a shared baseline within the illustration. */
 .dl-hero-art {
   position: relative;
   container-type: inline-size;
-  align-self: end;
+  align-self: center;
   width: 100%;
   min-width: 0;
   aspect-ratio: 1.52;

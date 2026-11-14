@@ -1,15 +1,19 @@
 .app-site-shell .particle-chapters {
-  --scene-height: 100svh;
-  --scene-step: clamp(14rem, 56svh, 36rem);
-  --scene-inset: clamp(4.4rem, 13svh, 8rem);
+  --scene-height: 100dvh;
+  --scene-step: 56dvh;
   width: 100%;
   background: #000 !important;
   color: #fff;
 }
 
-.particle-chapters[data-flight="sweep"] { --scene-step: clamp(13rem, 51svh, 34rem); }
-.particle-chapters[data-flight="wave"] { --scene-step: clamp(15rem, 60svh, 38rem); }
-.particle-chapters[data-flight="fold"] { --scene-step: clamp(14rem, 54svh, 35rem); }
+.particle-chapters[data-flight="sweep"] { --scene-step: 51dvh; }
+.particle-chapters[data-flight="wave"] { --scene-step: 60dvh; }
+.particle-chapters[data-flight="fold"] { --scene-step: 54dvh; }
+
+@media (prefers-reduced-motion: no-preference) {
+  html:has(.particle-story-track) { scroll-snap-type: y proximity; }
+  .particle-chapter { scroll-snap-align: start; }
+}
 
 .particle-story-track {
   position: relative;
@@ -27,18 +31,17 @@
   top: 0;
   height: var(--scene-height);
   display: grid;
-  grid-template-rows: minmax(0, .51fr) minmax(0, .49fr);
-  justify-items: center;
-  padding-top: var(--scene-inset);
+  place-items: center;
   align-self: start;
   z-index: 1;
   background: #000;
 }
 
 .app-site-shell .particle-chapters .particle-story-statement {
+  position: relative;
+  z-index: 1;
   width: min(100% - 3rem, 24ch);
-  align-self: end;
-  margin: 0 0 clamp(.5rem, 3.5svh, 2.5rem) !important;
+  margin: 0 !important;
   font-size: clamp(1.65rem, 5.45cqi, min(9svh, 4.9rem));
   font-weight: 620;
   line-height: 1.06;
@@ -46,12 +49,19 @@
   text-align: center;
   text-wrap: balance;
   color: #fff;
+  paint-order: stroke fill;
+  -webkit-text-stroke: .04em #000;
+  text-shadow: 0 0 .22em #000, 0 0 .43em #000, 0 0 .65em #000;
+  pointer-events: none;
 }
 
 .particle-story-art.particle-illustration {
+  position: absolute;
+  inset: 0;
   height: 100%;
-  width: min(100%, 65rem);
+  width: 100%;
   aspect-ratio: auto;
+  opacity: .68;
 }
 
 .app-site-shell .particle-chapters .particle-chapter {
@@ -64,6 +74,7 @@
 .particle-story-anchor { position: absolute; inset: 0 auto auto 0; }
 .particle-story-controls {
   position: absolute;
+  z-index: 2;
   inset: auto max(1rem, env(safe-area-inset-right)) max(.65rem, env(safe-area-inset-bottom)) auto;
   display: flex;
   align-items: center;
@@ -108,11 +119,9 @@
 
 @container (max-width: 40em) {
   .app-site-shell .particle-chapters .particle-story-statement { width: min(100% - 2rem, 22ch); }
-  .particle-story-stage { grid-template-rows: minmax(0,.50fr) minmax(0,.50fr); }
   .particle-story-transcript { width: calc(100% - 2rem); }
 }
 
 @media (max-height: 460px) {
-  .app-site-shell .particle-chapters { --scene-inset: 3.6rem; }
-  .app-site-shell .particle-chapters .particle-story-statement { font-size: clamp(1.15rem, 5svh, 1.8rem); margin-bottom: .35rem !important; }
+  .app-site-shell .particle-chapters .particle-story-statement { font-size: clamp(1.15rem, 5dvh, 1.8rem); }
 }

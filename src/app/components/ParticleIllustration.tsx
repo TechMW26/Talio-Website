@@ -12,7 +12,6 @@ type ParticleIllustrationProps = {
   progress?: MotionValue<number>;
   className?: string;
   flight?: ParticleFlight;
-  align?: 'center' | 'bottom';
 };
 
 // WebGL points and cursor interaction adapted from
@@ -43,6 +42,14 @@ function clamp(value: number) {
   return Math.max(0, Math.min(1, value));
 }
 
+function scatteredPoint(index: number) {
+  const seed = Math.sin((index + 1) * 91.7) * 43758.5453;
+  return seed - Math.floor(seed);
+}
+
+const FLIGHT_DURATION = 820;
+const DISPERSED_AT = .4;
+const FORM_AT = .53;
 const MAX_WEBGL_STAGES = 4;
 let webglStages = 0;
 
@@ -132,7 +139,7 @@ function createRenderer(canvas: HTMLCanvasElement, positions: Float32Array, opac
 }
 
 export function ParticleIllustration({
-  shapes, label, progress, className, flight = 'rise', align = 'center',
+  shapes, label, progress, className, flight = 'rise',
 }: ParticleIllustrationProps) {
   const field = useRef<HTMLDivElement>(null);
   const primary = useRef<HTMLCanvasElement>(null);
@@ -149,7 +156,11 @@ export function ParticleIllustration({
     const compact = window.matchMedia('(max-width: 680px)').matches;
     const count = compact ? 900 : 1660;
     const names = shapeKey ? shapeKey.split(',') as ParticleShape[] : ['orbit' as const];
-    const targets: (ReturnType<typeof particleTargets> | undefined)[] = [];
+    const scattered = Float32Array.from({ length: count * 2 }, (_, index) => (
+      index % 2 === 0 ? .035 + scatteredPoint(index) * .93 : .085 + scatteredPoint(index) * .83
+    ));
+    const base = new Float32Array(count * 2);
+    const departure = new Float32Array(count * 2);
     const positions = new Float32Array(count * 2);
     const displacement = new Float32Array(count * 2);
     const opacity = Float32Array.from({ length: count }, (_, index) => 0.36 + (index % 15) * 0.044);
@@ -165,7 +176,8 @@ export function ParticleIllustration({
     let reset = true;
     let frame = 0;
     let lastTick = 0;
-    let current = 0;
+    let selected = -1;
+    let flightStarted = -Infinity;
     let pointer: { x: number; y: number } | null = null;
     let ripple: { x: number; y: number; start: number } | null = null;
 
@@ -209,61 +221,72 @@ export function ParticleIllustration({
       const elapsed = lastTick ? Math.min(50, now - lastTick) : 16.7;
       lastTick = now;
       const last = names.length - 1;
-      const requested = clamp(progress?.get() ?? 0) * last;
-      const follow = 1 - Math.exp(-elapsed / 70);
-      if (reset || calm) current = calm ? Math.round(requested) : requested;
-      else current += (requested - current) * follow;
-      const moving = !calm && Math.abs(requested - current) > 0.002;
-      if (!moving && !calm) current = requested;
+      const requested = Math.round(clamp(progress?.get() ?? 0) * last);
+      if (calm) flightStarted = -Infinity;
+      else if (requested !== selected) {
+        departure.set(base);
+        // The first scene appears as a scattered field before taking shape.
+        flightStarted = selected < 0 ? now - FLIGHT_DURATION * DISPERSED_AT : now;
+      }
+      selected = requested;
 
-      const index = Math.floor(current);
-      const segment = current - index;
-      const next = segment > 0 ? Math.min(index + 1, last) : index;
-      const origin = targets[index] ??= particleTargets(names[index], count);
-      const destination = targets[next] ??= particleTargets(names[next], count);
-      const { points: from } = origin;
-      const { points: to } = destination;
-      const bottomAligned = align === 'bottom';
-      const radius = Math.min(width * .43, height * (bottomAligned ? .47 : .39));
-      const bottom = height - 1.8;
-      const centerX = width * .5;
-      const centerY = bottomAligned ? bottom : height * .5;
-      const fromBaseline = bottomAligned ? origin.bottom : 0;
-      const toBaseline = bottomAligned ? destination.bottom : 0;
+      const age = clamp((now - flightStarted) / FLIGHT_DURATION);
+      const dispersing = age < DISPERSED_AT;
+      const forming = age >= FORM_AT && age < 1;
+      const moving = age < 1;
+      const phase = dispersing ? age / DISPERSED_AT : (age - FORM_AT) / (1 - FORM_AT);
+      const follow = 1 - Math.exp(-elapsed / 70);
+      const shape = names[selected];
+      const outline = particleTargets(shape, count);
+      const radius = Math.min(width * .43, height * .35);
+      const widthScale = radius / width;
+      const heightScale = radius / height;
       const pointerRadius = Math.min(width, height) * .2;
       const rippleAge = ripple ? (now - ripple.start) / 430 : 1;
       if (rippleAge >= 1) ripple = null;
 
       if (host) {
-        const shape = names[Math.round(current)];
+        const particlePhase = dispersing ? 'dispersing' : forming ? 'forming' : moving ? 'scattered' : 'formed';
         if (host.dataset.particleShape !== shape) host.dataset.particleShape = shape;
+        if (host.dataset.particlePhase !== particlePhase) host.dataset.particlePhase = particlePhase;
       }
 
       let settling = false;
       for (let p = 0; p < positions.length; p += 2) {
-        const startX = from[p];
-        const endX = to[p];
-        const startY = from[p + 1] - fromBaseline;
-        const endY = to[p + 1] - toBaseline;
-        const stagger = flight === 'rise' ? from[p + 1] * .095
-          : flight === 'fold' ? Math.abs(startX) * .16 - .08 : startX * .095;
-        const step = clamp((segment - .12 - stagger) / .76);
-        const t = step * step * (3 - 2 * step);
-        const bend = 2 * t * (1 - t);
-        const band = Math.sin(startX * 5 + from[p + 1] * 3);
-        const lift = flight === 'wave' ? .52 + band * .35 : flight === 'sweep' ? .44 + from[p + 1] * .18 : .72 + band * .12;
-        const side = flight === 'fold' ? -(startX + endX) * .47
-          : flight === 'sweep' ? .78 + band * .22
-          : flight === 'wave' ? band * .38 : band * .15;
+        const cloudX = scattered[p];
+        const cloudY = scattered[p + 1];
+        const targetX = .5 + outline[p] * widthScale;
+        const targetY = .5 + outline[p + 1] * heightScale;
+        let x = moving ? cloudX : targetX;
+        let y = moving ? cloudY : targetY;
 
-        // A quadratic Bézier between the two outline points. A small spatial
-        // stagger releases groups in sequence and keeps the same path in reverse.
-        const middleX = centerX + (startX + endX) * radius * .5;
-        const middleY = centerY + (startY + endY) * radius * .5;
-        const controlX = Math.max(2, Math.min(width - 2, middleX + side * radius));
-        const controlY = Math.max(2, middleY - lift * radius);
-        const x = centerX + (startX + (endX - startX) * t) * radius + bend * (controlX - middleX);
-        const y = centerY + (startY + (endY - startY) * t) * radius + bend * (controlY - middleY);
+        if (dispersing || forming) {
+          const startX = dispersing ? departure[p] : cloudX;
+          const startY = dispersing ? departure[p + 1] : cloudY;
+          const endX = dispersing ? cloudX : targetX;
+          const endY = dispersing ? cloudY : targetY;
+          const order = flight === 'rise' ? cloudY : flight === 'fold' ? Math.abs(cloudX - .5) * 2 : cloudX;
+          const step = clamp((phase - order * .17) / .83);
+          const t = step * step * (3 - 2 * step);
+          const bend = 2 * t * (1 - t);
+          const band = Math.sin(cloudX * 11 + cloudY * 7);
+          const lift = flight === 'wave' ? .42 + band * .3 : .6 + cloudY * .17;
+          const side = flight === 'fold' ? (.5 - cloudX) * 1.2
+            : flight === 'sweep' ? .62 + band * .24
+            : flight === 'wave' ? band * .44 : band * .18;
+
+          // Both legs use bounded quadratic curves. Capturing the current field
+          // lets a new scene interrupt a transition without jumping the particles.
+          const middleX = (startX + endX) * .5;
+          const middleY = (startY + endY) * .5;
+          x = startX + (endX - startX) * t + bend * (clamp(middleX + side * widthScale) - middleX);
+          y = startY + (endY - startY) * t + bend * (clamp(middleY - lift * heightScale) - middleY);
+        }
+
+        base[p] = x;
+        base[p + 1] = y;
+        x *= width;
+        y *= height;
 
         let pushX = 0;
         let pushY = 0;
@@ -375,20 +398,22 @@ export function ParticleIllustration({
     }
 
     const watchSize = new ResizeObserver(resize);
+    const minimumVisibleFraction = .55;
     const watchVisibility = new IntersectionObserver(([entry]) => {
-      visible = entry.isIntersecting;
+      visible = entry.isIntersecting && entry.intersectionRatio >= minimumVisibleFraction;
       if (host) host.dataset.particleVisible = String(visible);
       if (visible) {
         initialize();
         reset = true;
         refresh();
       } else {
+        selected = -1;
         pointer = null;
         ripple = null;
         if (host) delete host.dataset.particlePointer;
         stop();
       }
-    });
+    }, { threshold: minimumVisibleFraction });
     const unsubscribe = progress?.on('change', refresh);
 
     watchSize.observe(host);
@@ -416,7 +441,7 @@ export function ParticleIllustration({
       canvas.width = canvas.height = 1;
       alternate.width = alternate.height = 1;
     };
-  }, [shapeKey, progress, flight, align]);
+  }, [shapeKey, progress, flight]);
 
   return (
     <div ref={field} className={`particle-illustration${className ? ` ${className}` : ''}`} role="img" aria-label={label}>

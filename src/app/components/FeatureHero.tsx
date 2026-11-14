@@ -22,13 +22,15 @@ const heroForms: Readonly<Record<string, readonly Form[]>> = {
   notifications: [['bell', 55, 80, 392], ['clock', 382, 36, 144, 'secondary'], ['inbox', 381, 287, 168]],
 };
 
-// Crop each composition to its last visible mark so all artwork ends on the hero baseline.
-const heroBaselines: Readonly<Record<string, number>> = {
+// The SVG heights fit the individual compositions, independently of their placement in the hero.
+const heroArtHeights: Readonly<Record<string, number>> = {
   overview: 458, projects: 411, productivity: 457, attendance: 426,
   leaves: 431, payroll: 485, goals: 428, workflows: 437,
   'team-chat': 478, meetings: 465, whiteboard: 466, people: 432,
   recruitment: 472, operations: 550, documents: 403, notifications: 462,
 };
+
+const lowerArt = new Set(['projects', 'payroll', 'whiteboard', 'recruitment']);
 
 export function FeatureHero({ slug, label, title, description, actions }: {
   slug: string;
@@ -38,6 +40,7 @@ export function FeatureHero({ slug, label, title, description, actions }: {
   actions: ReactNode;
 }) {
   const forms = heroForms[slug] ?? heroForms.overview;
+  const artPlacement = slug === 'operations' ? 'grounded' : lowerArt.has(slug) ? 'lower' : 'center';
   return (
     <section className="feature-cinema-hero" aria-labelledby="feature-title">
       <div className="product-wrap feature-cinema-layout">
@@ -47,8 +50,8 @@ export function FeatureHero({ slug, label, title, description, actions }: {
           <p className="product-lead">{description}</p>
           <div className="product-actions">{actions}</div>
         </div>
-        <div className="feature-cinema-art">
-          <svg viewBox={`0 0 575 ${heroBaselines[slug] ?? heroBaselines.overview}`} fill="none" aria-hidden="true" focusable="false">
+        <div className="feature-cinema-art" data-placement={artPlacement}>
+          <svg viewBox={`0 0 575 ${heroArtHeights[slug] ?? heroArtHeights.overview}`} fill="none" aria-hidden="true" focusable="false">
             {forms.map(([shape, x, y, size, weight], index) => (
               <g key={shape} transform={`translate(${x} ${y}) scale(${size / 24})`}>
                 <path

@@ -92,8 +92,22 @@
 .feature-cinema-copy .product-eyebrow { color: #b6bbc5; }
 .feature-cinema-copy .product-button { background: #2563eb; color: #fff; }
 .feature-cinema-copy .product-button:hover { background: #1d4ed8; }
-.feature-cinema-art { min-width: 0; align-self: end; }
-.feature-cinema-art svg { display: block; width: 100%; height: auto; }
+.feature-cinema-art {
+  min-width: 0;
+  align-self: center;
+}
+.feature-cinema-art svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 66svh;
+}
+.feature-cinema-art[data-placement="lower"] {
+  align-self: end;
+  padding-block-end: clamp(2.75rem, 9svh, 6rem);
+}
+.feature-cinema-art[data-placement="grounded"] { align-self: end; }
+.feature-cinema-art[data-placement="grounded"] svg { max-height: none; }
 .app-site-shell .product-page .feature-setup-note {
   scroll-margin-top: 6rem;
   padding: 1.4rem 0 1rem;
@@ -125,9 +139,14 @@
 
 @container product (max-width: 47em) {
   .product-wrap { width: calc(100% - 2rem); }
-  .feature-cinema-layout { grid-template-columns: minmax(0,1fr); gap: .25rem; align-content: space-between; }
+  .feature-cinema-layout {
+    grid-template-columns: minmax(0,1fr);
+    gap: clamp(1.6rem, 5svh, 3.25rem);
+    align-content: center;
+    padding-block-end: 2rem;
+  }
   .feature-cinema-copy { padding-block: 2rem 0; }
-  .feature-cinema-art { width: min(100%, 24rem); justify-self: end; }
+  .feature-cinema-art[data-placement] { width: min(100%, 24rem); justify-self: center; padding-block-end: 0; }
   .feature-cinema-copy .product-lead { max-width: 28rem; }
   .feature-directory, .product-related { grid-template-columns: minmax(0,1fr); gap: 0; }
   .product-search { width: 100%; }

@@ -299,7 +299,7 @@
 
 @container (max-width: 39rem) {
   .mira-landing .mira-wrap { width: calc(100% - 2rem); }
-  .mira-landing .mira-hero-layout { grid-template-columns: minmax(0, 1fr); gap: .35rem; padding-block-start: 5.1rem; }
+  .mira-landing .mira-hero-layout { grid-template-columns: minmax(0, 1fr); gap: .85rem; padding-block: 5.1rem 1.5rem; }
   .mira-landing .mira-hero-copy { padding-block: .75rem 0; }
   .mira-landing .mira-hero h1 { font-size: clamp(2.6rem, 11.3cqi, 4.45rem); }
   .mira-landing .mira-hero .mira-hero-description { font-size: .98rem; margin-block-start: .95rem !important; }

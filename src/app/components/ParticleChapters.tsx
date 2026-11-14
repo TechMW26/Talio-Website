@@ -1,7 +1,8 @@
-import { useId, useRef, useState } from 'react';
-import { motion, useMotionValueEvent, useReducedMotion, useScroll, useTransform } from 'motion/react';
+import { useEffect, useId, useRef, useState } from 'react';
+import { useInView, useMotionValueEvent, useScroll, useTransform } from 'motion/react';
 import { ArrowDown, ArrowLeft, ArrowRight } from 'lucide-react';
 import { ParticleIllustration, type ParticleShape } from './ParticleIllustration';
+import StoryLoadingText from './StoryLoadingText';
 import '@/styles/particle-chapters.css';
 
 export type ScrollChapter = {
@@ -23,27 +24,59 @@ export function ParticleChapters({ chapters, heading, id, flight = 'rise' }: {
 }) {
   const titleId = useId();
   const track = useRef<HTMLDivElement>(null);
+  const stage = useRef<HTMLDivElement>(null);
+  const stops = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(0);
-  const reducedMotion = useReducedMotion();
+  const [reducedMotion, setReducedMotion] = useState(false);
+  const inView = useInView(stage, { amount: 0.6 });
   const last = Math.max(0, chapters.length - 1);
   const { scrollYProgress } = useScroll({ target: track, offset: ['start start', 'end end'] });
-  const scene = useTransform(scrollYProgress, value => value * last);
+  const scene = useTransform(scrollYProgress, value => Math.round(value * last));
+  const particleProgress = useTransform(scene, index => last ? index / last : 0);
 
-  useMotionValueEvent(scene, 'change', value => setActive(Math.min(last, Math.max(0, Math.round(value)))));
-  const textOpacity = useTransform(scene, value => {
-    const distance = Math.abs(value - Math.round(value));
-    return distance < .24 ? 1 : 1 - ((distance - .24) / .26) * .26;
-  });
-  const textY = useTransform(scene, value => {
-    const offset = value - Math.round(value);
-    return `${-offset * 1.15}rem`;
-  });
+  useMotionValueEvent(scene, 'change', setActive);
+
+  useEffect(() => {
+    const preference = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const update = () => setReducedMotion(preference.matches);
+    update();
+    preference.addEventListener('change', update);
+    return () => preference.removeEventListener('change', update);
+  }, []);
+
+  useEffect(() => {
+    const field = stage.current;
+    if (!inView || reducedMotion || !field) return;
+
+    function advanceOnWheel(event: WheelEvent) {
+      if (!event.cancelable || event.ctrlKey || event.shiftKey || Math.abs(event.deltaX) >= Math.abs(event.deltaY)) return;
+
+      const index = scene.get();
+      const direction = Math.sign(event.deltaY);
+      const anchors = stops.current?.children;
+      const current = anchors?.[index];
+      if (!current || !field || Math.abs(current.getBoundingClientRect().top) > 16) return;
+
+      // A mouse wheel notch can fall within the browser's snap-back range.
+      // Keep fine trackpad movement and large swipes on native scroll snapping.
+      const next = anchors?.[index + direction];
+      const distance = next ? Math.abs(next.getBoundingClientRect().top) : field.clientHeight;
+      const notch = event.deltaMode === WheelEvent.DOM_DELTA_LINE || (
+        event.deltaMode === WheelEvent.DOM_DELTA_PIXEL && Math.abs(event.deltaY) >= 64 && Math.abs(event.deltaY) < distance / 2
+      );
+      if (!notch) return;
+
+      event.preventDefault();
+      if (next) next.scrollIntoView({ block: 'start', behavior: 'smooth' });
+      else window.scrollBy({ top: direction * distance * .45, behavior: 'smooth' });
+    }
+
+    field.addEventListener('wheel', advanceOnWheel, { passive: false });
+    return () => field.removeEventListener('wheel', advanceOnWheel);
+  }, [inView, reducedMotion, scene]);
 
   function goTo(index: number) {
-    const bounds = track.current?.getBoundingClientRect();
-    if (!bounds || !last) return;
-    const distance = Math.max(0, bounds.height - window.innerHeight);
-    window.scrollTo({ top: window.scrollY + bounds.top + distance * index / last, behavior: 'instant' });
+    stops.current?.children[index]?.scrollIntoView({ block: 'start', behavior: 'instant' });
   }
 
   const selected = chapters[active] ?? chapters[0];
@@ -54,18 +87,17 @@ export function ParticleChapters({ chapters, heading, id, flight = 'rise' }: {
     <section id={id} className="particle-chapters" aria-labelledby={titleId} data-flight={flight}>
       <h2 id={titleId} className="sr-only">{heading}</h2>
       <div className="particle-story-track" ref={track}>
-        <div className="particle-story-stage" data-scene={active + 1}>
-          <motion.p className="particle-story-statement" aria-hidden="true" style={reducedMotion ? undefined : { opacity: textOpacity, y: textY }}>
-            {statement}
-          </motion.p>
+        <div className="particle-story-stage" data-scene={active + 1} ref={stage}>
           <ParticleIllustration
             shapes={chapters.map(chapter => chapter.shape)}
-            progress={scrollYProgress}
+            progress={particleProgress}
             label={`Particle illustration: ${selected.title}`}
             flight={flight}
-            align="bottom"
             className="particle-story-art"
           />
+          <p className="particle-story-statement" aria-hidden="true">
+            <StoryLoadingText key={active} animate={inView && !reducedMotion}>{statement}</StoryLoadingText>
+          </p>
           <nav className="particle-story-controls" aria-label={`${heading} scene navigation`}>
             <button type="button" aria-label="Previous scene" aria-disabled={active === 0} onClick={() => active > 0 && goTo(active - 1)}>
               <ArrowLeft size="1.05em" aria-hidden="true" />
@@ -77,7 +109,7 @@ export function ParticleChapters({ chapters, heading, id, flight = 'rise' }: {
           </nav>
         </div>
 
-        <div className="particle-story-stops">
+        <div className="particle-story-stops" ref={stops}>
           {chapters.map((chapter, index) => {
             const chapterId = chapter.id ?? `${id}-${index + 1}`;
             return (

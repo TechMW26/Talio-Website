@@ -48,7 +48,7 @@ export function particleShapePath(shape: ParticleShape): string {
 }
 
 const svgNs = 'http://www.w3.org/2000/svg';
-const cache = new Map<string, { points: Float32Array; bottom: number }>();
+const cache = new Map<string, Float32Array>();
 
 function random(index: number) {
   const x = Math.sin(index * 78.233 + 11.21) * 43758.5453;
@@ -64,18 +64,13 @@ export function particleTargets(shape: ParticleShape, count: number) {
   path.setAttribute('d', particleShapePath(shape));
   const length = path.getTotalLength();
   const points = new Float32Array(count * 2);
-  let bottom = -Infinity;
-
   for (let i = 0; i < count; i++) {
     const point = path.getPointAtLength(length * (i + 0.5) / count);
     const spread = i % 13 === 0 ? 0.88 : 0.41;
     points[i * 2] = (point.x - 12 + (random(i * 2) - 0.5) * spread) / 12;
-    const y = (point.y - 12 + (random(i * 2 + 1) - 0.5) * spread) / 12;
-    points[i * 2 + 1] = y;
-    bottom = Math.max(bottom, y);
+    points[i * 2 + 1] = (point.y - 12 + (random(i * 2 + 1) - 0.5) * spread) / 12;
   }
 
-  const result = { points, bottom };
-  cache.set(key, result);
-  return result;
+  cache.set(key, points);
+  return points;
 }

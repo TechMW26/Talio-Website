@@ -42,14 +42,26 @@ function clamp(value: number) {
   return Math.max(0, Math.min(1, value));
 }
 
-function scatteredPoint(index: number) {
-  const seed = Math.sin((index + 1) * 91.7) * 43758.5453;
-  return seed - Math.floor(seed);
+function scatterAcrossViewport(points: Float32Array, width: number, height: number) {
+  const count = points.length / 2;
+  const columns = Math.max(1, Math.min(count, Math.round(Math.sqrt(count * width / height))));
+  const rows = Math.ceil(count / columns);
+  const cells = Uint16Array.from({ length: columns * rows }, (_, index) => index);
+
+  // Spread points across the entire viewport, then randomize their positions
+  // within each cell and which particles go there so no grid or clump appears.
+  for (let index = 0; index < count; index++) {
+    const swap = index + Math.floor(Math.random() * (cells.length - index));
+    const cell = cells[swap];
+    cells[swap] = cells[index];
+    points[index * 2] = (cell % columns + Math.random()) / columns;
+    points[index * 2 + 1] = (Math.floor(cell / columns) + Math.random()) / rows;
+  }
 }
 
-const FLIGHT_DURATION = 820;
-const DISPERSED_AT = .4;
-const FORM_AT = .53;
+const FLIGHT_DURATION = 980;
+const DISPERSED_AT = .32;
+const FORM_AT = .58;
 const MAX_WEBGL_STAGES = 4;
 let webglStages = 0;
 
@@ -156,9 +168,8 @@ export function ParticleIllustration({
     const compact = window.matchMedia('(max-width: 680px)').matches;
     const count = compact ? 900 : 1660;
     const names = shapeKey ? shapeKey.split(',') as ParticleShape[] : ['orbit' as const];
-    const scattered = Float32Array.from({ length: count * 2 }, (_, index) => (
-      index % 2 === 0 ? .035 + scatteredPoint(index) * .93 : .085 + scatteredPoint(index) * .83
-    ));
+    const scattered = new Float32Array(count * 2);
+    const timingAndBend = Float32Array.from({ length: count * 2 }, () => Math.random());
     const base = new Float32Array(count * 2);
     const departure = new Float32Array(count * 2);
     const positions = new Float32Array(count * 2);
@@ -225,6 +236,7 @@ export function ParticleIllustration({
       if (calm) flightStarted = -Infinity;
       else if (requested !== selected) {
         departure.set(base);
+        scatterAcrossViewport(scattered, width, height);
         // The first scene appears as a scattered field before taking shape.
         flightStarted = selected < 0 ? now - FLIGHT_DURATION * DISPERSED_AT : now;
       }
@@ -266,21 +278,21 @@ export function ParticleIllustration({
           const endX = dispersing ? cloudX : targetX;
           const endY = dispersing ? cloudY : targetY;
           const order = flight === 'rise' ? cloudY : flight === 'fold' ? Math.abs(cloudX - .5) * 2 : cloudX;
-          const step = clamp((phase - order * .17) / .83);
+          const stagger = dispersing ? .30 : .64;
+          const delay = stagger * (.9 * timingAndBend[p] + .1 * order);
+          const step = clamp((phase - delay) / (1 - stagger));
           const t = step * step * (3 - 2 * step);
           const bend = 2 * t * (1 - t);
-          const band = Math.sin(cloudX * 11 + cloudY * 7);
-          const lift = flight === 'wave' ? .42 + band * .3 : .6 + cloudY * .17;
-          const side = flight === 'fold' ? (.5 - cloudX) * 1.2
-            : flight === 'sweep' ? .62 + band * .24
-            : flight === 'wave' ? band * .44 : band * .18;
+          const curve = (2 * timingAndBend[p + 1] - 1) * .55;
+          const side = (endY - startY) * curve * (flight === 'sweep' ? 1 : .7);
+          const lift = (endX - startX) * curve * (flight === 'rise' ? 1 : .7);
 
-          // Both legs use bounded quadratic curves. Capturing the current field
-          // lets a new scene interrupt a transition without jumping the particles.
+          // Bend in both directions and stagger the travel so the particles
+          // spread and gather independently instead of moving as one mass.
           const middleX = (startX + endX) * .5;
           const middleY = (startY + endY) * .5;
-          x = startX + (endX - startX) * t + bend * (clamp(middleX + side * widthScale) - middleX);
-          y = startY + (endY - startY) * t + bend * (clamp(middleY - lift * heightScale) - middleY);
+          x = startX + (endX - startX) * t + bend * (clamp(middleX + side) - middleX);
+          y = startY + (endY - startY) * t + bend * (clamp(middleY - lift) - middleY);
         }
 
         base[p] = x;

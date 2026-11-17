@@ -1,17 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router';
 import {
-  ArrowDown, ArrowUpRight, Check, Download, Plus, RefreshCw,
+  ArrowUpRight, Check, Download, Plus, RefreshCw,
 } from 'lucide-react';
 import { IoLogoMicrosoft } from 'react-icons/io5';
 import { SiAndroid, SiApple, SiLinux } from 'react-icons/si';
 import { usePageMeta } from '@/app/hooks/usePageMeta';
 import { useLatestRelease } from '@/app/hooks/useLatestRelease';
 import { detectPlatform, releaseDownload } from '@/app/lib/downloads';
-import { downloadFaq } from '@/app/content/downloadFaq';
-import { deviceChapters, setupChapters } from '@/app/content/downloadScrollChapters';
-import { LandingFaq } from './LandingFaq';
-import { ParticleChapters, type ScrollChapter } from './ParticleChapters';
 import '@/styles/downloads-landing.css';
 
 type PlatformId = 'mac' | 'windows' | 'linux' | 'ios' | 'android';
@@ -27,56 +22,6 @@ type Platform = {
 
 const iosStore = 'https://apps.apple.com/in/app/talio-productivity/id6758448703';
 const playStore = 'https://play.google.com/store/apps/details?id=sbs.zenova.twa&hl=en_IN';
-const browserApp = 'https://app.talio.in';
-const downloadChapters: readonly ScrollChapter[] = [
-  ...deviceChapters.map((chapter, index) => ({
-    ...chapter,
-    id: `choose-your-build-${index + 1}`,
-    aliases: index === 0 ? ['match-your-device'] : undefined,
-  })),
-  ...setupChapters.map((chapter, index) => ({
-    ...chapter,
-    id: `from-download-to-workspace-${index + 1}`,
-    aliases: index === 0 ? ['from-download-to-workspace']
-      : index === 1 ? ['install-talio']
-      : index === 3 ? ['sign-in'] : undefined,
-  })),
-];
-
-function DeviceIllustration() {
-  return (
-    <div className="dl-hero-art" aria-hidden="true">
-      <div className="dl-laptop">
-        <div className="dl-laptop-screen">
-          <div className="dl-screen-title">
-            <span>Talio</span><span>Workspace</span>
-          </div>
-          <div className="dl-screen-layout">
-            <div className="dl-screen-menu"><span /><span /><span /><span /></div>
-            <div className="dl-screen-main">
-              <span className="dl-screen-heading">Launch plan</span>
-              <span className="dl-screen-row"><Check /><span>Share the brief</span></span>
-              <span className="dl-screen-row"><span className="dl-screen-checkbox" /><span>Review the draft</span></span>
-              <span className="dl-screen-row"><span className="dl-screen-checkbox" /><span>Confirm the date</span></span>
-            </div>
-          </div>
-        </div>
-        <div className="dl-laptop-base"><span /></div>
-      </div>
-      <div className="dl-phone">
-        <div className="dl-phone-speaker" />
-        <div className="dl-phone-screen">
-          <span>Talio</span>
-          <strong>Launch plan</strong>
-          <span className="dl-phone-rule"><Check /><i /></span>
-          <span className="dl-phone-rule"><i /></span>
-          <span className="dl-phone-rule"><i /></span>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 export function Downloads() {
   usePageMeta(
     'Download Talio',
@@ -124,7 +69,6 @@ export function Downloads() {
       options: [{ name: 'Open Google Play', arch: 'Talio Productivity', url: playStore, isAvailable: true }],
     },
   ];
-  const recommended = platforms.find(platform => platform.id === device);
   const releaseLabel = release ? `${release.tagName} · Desktop release`
     : status === 'error' ? 'Release unavailable' : 'Checking desktop release…';
   const unavailableLabel = status === 'loading' ? 'Checking availability…'
@@ -132,36 +76,9 @@ export function Downloads() {
 
   return (
     <main className="download-landing">
-      <section className="dl-hero" aria-labelledby="dl-title">
-        <div className="dl-wrap dl-hero-layout">
-          <div className="dl-hero-copy">
-            <span className="dl-kicker">Talio downloads</span>
-            <h1 id="dl-title">Take Talio<br />with you.</h1>
-            <p>Your projects, conversations and people tools on desktop, mobile, or the web.</p>
-            <div className="dl-actions">
-              <a className="dl-primary" href={recommended ? `#download-${recommended.id}` : '#platforms'}>
-                {device === 'mac' ? 'Choose your Mac chip' : recommended ? `Get Talio for ${recommended.name}` : 'Choose your platform'}
-                <ArrowDown aria-hidden="true" />
-              </a>
-              <a className="dl-text-link" href={browserApp}>
-                Open in browser <ArrowUpRight aria-hidden="true" />
-              </a>
-            </div>
-          </div>
-          <DeviceIllustration />
-        </div>
-      </section>
-
-      <ParticleChapters
-        id="choose-your-build"
-        heading="From download to first task"
-        chapters={downloadChapters}
-        flight="sweep"
-      />
-
       <section id="platforms" className="dl-wrap dl-platforms" aria-labelledby="platform-title">
         <div className="dl-section-heading">
-          <h2 id="platform-title">Choose your platform.</h2>
+          <h1 id="platform-title">Download Talio</h1>
           <p className="dl-release" role="status"><span data-ready={status === 'ready'} aria-hidden="true" /> {releaseLabel}</p>
         </div>
         {status === 'error' && (
@@ -180,7 +97,7 @@ export function Downloads() {
             >
               <div className="dl-platform-heading">
                 <platform.icon className="dl-platform-icon" aria-hidden="true" />
-                <h3 id={`dl-name-${platform.id}`}>{platform.name}</h3>
+                <h2 id={`dl-name-${platform.id}`}>{platform.name}</h2>
                 {device === platform.id && <span className="dl-recommended"><Check aria-hidden="true" /> Your device</span>}
               </div>
               <div className="dl-options">
@@ -222,16 +139,6 @@ export function Downloads() {
           <p>Open the Apple menu and select About This Mac. Choose Apple Silicon if you see an Apple chip, or Intel if you see an Intel processor.</p>
           <a className="dl-text-link" href="#download-mac">See Mac downloads <ArrowUpRight aria-hidden="true" /></a>
         </details>
-      </section>
-
-      <div className="dl-wrap dl-faq"><LandingFaq items={downloadFaq} title="Download and setup FAQs" /></div>
-
-      <section className="dl-wrap dl-support" aria-labelledby="dl-support-heading">
-        <div>
-          <h2 id="dl-support-heading">Need a hand getting set up?</h2>
-          <p>Contact us if you can’t find the right installer or open your workspace.</p>
-        </div>
-        <Link className="dl-text-link" to="/contact">Contact support <ArrowUpRight aria-hidden="true" /></Link>
       </section>
     </main>
   );

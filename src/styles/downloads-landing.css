@@ -12,7 +12,7 @@
   line-height: 1.6;
 }
 
-.app-site-shell .download-landing :is(.dl-hero-copy, .dl-section-heading, .dl-platform-heading, .dl-support) :where(h1, h2, h3, p) {
+.app-site-shell .download-landing :is(.dl-section-heading, .dl-platform-heading) :where(h1, h2, h3, p) {
   margin: 0 !important;
 }
 
@@ -26,92 +26,21 @@
   margin-inline: auto;
 }
 
-.app-site-shell .download-landing .dl-hero {
-  background: #000 !important;
-}
-
-.dl-hero-layout {
-  display: grid;
-  grid-template-columns: minmax(0, .78fr) minmax(0, 1.22fr);
-  gap: clamp(1.8rem, 4.8cqi, 4rem);
-  align-items: center;
-  min-height: min(71svh, 43rem);
-  padding-block: 2.3rem clamp(1.5rem, 4.5svh, 3.5rem);
-}
-
-.dl-hero-copy {
-  min-width: 0;
-  padding-block: 1.75rem 3.6rem;
-}
-
-.dl-kicker {
-  color: var(--dl-muted);
-  font-size: .76rem;
-  font-weight: 600;
-  letter-spacing: .13em;
-  text-transform: uppercase;
-}
-
-.dl-primary svg, .dl-text-link svg {
-  flex: none;
-  width: 1rem;
-  height: 1rem;
-}
-
-.download-landing .dl-hero h1 {
-  margin-block-start: 1.1rem !important;
-  font-size: clamp(3.45rem, 8.15cqi, 7.05rem);
-  font-weight: 650;
-  letter-spacing: -.079em;
-  line-height: .94;
-}
-
-.download-landing .dl-hero-copy > p {
-  max-width: 25rem;
-  margin-block-start: 1.35rem !important;
-  color: #bec1ca;
-  font-size: clamp(.97rem, 1.6cqi, 1.14rem);
-}
-
-.dl-actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: .55rem 1.35rem;
-  margin-top: 1.65rem;
-}
-
-.dl-primary, .dl-text-link {
-  display: inline-flex;
-  align-items: center;
-  gap: .55rem;
-  font-size: .9rem;
-  font-weight: 620;
-  text-decoration: none;
-}
-
-.dl-primary {
-  min-height: 3.05rem;
-  padding: .65rem 1.15rem;
-  border-radius: 2rem;
-  color: #121320;
-  background: #fff;
-  transition: background 180ms ease, transform 180ms ease;
-}
-
-.dl-primary:hover {
-  background: #e0e7ff;
-  transform: translateY(-.125rem);
-}
-
-.dl-text-link {
-  min-height: 2.75rem;
-  color: var(--dl-accent);
-}
-
 .dl-text-link:hover, .dl-mac-help:hover {
   text-decoration: underline;
   text-underline-offset: .23em;
+}
+
+.dl-text-link {
+  color: var(--dl-accent);
+  font-size: .86rem;
+}
+
+.dl-text-link svg {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  vertical-align: middle;
 }
 
 .dl-release span {
@@ -122,161 +51,8 @@
   background: var(--dl-accent);
 }
 
-/* The devices sit on a shared baseline within the illustration. */
-.dl-hero-art {
-  position: relative;
-  container-type: inline-size;
-  align-self: center;
-  width: 100%;
-  min-width: 0;
-  aspect-ratio: 1.52;
-  color: #f4f4f5;
-}
-
-.dl-laptop {
-  position: absolute;
-  inset: auto 12% 0 0;
-}
-
-.dl-laptop-screen {
-  width: 89%;
-  margin-inline: auto;
-  aspect-ratio: 1.52;
-  overflow: hidden;
-  border: 1.4cqi solid #f2f2f4;
-  border-radius: 2.2cqi 2.2cqi 0 0;
-  background: #0a0a0b;
-}
-
-.dl-laptop-base {
-  display: grid;
-  place-items: start center;
-  height: 2.25cqi;
-  border-radius: 0 0 3cqi 3cqi;
-  background: #f2f2f4;
-}
-
-.dl-laptop-base > span {
-  width: 15%;
-  height: .65cqi;
-  border-radius: 0 0 .35cqi .35cqi;
-  background: #85858d;
-}
-
-.dl-screen-title {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  height: 15%;
-  padding-inline: 6%;
-  border-bottom: 1px solid #f4f4f530;
-  color: #a8a8b0;
-  font-size: 1.65cqi;
-}
-
-.dl-screen-title > span:first-child { color: #fff; font-size: 2.25cqi; font-weight: 650; }
-.dl-screen-layout { display: flex; height: 85%; }
-
-.dl-screen-menu {
-  width: 25%;
-  display: grid;
-  grid-auto-rows: min-content;
-  justify-items: start;
-  gap: 2.6cqi;
-  border-inline-end: 1px solid #f4f4f525;
-  padding: 4.8cqi 0 0 5%;
-}
-
-.dl-screen-menu > span { width: 58%; height: .55cqi; background: #696970; }
-.dl-screen-menu > span:first-child { width: 69%; background: #e4e4e7; }
-.dl-screen-menu > span:nth-child(3) { width: 43%; }
-
-.dl-screen-main {
-  width: 75%;
-  display: grid;
-  align-content: start;
-  gap: 2.8cqi;
-  padding: 4cqi 5%;
-}
-
-.dl-screen-heading {
-  font-size: 4.7cqi;
-  font-weight: 640;
-  letter-spacing: -.055em;
-  line-height: 1;
-}
-
-.dl-screen-row {
-  display: flex;
-  align-items: center;
-  gap: 1.4cqi;
-  min-width: 0;
-  padding-block-end: 1.1cqi;
-  border-bottom: 1px solid #f4f4f527;
-  color: #d9d9de;
-  font-size: 1.75cqi;
-}
-
-.dl-screen-row svg, .dl-screen-checkbox {
-  flex: none;
-  width: 1.65cqi;
-  height: 1.65cqi;
-}
-.dl-screen-checkbox { border: 1px solid #9c9ca6; border-radius: .25cqi; }
-
-.dl-phone {
-  position: absolute;
-  inset: auto 0 0 auto;
-  width: 28%;
-  aspect-ratio: .5;
-  padding: 4.5cqi 2.25cqi 2cqi;
-  overflow: hidden;
-  border: 1.25cqi solid #f2f2f4;
-  border-radius: 4cqi 4cqi 3.3cqi 3.3cqi;
-  background: #050505;
-  box-shadow: -1.15cqi 0 0 #000;
-}
-
-.dl-phone-speaker {
-  position: absolute;
-  top: 1cqi;
-  left: 50%;
-  width: 34%;
-  height: 1.45cqi;
-  transform: translateX(-50%);
-  border-radius: 2cqi;
-  background: #f2f2f4;
-}
-
-.dl-phone-screen {
-  display: grid;
-  align-content: start;
-  gap: 2.2cqi;
-  line-height: 1.05;
-}
-
-.dl-phone-screen > span:first-child { color: #b2b2ba; font-size: 1.75cqi; }
-.dl-phone-screen strong { color: #fff; font-size: 4.6cqi; font-weight: 640; letter-spacing: -.075em; }
-
-.dl-phone-rule {
-  display: flex;
-  align-items: center;
-  gap: .85cqi;
-  height: 2.15cqi;
-  border-bottom: 1px solid #f4f4f535;
-}
-
-.dl-phone-rule svg { width: 1.3cqi; height: 1.3cqi; }
-.dl-phone-rule i { width: 55%; height: .5cqi; background: #9999a2; }
-.dl-phone-rule:nth-last-child(2) i { width: 75%; }
-.dl-phone-rule:last-child i { width: 40%; }
-
 .dl-platforms, .dl-platform, .dl-disclosure {
   scroll-margin-top: calc(var(--dl-header-offset) + 0.8rem);
-}
-
-.dl-platforms, .dl-support {
-  border-top: 1px solid var(--dl-border);
 }
 
 .dl-platforms {
@@ -292,7 +68,7 @@
   margin-block-end: 1.65rem;
 }
 
-.dl-section-heading h2, .dl-support h2 {
+.dl-section-heading h1 {
   font-size: clamp(2.15rem, 4.2cqi, 3.85rem);
   line-height: 1.05;
   font-weight: 560;
@@ -364,7 +140,7 @@
   padding-block-end: 0.75rem;
 }
 
-.dl-platform-heading h3 {
+.dl-platform-heading h2 {
   font-size: 1.42rem;
   line-height: 1.3;
   font-weight: 550;
@@ -424,8 +200,6 @@ a.dl-option:hover {
   font-size: 0.78rem;
 }
 
-.dl-faq { padding-block: 1.5rem 3rem; }
-
 .dl-disclosure {
   max-width: 28rem;
   margin-block-start: 1.4rem;
@@ -433,7 +207,7 @@ a.dl-option:hover {
   border-block: 1px solid var(--dl-border);
 }
 
-.app-site-shell .download-landing :is(.dl-platforms, .dl-support) { background: transparent !important; }
+.app-site-shell .download-landing .dl-platforms { background: transparent !important; }
 
 .dl-disclosure summary {
   display: flex;
@@ -455,48 +229,19 @@ a.dl-option:hover {
   font-size: 0.86rem;
 }
 
-.dl-support {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem 2rem;
-  padding-block: 2.7rem 3.6rem;
-}
-
-.dl-support h2 { font-size: clamp(1.6rem, 3.3cqi, 2.65rem); }
-.download-landing .dl-support p { margin-block-start: 0.65rem !important; color: var(--dl-muted); }
-
 @container download-page (max-width: 58em) {
   .dl-platform { flex-basis: calc((100% - var(--dl-column-gap)) / 2); }
 }
 
-@container download-page (max-width: 47em) {
-  .dl-hero-layout {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 1.45rem;
-    min-height: auto;
-    padding-block-start: 1.3rem;
-  }
-
-  .dl-hero-copy { padding-block: 1rem 0; }
-  .dl-hero-art { width: min(100%, 33rem); margin-inline: auto; }
-}
-
 @container download-page (max-width: 34em) {
   .dl-wrap { width: calc(100% - 2rem); }
-  .download-landing .dl-hero h1 { font-size: clamp(3.05rem, 13cqi, 4.7rem); }
-  .dl-hero-layout { gap: 1rem; }
-  .dl-hero-art { aspect-ratio: 1.52; }
   .dl-platform { flex-basis: 100%; }
   .dl-platform-grid { row-gap: 0.9rem; }
   .dl-platforms { padding-block: 2.3rem 2.7rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .download-landing .dl-primary, .download-landing .dl-option, .download-landing .dl-platform, .dl-disclosure summary svg {
+  .download-landing .dl-option, .download-landing .dl-platform, .dl-disclosure summary svg {
     transition: none;
   }
-
-  .download-landing .dl-primary:hover { transform: none; }
 }
